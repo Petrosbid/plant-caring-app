@@ -1,0 +1,1 @@
+# This file was removed as the Reminder model is defined in models.py
