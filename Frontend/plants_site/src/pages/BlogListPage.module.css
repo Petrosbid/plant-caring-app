@@ -1,0 +1,46 @@
+/* src/pages/BlogListPage.module.css */
+
+.pageContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+  }
+
+  .pageTitle {
+    font-size: 2.5rem;
+    color: var(--color-primary);
+    text-align: center;
+    margin-bottom: 3rem;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2rem;
+  }
+
+  .loading,
+  .error,
+  .empty {
+    text-align: center;
+    padding: 4rem 1rem;
+    font-size: 1.25rem;
+  }
+
+  .error {
+    color: #dc2626;
+  }
+
+  .empty {
+    color: #6b7280;
+  }
+
+  /* RTL Support */
+  [dir="rtl"] .pageContainer {
+    text-align: right;
+  }
+
+  [dir="rtl"] .pageTitle {
+    text-align: center;
+  }
+  

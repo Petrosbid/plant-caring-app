@@ -1,8 +1,27 @@
 // API service for plant identification app
 import type { Plant, Disease, Reminder, User } from '../types';
+import axios from 'axios';
 
 // Base API URL - points to your backend
 const API_BASE_URL = 'http://localhost:8000/api'; // Backend API URL
+const BLOG_API_BASE_URL = 'http://localhost:8000/api/blog'; // Blog API URL
+
+// Create axios instance for blog API with error handling
+const blogApi = axios.create({
+  baseURL: BLOG_API_BASE_URL,
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
+
+// Add auth token to requests
+blogApi.interceptors.request.use((config) => {
+  const token = localStorage.getItem('access_token');
+  if (token) {
+    config.headers.Authorization = `Bearer ${token}`;
+  }
+  return config;
+});
 
 // Helper function to get authorization header
 const getAuthHeaders = () => {
@@ -439,4 +458,60 @@ export const reminderService = {
       throw new Error('Failed to mark reminder as completed');
     }
   }
+};
+
+// Blog service
+export const blogService = {
+  // Get all blog posts
+  getAllPosts: async (params?: { tags?: string; limit?: number }): Promise<any> => {
+    const response = await blogApi.get('/posts/', { params });
+    return response.data;
+  },
+
+  // Get post by slug with likes, dislikes, comments count
+  getPostBySlug: async (slug: string): Promise<any> => {
+    const response = await blogApi.get(`/posts/${slug}/`);
+    return response.data;
+  },
+
+  // Like a post (uses slug)
+  likePost: async (slug: string): Promise<any> => {
+    const response = await blogApi.post(`/posts/${slug}/like/`);
+    return response.data;
+  },
+
+  // Dislike a post (uses slug)
+  dislikePost: async (slug: string): Promise<any> => {
+    const response = await blogApi.post(`/posts/${slug}/dislike/`);
+    return response.data;
+  },
+
+  // Get comments for a post (uses slug)
+  getComments: async (slug: string): Promise<any> => {
+    const response = await blogApi.get(`/posts/${slug}/comments/`);
+    return response.data;
+  },
+
+  // Add a comment to a post (uses slug)
+  addComment: async (slug: string, commentData: { content: string; parent?: number }): Promise<any> => {
+    const response = await blogApi.post(`/posts/${slug}/comments/`, commentData);
+    return response.data;
+  },
+
+  // Vote on a comment
+  voteComment: async (commentId: number, voteType: 1 | -1): Promise<any> => {
+    const response = await blogApi.post(`/comments/${commentId}/vote/`, { vote_type: voteType });
+    return response.data;
+  },
+
+  // Delete a comment
+  deleteComment: async (commentId: number): Promise<void> => {
+    await blogApi.delete(`/comments/${commentId}/`);
+  },
+
+  // Update a comment
+  updateComment: async (commentId: number, content: string): Promise<any> => {
+    const response = await blogApi.put(`/comments/${commentId}/`, { content });
+    return response.data;
+  },
 };

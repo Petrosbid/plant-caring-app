@@ -1,0 +1,73 @@
+/* src/components/home/LatestPostsCarousel.module.css */
+
+.carouselContainer {
+    padding: 3rem 0;
+    /* Adjust Swiper variables to match your theme */
+    --swiper-navigation-color: var(--color-primary);
+    --swiper-pagination-color: var(--color-primary);
+  }
+  
+  .slide {
+    border-radius: 8px;
+    overflow: hidden;
+    aspect-ratio: 4 / 3;
+  }
+  
+  .slideLink {
+    display: block;
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
+  
+  .slideContent {
+    width: 100%;
+    height: 100%;
+  }
+  
+  .slideImage {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.4s ease-out;
+  }
+  
+  .slideLink:hover .slideImage {
+    transform: scale(1.05);
+  }
+  
+  .overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8) 0%, rgba(0, 0, 0, 0) 50%);
+  }
+  
+  .textContainer {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem;
+    color: #fff;
+    transform: translateY(20px);
+    opacity: 0;
+    transition: transform 0.4s ease-out, opacity 0.4s ease-out;
+  }
+  
+  .slideLink:hover .textContainer {
+    transform: translateY(0);
+    opacity: 1;
+  }
+  
+  .slideTitle {
+    font-size: 1.3rem;
+    margin: 0 0 0.5rem;
+    line-height: 1.3;
+  }
+  
+  .readMore {
+    font-size: 0.9rem;
+    font-weight: 600;
+    color: var(--color-primary);
+  }
+  

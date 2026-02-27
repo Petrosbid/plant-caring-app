@@ -91,7 +91,12 @@ export default function App() {
   return (
     <LanguageThemeProvider>
       <AuthProvider>
-        <BrowserRouter>
+        <BrowserRouter
+          future={{
+            v7_startTransition: true,
+            v7_relativeSplatPath: true,
+          }}
+        >
           <div className="flex flex-col min-h-screen bg-surface-light dark:bg-surface-dark text-slate-800 dark:text-slate-100 font-sans antialiased">
             <AnimatedRoutes />
           </div>
