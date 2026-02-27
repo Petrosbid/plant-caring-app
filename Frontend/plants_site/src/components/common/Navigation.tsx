@@ -31,7 +31,8 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
     <motion.nav
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="md:hidden sticky top-0 z-50 glass border-b border-slate-200/60 dark:border-slate-700/50"
+      className="md:hidden sticky top-0 z-50 glass border-b border-slate-200/60 dark:border-slate-700/50 header-ltr"
+      dir="ltr"
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-14">

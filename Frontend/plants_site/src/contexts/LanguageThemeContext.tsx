@@ -2,10 +2,12 @@ import React, { createContext, useContext, useState, useEffect } from 'react';
 import type {ReactNode} from 'react';
 type Language = 'en' | 'fa';
 type Theme = 'light' | 'dark';
+type Direction = 'ltr' | 'rtl';
 
 interface LanguageThemeContextType {
   language: Language;
   theme: Theme;
+  direction: Direction;
   toggleLanguage: () => void;
   toggleTheme: () => void;
   t: (key: string) => string;
@@ -28,6 +30,9 @@ export const LanguageThemeProvider: React.FC<LanguageThemeProviderProps> = ({ ch
     return (savedTheme as Theme) || 'light';
   });
 
+  // Determine direction based on language
+  const direction: Direction = language === 'fa' ? 'rtl' : 'ltr';
+
   // Apply theme to document
   useEffect(() => {
     if (theme === 'dark') {
@@ -38,10 +43,13 @@ export const LanguageThemeProvider: React.FC<LanguageThemeProviderProps> = ({ ch
     localStorage.setItem('theme', theme);
   }, [theme]);
 
-  // Save language preference
+  // Save language preference and apply direction
   useEffect(() => {
     localStorage.setItem('language', language);
-  }, [language]);
+    // Apply direction to document element
+    document.documentElement.setAttribute('dir', direction);
+    document.documentElement.setAttribute('lang', language);
+  }, [language, direction]);
 
   const toggleLanguage = () => {
     setLanguage(prev => {
@@ -111,6 +119,7 @@ export const LanguageThemeProvider: React.FC<LanguageThemeProviderProps> = ({ ch
     <LanguageThemeContext.Provider value={{
       language,
       theme,
+      direction,
       toggleLanguage,
       toggleTheme,
       t

@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({ navigateTo, currentPage }) => {
   const { user, isAuthenticated, logout } = useAuth();
   const { language, theme, toggleLanguage, toggleTheme, t } = useLanguageTheme();
 
-  const isActive = (page: string) => currentPage === page;
+  const isActive = (itemKey: string) => currentPage === itemKey;
 
   return (
     <>
@@ -32,7 +32,8 @@ const Header: React.FC<HeaderProps> = ({ navigateTo, currentPage }) => {
         initial={{ y: -20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
         transition={{ duration: 0.4, ease: 'easeOut' }}
-        className="hidden md:block sticky top-0 z-40 glass border-b border-slate-200/60 dark:border-slate-700/50 shadow-sm"
+        className="hidden md:block sticky top-0 z-40 glass border-b border-slate-200/60 dark:border-slate-700/50 shadow-sm header-ltr"
+        dir="ltr"
       >
         <div className="container mx-auto px-4 lg:px-6">
           <div className="flex justify-between items-center h-16">

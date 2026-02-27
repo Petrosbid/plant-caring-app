@@ -18,6 +18,13 @@
   --color-border: #e2e8f0;
   --color-brand: #16a34a;
   --color-brand-hover: #15803d;
+  
+  /* Blog and component colors */
+  --color-primary: #16a34a;
+  --color-secondary: #64748b;
+  --text-color: #0f172a;
+  --text-color-secondary: #64748b;
+  --background-light: #f8fafc;
 }
 
 .dark {
@@ -28,6 +35,13 @@
   --color-border: #1e293b;
   --color-brand: #4ade80;
   --color-brand-hover: #22c55e;
+  
+  /* Blog and component colors */
+  --color-primary: #4ade80;
+  --color-secondary: #94a3b8;
+  --text-color: #f1f5f9;
+  --text-color-secondary: #94a3b8;
+  --background-light: #1e293b;
 }
 
 body {
@@ -37,6 +51,29 @@ body {
   background-color: var(--color-bg);
   color: var(--color-text);
   transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* RTL Support */
+[dir="rtl"] {
+  font-family: 'Vazirmatn', 'DM Sans', system-ui, sans-serif;
+  text-align: right;
+}
+
+[dir="rtl"] body {
+  text-align: right;
+}
+
+/* Header and Navigation always stay LTR */
+.header-ltr,
+[dir="rtl"] .header-ltr {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+.header-ltr *,
+[dir="rtl"] .header-ltr * {
+  direction: ltr !important;
+  text-align: left !important;
 }
 
 /* Smooth scroll */
@@ -95,6 +132,18 @@ html {
 .nav-link-underline.active::after {
   transform: scaleX(1);
   transform-origin: left;
+}
+
+/* RTL Animated underline for nav links */
+[dir="rtl"] .nav-link-underline::after {
+  left: auto;
+  right: 0;
+  transform-origin: left;
+}
+
+[dir="rtl"] .nav-link-underline:hover::after,
+[dir="rtl"] .nav-link-underline.active::after {
+  transform-origin: right;
 }
 
 /* Reduced motion */

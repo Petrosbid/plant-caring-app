@@ -62,7 +62,21 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
   return (
     <div className="min-h-screen">
       {/* Hero */}
-      <section className="relative overflow-hidden gradient-mesh bg-gradient-to-br from-brand-50 via-white to-emerald-50/50 dark:from-slate-900 dark:via-slate-900 dark:to-brand-950/30 py-20 lg:py-28">
+      <section className="relative overflow-hidden h-[81vh] py-20 lg:py-28">
+        {/* Background Video */}
+        <div className="absolute inset-0 overflow-hidden">
+          <video
+            autoPlay
+            loop
+            muted
+            playsInline
+            className="absolute inset-0 w-full h-full object-cover"
+          >
+            <source src="/Abstract_Gradient_Animation_Generation.mkv" type="video/webm" />
+          </video>
+          {/* Overlay for better text readability */}
+          <div className="absolute inset-0 bg-white/70 dark:bg-slate-900/70" />
+        </div>
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,197,94,0.12),transparent)] dark:opacity-60" />
         <div className="container mx-auto px-4 lg:px-6 relative z-10">
           <motion.div

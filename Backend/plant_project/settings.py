@@ -41,17 +41,23 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'material',
 
     # Third-party apps
     'rest_framework',
     'rest_framework_simplejwt',
-    'corsheaders',  # Add CORS headers
+    'corsheaders',
+    'taggit',
+    'ckeditor',
+    'ckeditor_uploader',
+    'drf_spectacular',
 
     # Local apps
     'users',
     'plants',
     'diseases',
     'gardens',
+    'blog',
 ]
 
 MIDDLEWARE = [
@@ -131,6 +137,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.2/ref/settings/#default-auto-field
@@ -145,6 +152,7 @@ REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
     ],
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
 # Media files (for user-uploaded content)
@@ -153,6 +161,17 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Custom User Model
 AUTH_USER_MODEL = 'users.CustomUser'
+
+#  CKEditor configuration at the end of the file
+CKEDITOR_UPLOAD_PATH = "uploads/"
+CKEDITOR_CONFIGS = {
+    'default': {
+        'toolbar': 'full',
+        'height': 300,
+        'width': '100%',
+        'extraPlugins': ','.join(['codesnippet']), # Optional: for code blocks
+    },
+}
 
 # JWT Authentication Settings
 from datetime import timedelta
@@ -225,3 +244,45 @@ CORS_ALLOW_HEADERS = [
 
 # OpenRouter API Key
 OPENROUTER_API_KEY = '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'
+
+# API Documentation (drf-spectacular)
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'PlantCare Pro API',
+    'DESCRIPTION': '''
+        ## PlantCare Pro Backend API
+        
+        This API provides endpoints for:
+        - **User Authentication**: JWT-based authentication with login, register, and profile management
+        - **Plants**: Plant identification and plant database
+        - **Diseases**: Disease detection and information
+        - **My Garden**: User's personal garden management
+        - **Blog**: Blog posts and articles about plant care
+        
+        ## Authentication
+        Most endpoints require authentication using JWT tokens. 
+        Obtain a token by posting to `/api/token/` with your credentials.
+        Include the token in the Authorization header: `Bearer <your-token>`
+    ''',
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+    'COMPONENT_SPLIT_REQUEST': True,
+    'TAGS': [
+        {'name': 'Authentication', 'description': 'User authentication and authorization'},
+        {'name': 'Users', 'description': 'User profile management'},
+        {'name': 'Plants', 'description': 'Plant identification and database'},
+        {'name': 'Diseases', 'description': 'Disease detection and information'},
+        {'name': 'My Garden', 'description': 'Personal garden management'},
+        {'name': 'Blog', 'description': 'Blog posts and articles'},
+    ],
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'docExpansion': 'list',
+        'defaultModelsExpandDepth': 2,
+        'defaultModelExpandDepth': 2,
+    },
+    'PREPROCESSING_HOOKS': [
+        'drf_spectacular.hooks.preprocess_exclude_path_format'
+    ],
+}
