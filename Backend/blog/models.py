@@ -4,7 +4,31 @@ from django.utils import timezone
 from django.utils.text import slugify
 from ckeditor_uploader.fields import RichTextUploadingField
 from taggit.managers import TaggableManager
+from taggit.models import TagBase, GenericTaggedItemBase
 
+class PersianTag(TagBase):
+    class Meta:
+        verbose_name = "برچسب فارسی"
+        verbose_name_plural = "برچسب‌های فارسی"
+
+class TaggedPostWithPersian(GenericTaggedItemBase):
+    tag = models.ForeignKey(
+        PersianTag,
+        on_delete=models.CASCADE,
+        related_name="persian_tagged_posts"
+    )
+
+class EnglishTag(TagBase):
+    class Meta:
+        verbose_name = "English Tag"
+        verbose_name_plural = "English Tags"
+
+class TaggedPostWithEnglish(GenericTaggedItemBase):
+    tag = models.ForeignKey(
+        EnglishTag,
+        on_delete=models.CASCADE,
+        related_name="english_tagged_posts"
+    )
 
 class Post(models.Model):
     class Status(models.TextChoices):
@@ -48,7 +72,8 @@ class Post(models.Model):
     dislikes_count = models.PositiveIntegerField(default=0)
 
     # Tags
-    tags = TaggableManager()
+    tags = TaggableManager(through=TaggedPostWithPersian, blank=True)
+    tags_en = TaggableManager(through=TaggedPostWithEnglish, blank=True)
 
     class Meta:
         ordering = ['-publish']

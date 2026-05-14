@@ -11,13 +11,11 @@ import logging
 
 logger = logging.getLogger(__name__)
 
-# Initialize the model and processor once when the module is loaded
 model = None
 preprocess = None
 tokenizer = None
 
 
-# Expanded plant database with 200 plant names
 PLANT_DATABASE = [
     "Anthurium andraeanum (Flamingo Flower)", "Spathiphyllum (Peace Lily)", "Monstera deliciosa (Swiss Cheese Plant)",
     "Philodendron hederaceum","Epipremnum aureum (Pothos)", "Sansevieria trifasciata (Snake Plant)",
@@ -40,25 +38,18 @@ def load_model():
     if model is None or preprocess is None or tokenizer is None:
         try:
             logger.info("Loading BioCLIP plant identification model from local path...")
-            # Load the local BioCLIP model - using the hub format to point to local cache
             model, _, preprocess = open_clip.create_model_and_transforms('hf-hub:imageomics/bioclip', cache_dir=os.path.join(settings.BASE_DIR, 'models', 'huggingface', 'hub'))
             tokenizer = open_clip.get_tokenizer('hf-hub:imageomics/bioclip', cache_dir=os.path.join(settings.BASE_DIR, 'models', 'huggingface', 'hub'))
             logger.info("BioCLIP model loaded successfully from local path")
         except Exception as e:
             logger.error(f"Error loading BioCLIP model: {e}")
-            # Fallback to a simple approach if model loading fails
             model = None
             preprocess = None
             tokenizer = None
 
 def preprocess_image(image_path):
-    """
-    Preprocess the uploaded image for model inference.
-    """
     try:
-        # Open and resize the image
         image = Image.open(image_path).convert('RGB')
-        # Resize to the expected input size for the model
         image = image.resize((224, 224))
         return image
     except Exception as e:
@@ -66,73 +57,49 @@ def preprocess_image(image_path):
         return None
 
 def predict_plant(image_data):
-    """
-    Function to identify a plant from an uploaded image using the BioCLIP model.
-
-    :param image_data: The uploaded image file data.
-    :return: A dictionary containing the ID and name of the identified plant.
-             Returns {'id': None, 'name': None} if no plant can be identified.
-    """
     from .models import Plant
-
-    # Load the model if not already loaded
     load_model()
 
-    # Determine the file extension based on the image data
     if hasattr(image_data, 'name') and image_data.name:
-        # If image_data is a file object with a name attribute
         file_extension = os.path.splitext(image_data.name)[1]
     elif isinstance(image_data, str) and image_data.strip():
-        # Check if it's a base64 data URL
         if image_data.startswith('data:'):
-            # Extract extension from data URL
             import re
             match = re.match(r'data:image/(\w+)', image_data)
             if match:
                 file_extension = '.' + match.group(1)
             else:
-                file_extension = '.jpg'  # default to jpg
+                file_extension = '.jpg'
         else:
-            # If it's a non-empty string path
             file_extension = os.path.splitext(image_data)[1]
     else:
-        # Default to .jpg if we can't determine the extension
         file_extension = '.jpg'
 
-    # Create a temporary file to store the uploaded image
     with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as tmp_file:
-        if hasattr(image_data, 'chunks'):  # If it's a file object
+        if hasattr(image_data, 'chunks'):
             for chunk in image_data.chunks():
                 tmp_file.write(chunk)
         elif isinstance(image_data, str) and image_data.strip():
             if image_data.startswith('data:'):
-                # Handle base64 data URL
                 import base64
-                # Split the data URL to get the base64 part
                 header, encoded = image_data.split(',', 1)
-                # Decode the base64 string
                 img_data = base64.b64decode(encoded)
                 tmp_file.write(img_data)
             else:
-                # If it's a non-empty file path string
                 with open(image_data, 'rb') as f:
                     tmp_file.write(f.read())
         else:
-            # If we don't have valid image data, return early
             logger.error("Invalid image data provided for plant identification")
             return {'id': None, 'name': None}
         tmp_path = tmp_file.name
 
     try:
-        # If model loading failed, fall back to a simple approach
         if model is None or preprocess is None or tokenizer is None:
             logger.warning("Using fallback prediction method due to model loading failure")
             plant_ids = list(Plant.objects.values_list('id', flat=True))
             if not plant_ids:
                 return {'id': None, 'name': None}
 
-            # For demo purposes, return a random plant ID
-            # In a real implementation, you'd want a more sophisticated fallback
             import random
             detected_plant_id = random.choice(plant_ids)
             return {'id': detected_plant_id, 'name': None}
@@ -204,7 +171,6 @@ def predict_plant(image_data):
         logger.error(f"Error during plant prediction: {e}")
         return {'id': None, 'name': None}
     finally:
-        # Clean up the temporary file
         try:
             os.unlink(tmp_path)
         except:

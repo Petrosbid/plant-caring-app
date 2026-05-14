@@ -8,31 +8,102 @@ interface NavigationProps {
   currentPage: string;
 }
 
-const navItems = [
-  { key: 'home', labelKey: 'home' },
-  { key: 'identify', labelKey: 'identify' },
-  { key: 'disease', labelKey: 'disease' },
-  { key: 'care-guide', labelKey: 'careGuide' },
-  { key: 'reminders', labelKey: 'reminders' },
-  { key: 'library', labelKey: 'library' },
+interface NavItem {
+  key: string;
+  labelKey: string;
+  children?: NavItem[];
+}
+
+const navItems: NavItem[] = [
+  { key: "home", labelKey: "home" },
+  { key: "care-guide", labelKey: "careGuide" },
+  { key: "reminder", labelKey: "reminders" },
+  {
+    key: "garden",
+    labelKey: "garden",
+    children: [
+      { key: "garden", labelKey: "garden" },
+      { key: "mygarden", labelKey: "mygarden" }
+    ]
+  },
+  { key: "diseases", labelKey: "diseases" },
+  { key: "blog", labelKey: "blog" },
+  {
+    key: "AI",
+    labelKey: "AI",
+    children: [
+      { key: "identify", labelKey: "identify" },
+      { key: "disease", labelKey: "disease" },
+      { key: "recommend", labelKey: "recommend" }
+    ]
+  }
 ];
 
 const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
   const [isOpen, setIsOpen] = useState(false);
   const { user, isAuthenticated, logout } = useAuth();
   const { language, theme, toggleLanguage, toggleTheme, t } = useLanguageTheme();
+  const isRtl = language === 'fa';
 
   const closeAndNavigate = (page: string) => {
     navigateTo(page);
     setIsOpen(false);
   };
 
+  const renderNavItem = (item: NavItem, depth = 0) => {
+    const hasChildren = item.children && item.children.length > 0;
+    const isActive = currentPage === item.key;
+
+    if (hasChildren) {
+      return (
+        <div key={item.key} className="space-y-1">
+          <div
+            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-between text-slate-700 dark:text-slate-200 ${
+              isRtl ? 'flex-row-reverse' : ''
+            }`}
+          >
+            <span>{t(item.labelKey)}</span>
+            <svg
+              className={`w-4 h-4 transition-transform ${isRtl ? 'rotate-180' : ''}`}
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+            </svg>
+          </div>
+          <div
+            className={`space-y-1 ${
+              isRtl ? 'pr-4 border-r-2' : 'pl-4 border-l-2'
+            } border-slate-200 dark:border-slate-700 ml-2 mr-2`}
+          >
+            {item.children!.map(child => renderNavItem(child, depth + 1))}
+          </div>
+        </div>
+      );
+    }
+
+    return (
+      <button
+        key={item.key}
+        onClick={() => closeAndNavigate(item.key)}
+        className={`w-full text-left py-3 px-4 rounded-xl font-medium transition-colors ${
+          isActive
+            ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400'
+            : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80'
+        } ${isRtl ? 'text-right' : 'text-left'}`}
+      >
+        {t(item.labelKey)}
+      </button>
+    );
+  };
+
   return (
     <motion.nav
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="md:hidden sticky top-0 z-50 glass border-b border-slate-200/60 dark:border-slate-700/50 header-ltr"
-      dir="ltr"
+      className="md:hidden sticky top-0 z-50 glass border-b border-slate-200/60 dark:border-slate-700/50"
+      dir={isRtl ? 'rtl' : 'ltr'}
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-14">
@@ -42,7 +113,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
             whileTap={{ scale: 0.98 }}
           >
             <span className="text-xl">🌱</span>
-            <span className="font-display font-bold text-brand-600 dark:text-brand-400">PlantCare Pro</span>
+            <span className="font-display font-bold text-brand-600 dark:text-brand-400">PlantCare</span>
           </motion.button>
 
           <div className="flex items-center gap-2">
@@ -82,53 +153,43 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
             className="overflow-hidden border-t border-slate-200/60 dark:border-slate-700/50"
           >
             <ul className="py-4 space-y-1 px-4">
-              {navItems.map((item, i) => (
-                <motion.li
-                  key={item.key}
-                  initial={{ opacity: 0, x: -10 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  transition={{ delay: i * 0.03 }}
-                >
-                  <button
-                    onClick={() => closeAndNavigate(item.key)}
-                    className={`w-full text-left py-3 px-4 rounded-xl font-medium transition-colors ${
-                      currentPage === item.key
-                        ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400'
-                        : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80'
-                    }`}
-                  >
-                    {t(item.labelKey)}
-                  </button>
-                </motion.li>
+              {navItems.map((item) => (
+                <li key={item.key}>{renderNavItem(item)}</li>
               ))}
               {isAuthenticated ? (
                 <>
-                  <motion.li initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.2 }}>
+                  <li>
                     <button
                       onClick={() => closeAndNavigate('profile')}
-                      className="w-full text-left py-3 px-4 rounded-xl font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 flex items-center gap-2"
+                      className={`w-full py-3 px-4 rounded-xl font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 flex items-center gap-2 ${
+                        isRtl ? 'flex-row-reverse justify-end' : ''
+                      }`}
                     >
                       <span>👤</span> {user?.first_name}
                     </button>
-                  </motion.li>
-                  <motion.li initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.22 }}>
+                  </li>
+                  <li>
                     <button
                       onClick={() => { logout(); setIsOpen(false); }}
-                      className="w-full text-left py-3 px-4 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10"
+                      className={`w-full py-3 px-4 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 ${
+                        isRtl ? 'text-right' : 'text-left'
+                      }`}
                     >
                       {t('logout')}
                     </button>
-                  </motion.li>
+                  </li>
                 </>
               ) : (
-                <motion.li initial={{ opacity: 0, x: -10 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.18 }}>
+                <li>
                   <button
                     onClick={() => closeAndNavigate('login')}
-                    className="w-full text-left py-3 px-4 rounded-xl font-medium bg-brand-500 text-white"
+                    className={`w-full py-3 px-4 rounded-xl font-medium bg-brand-500 text-white ${
+                      isRtl ? 'text-right' : 'text-left'
+                    }`}
                   >
                     {t('signIn')}
                   </button>
-                </motion.li>
+                </li>
               )}
             </ul>
           </motion.div>

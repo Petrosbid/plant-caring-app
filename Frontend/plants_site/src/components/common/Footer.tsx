@@ -40,7 +40,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
               whileHover={{ scale: 1.02 }}
             >
               <span className="text-2xl">🌱</span>
-              <span className="font-display text-xl font-bold text-white">PlantCare Pro</span>
+              <span className="font-display text-xl font-bold text-white">PlantCare</span>
             </motion.div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
               {isEn
@@ -125,7 +125,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
 
         <div className="border-t border-slate-700/80 mt-10 pt-8 text-center">
           <p className="text-slate-500 text-sm">
-            &copy; {new Date().getFullYear()} PlantCare Pro. {isEn ? 'All rights reserved.' : 'تمامی حقوق محفوظ است.'}
+            &copy; {new Date().getFullYear()} PlantCare. {isEn ? 'All rights reserved.' : 'تمامی حقوق محفوظ است.'}
           </p>
         </div>
       </div>

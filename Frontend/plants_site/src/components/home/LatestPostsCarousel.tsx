@@ -1,29 +1,29 @@
-// src/components/home/LatestPostsCarousel.tsx
-
-import React, { useState, useEffect } from 'react';
-import axios from 'axios';
-import { Link } from 'react-router-dom';
-import type { PostListItem } from '../../types/blog';
-
-// Import Swiper React components
-import { Swiper, SwiperSlide } from 'swiper/react';
-import { Navigation, Pagination, A11y, Autoplay } from 'swiper/modules';
-
-// Import Swiper styles
-import 'swiper/css';
-import 'swiper/css/navigation';
-import 'swiper/css/pagination';
-
-import styles from './LatestPostsCarousel.module.css';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Link } from "react-router-dom";
+import type { PostListItem } from "../../types/blog";
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Navigation, Pagination, A11y, Autoplay } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/navigation";
+import "swiper/css/pagination";
+import styles from "./LatestPostsCarousel.module.css";
+import { useLanguageTheme } from "../../contexts/LanguageThemeContext";
 
 const LatestPostsCarousel: React.FC = () => {
   const [latestPosts, setLatestPosts] = useState<PostListItem[]>([]);
+  const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const { language } = useLanguageTheme();
+  const isEn = language === "en";
 
   useEffect(() => {
     const fetchLatest = async () => {
       try {
-        const response = await axios.get('/api/blog/posts/latest/');
-        setLatestPosts(response.data);
+        const response = await axios.get<PostListItem[] | { results: PostListItem[] }>(
+          "/api/blog/posts/latest/"
+        );
+        const data = response.data;
+        setLatestPosts(Array.isArray(data) ? data : data.results || []);
       } catch (error) {
         console.error("Failed to fetch latest posts:", error);
       }
@@ -31,17 +31,15 @@ const LatestPostsCarousel: React.FC = () => {
     fetchLatest();
   }, []);
 
-  if (latestPosts.length === 0) {
-    return null; // Don't render anything if there are no posts
-  }
+  if (latestPosts.length === 0) return null;
 
   return (
     <div className={styles.carouselContainer}>
       <Swiper
-        modules={[Navigation, Pagination, A11y, Autoplay]}
+        key={language} 
+        modules={[ Pagination, A11y, Autoplay]}
         spaceBetween={30}
         slidesPerView={1}
-        navigation
         pagination={{ clickable: true }}
         autoplay={{ delay: 5000, disableOnInteraction: false }}
         loop={true}
@@ -50,20 +48,51 @@ const LatestPostsCarousel: React.FC = () => {
           1024: { slidesPerView: 3, spaceBetween: 30 },
         }}
       >
-        {latestPosts.map(post => (
-          <SwiperSlide key={post.id} className={styles.slide}>
-            <Link to={`/blog/${post.slug}`} className={styles.slideLink}>
-              <div className={styles.slideContent}>
-                {post.cover_image && <img src={post.cover_image} alt={post.title} className={styles.slideImage} />}
-                <div className={styles.overlay}></div>
-                <div className={styles.textContainer}>
-                  <h3 className={styles.slideTitle}>{post.title}</h3>
-                  <span className={styles.readMore}>Read More &rarr;</span>
+        {latestPosts.map((post) => {
+          const title = isEn && post.title_en ? post.title_en : post.title;
+          const excerpt =
+            (isEn && post.excerpt_en
+              ? post.excerpt_en
+              : post.meta_description) || post.excerpt;
+
+          return (
+            <SwiperSlide key={post.id} className={styles.slide}>
+              <Link
+                to={`/blog/${post.slug}`}
+                className={styles.slideLink}
+                onMouseEnter={() => setHoveredCard(post.id)}
+                onMouseLeave={() => setHoveredCard(null)}
+              >
+                <div className={styles.slideContent}>
+                  {post.cover_image && (
+                    <img
+                      src={post.cover_image}
+                      alt={title}
+                      className={styles.slideImage}
+                    />
+                  )}
+                  <div className={styles.overlay} />
+                  <div className={styles.textContainer}>
+                    <h3 className={styles.slideTitle}>
+                      {title}
+                      <span className={styles.arrow}></span>
+                    </h3>
+                    {hoveredCard === post.id && (
+                      <div className={styles.excerptCard}>
+                        <p className={styles.excerptText}>{excerpt}</p>
+                        <div className={styles.statsRow}>
+                          <span>❤️ {post.likes_count ?? 0}</span>
+                          <span>👁️ {post.view_count  ?? 0}</span>
+                          <span>💬 {post.comments_count ?? 0}</span>
+                        </div>
+                      </div>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </Link>
-          </SwiperSlide>
-        ))}
+              </Link>
+            </SwiperSlide>
+          );
+        })}
       </Swiper>
     </div>
   );

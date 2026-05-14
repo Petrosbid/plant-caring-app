@@ -9,12 +9,13 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
-
+from datetime import timedelta
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+AUTH_USER_MODEL = 'users.CustomUser'
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -31,6 +32,9 @@ ALLOWED_HOSTS = [
     '192.168.1.10',  # The IP used in the Flutter app
 ]
 
+SMS_IR_API_KEY = "YOUR_API_KEY"
+SMS_IR_LINE_NUMBER = "YOUR_LINE_NUMBER"
+SMS_IR_OTP_TEMPLATE_ID = "YOUR_OTP_TEMPLATE_ID"
 
 # Application definition
 
@@ -51,6 +55,7 @@ INSTALLED_APPS = [
     'ckeditor',
     'ckeditor_uploader',
     'drf_spectacular',
+    'django_filters',
 
     # Local apps
     'users',
@@ -146,6 +151,15 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # REST Framework settings
 REST_FRAMEWORK = {
+    'DEFAULT_THROTTLE_CLASSES': [
+        'rest_framework.throttling.AnonRateThrottle',
+        'rest_framework.throttling.UserRateThrottle',
+    ],
+    'DEFAULT_THROTTLE_RATES': {
+        'anon': '100/hour',
+        'user': '1000/day',
+        'otp_request': '3/minute',
+    },
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
@@ -155,26 +169,21 @@ REST_FRAMEWORK = {
     'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
 }
 
-# Media files (for user-uploaded content)
-MEDIA_URL = '/media/'
+MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-# Custom User Model
-AUTH_USER_MODEL = 'users.CustomUser'
 
-#  CKEditor configuration at the end of the file
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_CONFIGS = {
     'default': {
         'toolbar': 'full',
-        'height': 300,
+        'height': 500,
         'width': '100%',
-        'extraPlugins': ','.join(['codesnippet']), # Optional: for code blocks
+        'extraPlugins': ','.join(['codesnippet']),
     },
 }
+SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
 
-# JWT Authentication Settings
-from datetime import timedelta
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),

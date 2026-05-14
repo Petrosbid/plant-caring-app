@@ -1,3 +1,4 @@
+// context/AuthContext.tsx
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User } from '../types';
 import { authService } from '../services/api';
@@ -9,6 +10,11 @@ interface AuthContextType {
   register: (userData: { username: string; email: string; password: string; first_name?: string; last_name?: string }) => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   isAuthenticated: boolean;
+  requestOtpCode: (phoneNumber: string) => Promise<void>;
+  loginWithOtp: (phoneNumber: string, code: string) => Promise<void>;
+  registerWithPhoneOtp: (data: { phone: string; username: string; first_name?: string; last_name?: string }) => Promise<void>;
+  registerWithEmailOtp: (data: { email: string; username: string; first_name?: string; last_name?: string }) => Promise<void>;
+  verifyRegisterOtp: (identifier: string, code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,13 +27,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
-  // Check if user is logged in on initial load
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');
     const refreshToken = localStorage.getItem('refresh_token');
 
     if (accessToken && refreshToken) {
-      // Fetch user profile to ensure we have current data
       const fetchUserProfile = async () => {
         try {
           const userData = await authService.getProfile();
@@ -36,7 +40,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsAuthenticated(true);
         } catch (error) {
           console.error('Failed to fetch user profile:', error);
-          // Clear invalid tokens if profile fetch fails
           localStorage.removeItem('access_token');
           localStorage.removeItem('refresh_token');
           localStorage.removeItem('user');
@@ -44,7 +47,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           setIsAuthenticated(false);
         }
       };
-
       fetchUserProfile();
     }
   }, []);
@@ -52,14 +54,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const login = async (username: string, password: string) => {
     try {
       const { access, refresh } = await authService.login({ username, password });
-
-      // Store tokens in localStorage
       localStorage.setItem('access_token', access);
       localStorage.setItem('refresh_token', refresh);
-
-      // Fetch user profile after successful login
       const userData = await authService.getProfile();
-
       localStorage.setItem('user', JSON.stringify(userData));
       setUser(userData);
       setIsAuthenticated(true);
@@ -72,8 +69,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const register = async (userData: { username: string; email: string; password: string; first_name?: string; last_name?: string }) => {
     try {
       const response = await authService.register(userData);
-
-      // After registration, auto-login the user
       await login(userData.username, userData.password);
       return response;
     } catch (error) {
@@ -90,9 +85,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Logout API call failed:', error);
-      // Continue with local logout even if API call fails
     } finally {
-      // Remove tokens from localStorage
       localStorage.removeItem('access_token');
       localStorage.removeItem('refresh_token');
       localStorage.removeItem('user');
@@ -109,8 +102,44 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  const requestOtpCode = async (phoneNumber: string) => {
+    try {
+      await authService.requestOtp(phoneNumber);
+    } catch (error) {
+      console.error('Request OTP failed:', error);
+      throw error;
+    }
+  };
+
+  // ورود با کد یکبارمصرف
+  const loginWithOtp = async (phoneNumber: string, code: string) => {
+    try {
+      const { access, refresh } = await authService.verifyOtp(phoneNumber, code);
+      localStorage.setItem('access_token', access);
+      localStorage.setItem('refresh_token', refresh);
+      const userData = await authService.getProfile();
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('OTP login failed:', error);
+      throw error;
+    }
+  };
+  const registerWithPhoneOtp = async (data: { phone?: string; email?: string; first_name?: string; last_name?: string; username: string; }) => {
+  await authService.registerRequestOtp('phone', data);
+};
+const registerWithEmailOtp = async (data: { phone?: string; email?: string; first_name?: string; last_name?: string; username: string; }) => {
+  await authService.registerRequestOtp('email', data);
+};
+const verifyRegisterOtp = async (identifier: string, code: string) => {
+  const response = await authService.registerVerifyOtp(identifier, code);
+  const userData = await authService.getProfile(); 
+  setUser(userData);
+  setIsAuthenticated(true);
+};
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, updateUser, isAuthenticated }}>
+    <AuthContext.Provider value={{ user, login, logout, register, updateUser, isAuthenticated, requestOtpCode, loginWithOtp }}>
       {children}
     </AuthContext.Provider>
   );

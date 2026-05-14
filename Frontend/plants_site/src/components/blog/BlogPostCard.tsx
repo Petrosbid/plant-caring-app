@@ -18,6 +18,7 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, language }) => {
   
   // Use English content if available and language is English
   const title = isEn && post.title_en ? post.title_en : post.title;
+  const excerpt = isEn && post.excerpt_en ? post.excerpt_en : post.excerpt;
 
   return (
     <motion.div
@@ -31,7 +32,7 @@ const BlogPostCard: React.FC<BlogPostCardProps> = ({ post, language }) => {
         </div>
         <div className={styles.content}>
           <h3 className={styles.title}>{title}</h3>
-          <p className={styles.excerpt}>{post.excerpt}</p>
+          <p className={styles.excerpt}>{excerpt}</p>
           <div className={styles.meta}>
             <span>{post.author.first_name} {post.author.last_name}</span>
             <span>&bull;</span>

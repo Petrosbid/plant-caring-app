@@ -123,80 +123,6 @@ def predict_disease(image_data):
             detected_disease_id = random.choice(disease_ids)
             return {'id': detected_disease_id, 'details': None}
 
-        # Open and preprocess the image using the processor
-        image = Image.open(tmp_path).convert('RGB')
-        inputs = processor(images=image, return_tensors="pt")
-
-        # Perform inference
-        with torch.no_grad():
-            outputs = model(**inputs)
-            probs = torch.nn.functional.softmax(outputs.logits, dim=-1)[0]
-
-        # Get the top prediction
-        top_k = torch.topk(probs, 1)
-        predicted_class_idx = top_k.indices[0].item()
-        confidence_score = top_k.values[0].item() * 100
-
-        # Get the predicted disease label from the model config
-        predicted_disease_label = model.config.id2label[predicted_class_idx]
-
-        # Get detailed disease information from LLM
-        try:
-            # Import the LLM disease module dynamically
-            import importlib.util
-
-            # Get the path to the llm_diseas.py file
-            diseases_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'diseases')
-            llm_diseas_path = os.path.join(diseases_dir, 'llm_diseas.py')
-
-            spec = importlib.util.spec_from_file_location("llm_diseas", llm_diseas_path)
-            llm_diseas_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(llm_diseas_module)
-
-            disease_details = llm_diseas_module.get_disease_details_from_llm(predicted_disease_label)
-        except Exception as e:
-            logger.error(f"Failed to import or execute llm_diseas module: {e}")
-            disease_details = None
-
-        # Find the corresponding disease in the database
-        # This assumes that the disease labels in the model match those in the Disease model
-        detected_disease_id = None
-        try:
-            # Convert the predicted label to lowercase for comparison
-            predicted_lower = predicted_disease_label.lower()
-
-            # Try to find an exact match first
-            detected_disease = Disease.objects.filter(name__iexact=predicted_disease_label).first()
-
-            if not detected_disease:
-                # Try to find a partial match in the name
-                diseases = Disease.objects.all()
-                for disease in diseases:
-                    if disease.name.lower() in predicted_lower or predicted_lower in disease.name.lower():
-                        detected_disease = disease
-                        break
-
-            if not detected_disease:
-                # Try to find a match by checking if any disease name appears in the predicted label
-                diseases = Disease.objects.all()
-                for disease in diseases:
-                    disease_name_lower = disease.name.lower()
-                    if disease_name_lower in predicted_lower:
-                        detected_disease = disease
-                        break
-
-            if detected_disease:
-                detected_disease_id = detected_disease.id
-            else:
-                # If no match found, log the prediction for debugging
-                logger.warning(f"No matching disease found for prediction: '{predicted_disease_label}'. Available diseases: {[d.name for d in Disease.objects.all()]}")
-
-        except Exception as db_error:
-            logger.error(f"Database lookup error: {db_error}")
-
-        logger.info(f"Predicted disease: {predicted_disease_label} with confidence: {confidence_score:.2f}%, ID: {detected_disease_id}")
-        return {'id': detected_disease_id, 'name': predicted_disease_label, 'details': disease_details, 'confidence': confidence_score}
-
     except Exception as e:
         logger.error(f"Error during disease prediction: {e}")
         return {'id': None, 'details': None}
@@ -206,3 +132,81 @@ def predict_disease(image_data):
             os.unlink(tmp_path)
         except:
             pass
+
+
+    # Open and preprocess the image using the processor
+    image = Image.open(tmp_path).convert('RGB')
+    inputs = processor(images=image, return_tensors="pt")
+
+    # Perform inference
+    with torch.no_grad():
+        outputs = model(**inputs)
+        probs = torch.nn.functional.softmax(outputs.logits, dim=-1)[0]
+
+    # Get the top prediction
+    top_k = torch.topk(probs, 1)
+    predicted_class_idx = top_k.indices[0].item()
+    confidence_score = top_k.values[0].item() * 100
+
+    # Get the predicted disease label from the model config
+    predicted_disease_label = model.config.id2label[predicted_class_idx]
+
+    # Get detailed disease information from LLM
+    try:
+        # Import the LLM disease module dynamically
+        import importlib.util
+
+        # Get the path to the llm_diseas.py file
+        diseases_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'diseases')
+        llm_diseas_path = os.path.join(diseases_dir, 'llm_diseas.py')
+
+        spec = importlib.util.spec_from_file_location("llm_diseas", llm_diseas_path)
+        llm_diseas_module = importlib.util.module_from_spec(spec)
+        spec.loader.exec_module(llm_diseas_module)
+
+        disease_details = llm_diseas_module.get_disease_details_from_llm(predicted_disease_label)
+    except Exception as e:
+        logger.error(f"Failed to import or execute llm_diseas module: {e}")
+        disease_details = None
+
+    # Find the corresponding disease in the database
+    # This assumes that the disease labels in the model match those in the Disease model
+    detected_disease_id = None
+    try:
+        # Convert the predicted label to lowercase for comparison
+        predicted_lower = predicted_disease_label.lower()
+
+        # Try to find an exact match first
+        detected_disease = Disease.objects.filter(name__iexact=predicted_disease_label).first()
+
+        if not detected_disease:
+            # Try to find a partial match in the name
+            diseases = Disease.objects.all()
+            for disease in diseases:
+                if disease.name.lower() in predicted_lower or predicted_lower in disease.name.lower():
+                    detected_disease = disease
+                    break
+
+        if not detected_disease:
+            # Try to find a match by checking if any disease name appears in the predicted label
+            diseases = Disease.objects.all()
+            for disease in diseases:
+                disease_name_lower = disease.name.lower()
+                if disease_name_lower in predicted_lower:
+                    detected_disease = disease
+                    break
+
+        if detected_disease:
+            detected_disease_id = detected_disease.id
+        else:
+            # If no match found, log the prediction for debugging
+            logger.warning(
+                f"No matching disease found for prediction: '{predicted_disease_label}'. Available diseases: {[d.name for d in Disease.objects.all()]}")
+
+    except Exception as db_error:
+        logger.error(f"Database lookup error: {db_error}")
+
+    logger.info(
+        f"Predicted disease: {predicted_disease_label} with confidence: {confidence_score:.2f}%, ID: {detected_disease_id}")
+    return {'id': detected_disease_id, 'name': predicted_disease_label, 'details': disease_details,
+            'confidence': confidence_score}

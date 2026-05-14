@@ -1,4 +1,5 @@
 /** @type {import('tailwindcss').Config} */
+
 export default {
   content: [
     "./index.html",
@@ -8,8 +9,10 @@ export default {
   theme: {
     extend: {
       fontFamily: {
-        sans: ['DM Sans', 'system-ui', 'sans-serif'],
-        display: ['Outfit', 'system-ui', 'sans-serif'],
+        sans: ['inter', 'DM Sans', 'system-ui', 'sans-serif'],
+        display: ['Vazirmatn', 'system-ui', 'sans-serif'],
+        vazirmatn: ['Vazirmatn', 'system-ui', 'sans-serif'],
+        persian: ['Vazirmatn', 'Inter', 'system-ui', 'sans-serif'],
       },
       colors: {
         brand: {

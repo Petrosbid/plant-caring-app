@@ -1,4 +1,4 @@
-// Basic tests for the PlantCare Pro application
+// Basic tests for the PlantCare application
 import { vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import App from './App';

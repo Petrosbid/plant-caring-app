@@ -11,16 +11,28 @@ class UserPlant(models.Model):
     added_date = models.DateTimeField(auto_now_add=True)
 
     # Care reminder information
-    last_watered = models.DateTimeField(default=timezone.now, help_text="Date when the plant was last watered")
-    next_watering_date = models.DateTimeField(null=True, blank=True, help_text="Date when the plant needs to be watered next")
+    last_watered = models.DateTimeField(
+        null=True, blank=True, default=None,
+        help_text="Date when the plant was last watered"
+    )
+    next_watering_date = models.DateTimeField(null=True, blank=True,
+                                              help_text="Date when the plant needs to be watered next")
     watering_interval_days = models.IntegerField(default=7, help_text="Number of days between watering")
 
-    last_fertilized = models.DateTimeField(default=timezone.now, help_text="Date when the plant was last fertilized")
-    next_fertilizing_date = models.DateTimeField(null=True, blank=True, help_text="Date when the plant needs to be fertilized next")
+    last_fertilized = models.DateTimeField(
+        null=True, blank=True, default=None,
+        help_text="Date when the plant was last fertilized"
+    )
+    next_fertilizing_date = models.DateTimeField(null=True, blank=True,
+                                                 help_text="Date when the plant needs to be fertilized next")
     fertilizing_interval_days = models.IntegerField(default=30, help_text="Number of days between fertilizing")
 
-    last_pruned = models.DateTimeField(default=timezone.now, help_text="Date when the plant was last pruned")
-    next_pruning_date = models.DateTimeField(null=True, blank=True, help_text="Date when the plant needs to be pruned next")
+    last_pruned = models.DateTimeField(
+        null=True, blank=True, default=None,
+        help_text="Date when the plant was last pruned"
+    )
+    next_pruning_date = models.DateTimeField(null=True, blank=True,
+                                             help_text="Date when the plant needs to be pruned next")
     pruning_interval_days = models.IntegerField(default=90, help_text="Number of days between pruning")
 
     health_status = models.CharField(max_length=20, choices=[
@@ -29,20 +41,31 @@ class UserPlant(models.Model):
         ('unhealthy', 'Unhealthy'),
     ], default='healthy', help_text="Current health status of the plant")
 
+    POT_SIZE_CHOICES = [
+        ('no_pot', 'بدون گلدان'),
+        ('small', 'گلدان کوچک'),
+        ('medium', 'گلدان متوسط'),
+        ('large', 'گلدان بزرگ'),
+        ('extra_large', 'گلدان خیلی بزرگ'),
+    ]
+
+    pot_size = models.CharField(
+        max_length=20,
+        choices=POT_SIZE_CHOICES,
+        default='medium',
+        help_text="سایز گلدان فعلی گیاه"
+    )
+
     notes = models.TextField(blank=True, null=True, help_text="Personal notes about the plant")
 
-    # Calculate next care dates based on plant care requirements
     def save(self, *args, **kwargs):
-        # Calculate next watering date based on plant's watering frequency and last watered date
-        if not self.next_watering_date:
+        if self.last_watered and not self.next_watering_date:  # فقط اگر last_watered موجود باشد
             self.next_watering_date = self.last_watered + timedelta(days=self.watering_interval_days)
 
-        # Calculate next fertilizing date
-        if not self.next_fertilizing_date:
+        if self.last_fertilized and not self.next_fertilizing_date:
             self.next_fertilizing_date = self.last_fertilized + timedelta(days=self.fertilizing_interval_days)
 
-        # Calculate next pruning date
-        if not self.next_pruning_date:
+        if self.last_pruned and not self.next_pruning_date:
             self.next_pruning_date = self.last_pruned + timedelta(days=self.pruning_interval_days)
 
         super().save(*args, **kwargs)
@@ -70,6 +93,8 @@ class UserPlant(models.Model):
         if self.next_pruning_date:
             return timezone.now().date() >= self.next_pruning_date.date()
         return False
+
+
 
 
 class Reminder(models.Model):
@@ -104,3 +129,63 @@ class Reminder(models.Model):
 
     class Meta:
         ordering = ['-scheduled_date']
+
+
+
+class GrowthRecord(models.Model):
+    UNIT_CHOICES = [
+        ('cm', 'سانتی‌متر'),
+        ('inch', 'اینچ'),
+    ]
+
+    user_plant = models.ForeignKey(
+        UserPlant,
+        on_delete=models.CASCADE,
+        related_name='growth_records'
+    )
+    date = models.DateTimeField(default=timezone.now)
+    height = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="ارتفاع گیاه (مثلاً 15.5)"
+    )
+    width = models.DecimalField(
+        max_digits=6,
+        decimal_places=2,
+        null=True,
+        blank=True,
+        help_text="عرض یا پهنای گیاه"
+    )
+    unit = models.CharField(
+        max_length=10,
+        choices=UNIT_CHOICES,
+        default='cm'
+    )
+    notes = models.TextField(blank=True, null=True, help_text="یادداشت مرتبط با این رکورد رشد")
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __str__(self):
+        return f"{self.user_plant} - {self.date.strftime('%Y/%m/%d')}: {self.height} {self.unit}"
+
+
+class PlantChatMessage(models.Model):
+    """ذخیره تاریخچه چت کاربر با دستیار برای هر گیاه خاص در باغچه کاربر"""
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='plant_chats')
+    user_plant = models.ForeignKey(UserPlant, on_delete=models.CASCADE, related_name='chat_messages')
+    message = models.TextField(verbose_name="پیام کاربر")
+    response = models.TextField(verbose_name="پاسخ دستیار")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = "پیام چت گیاه"
+        verbose_name_plural = "پیام‌های چت گیاهان"
+
+    def __str__(self):
+        return f"{self.user.username} - {self.user_plant.plant.farsi_name} - {self.created_at.strftime('%Y/%m/%d %H:%M')}"

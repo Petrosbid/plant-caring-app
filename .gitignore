@@ -55,6 +55,8 @@ Icon?
 # Flutter build outputs
 Frontend/plants_app/build/
 Frontend/plants_app/.dart_tool/
+plants_app/
+Frontend/plants_site/bugs
 
 # Node modules
 Frontend/plants_site/node_modules/

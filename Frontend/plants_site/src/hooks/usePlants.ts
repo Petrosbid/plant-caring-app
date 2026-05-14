@@ -15,7 +15,6 @@ export const usePlants = () => {
         const data = await plantService.searchPlants(query);
         setPlants(data);
       } else {
-        // If no query, get all plants
         const data = await plantService.getAllPlants();
         setPlants(data);
       }

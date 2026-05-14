@@ -16,14 +16,22 @@ export interface Comment {
 
 // Interface for the blog post list view
 export interface PostListItem {
+  view_count: number;
+  date: any;
+  published_date: any;
+  category: string;
+  meta_description_en: boolean;
+  meta_description: any;
+  views_count: number;
   id: number;
   title: string;
   title_en?: string | null;
   slug: string;
   author: Author;
   cover_image: string | null;
-  publish: string; // ISO 8601 date string
+  publish: string; 
   excerpt: string;
+  excerpt_en : string;
   likes_count?: number;
   dislikes_count?: number;
   comments_count?: number;
@@ -33,7 +41,7 @@ export interface PostListItem {
 export interface PostDetail extends Omit<PostListItem, 'excerpt'> {
   content: string;
   content_en?: string | null;
-  updated: string; // ISO 8601 date string
+  updated: string; 
   meta_description: string;
   meta_description_en?: string | null;
   tags: string[];

@@ -2,6 +2,11 @@ from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
 from .models import UserPlant, Reminder
+from django.db.models.signals import post_save, post_delete
+from django.dispatch import receiver
+from django.db.models import F
+from .models import UserPlant
+from plants.models import Plant
 
 @receiver(post_save, sender=UserPlant)
 def update_care_dates(sender, instance, created, **kwargs):
@@ -93,3 +98,12 @@ def create_initial_reminders(sender, instance, created, **kwargs):
                     'recurrence_interval': instance.pruning_interval_days
                 }
             )
+
+@receiver(post_save, sender=UserPlant)
+def increment_plant_garden_count(sender, instance, created, **kwargs):
+    if created:
+        Plant.objects.filter(pk=instance.plant_id).update(garden_count=F('garden_count') + 1)
+
+@receiver(post_delete, sender=UserPlant)
+def decrement_plant_garden_count(sender, instance, **kwargs):
+    Plant.objects.filter(pk=instance.plant_id).update(garden_count=F('garden_count') - 1)

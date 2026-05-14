@@ -1,115 +1,191 @@
+# diseases/llm_disease.py
 import requests
 import json
 from django.conf import settings
+from .models import Disease
 
-# تنظیمات اولیه (از همان تنظیمات قبلی استفاده می‌کند)
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', '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')
+OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY',
+                             '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')
 
 
 def get_disease_details_from_llm(disease_name, plant_name=None):
     """
-    Get detailed disease information and treatment steps from LLM.
-
-    Args:
-        disease_name (str): Name of the disease (e.g., "Powdery Mildew" or "سفیدک سطحی")
-        plant_name (str, optional): Name of the specific plant affected (helps context)
-
-    Returns:
-        dict: Dictionary containing disease description and list of solutions.
+    دریافت اطلاعات دقیق و جامع بیماری از LLM (دوزبانه)
     """
+    context_plant = f" on the plant '{plant_name}'" if plant_name else " on plants"
 
-    # اگر نام گیاه داده شده باشد، در پرامپت لحاظ می‌شود تا راهکار دقیق‌تر باشد
-    context_str = f"for the plant '{plant_name}'" if plant_name else "for plants"
-
-    # 1. پرامپت تخصصی برای بیماری‌شناسی
     system_prompt = f"""
-You are an expert plant pathologist and botanist. I will give you a plant disease name {context_str}.
-You must provide a diagnosis, explanation, and a step-by-step treatment plan in Persian (Farsi).
+You are an expert plant pathologist with deep knowledge of plant diseases, their symptoms, etiology, epidemiology, and integrated pest management.
 
-Return ONLY a raw JSON object (no markdown formatting like ```json).
-The JSON must strictly follow this structure:
+I will give you the name of a plant disease{context_plant}.  
+You must provide a COMPLETE, SCIENTIFICALLY ACCURATE, and PRACTICAL diagnosis and treatment plan in **BOTH English and Persian (Farsi)**.
+
+Return ONLY a valid JSON object (no markdown, no extra text). The JSON must strictly follow the structure below.
+
+---
+
+### JSON STRUCTURE (all fields required)
+
 {{
-    "disease_name_fa": "نام علمی و رایج بیماری به فارسی",
-    "description": "توضیح کامل درباره چیستی بیماری، علائم ظاهری و علت به وجود آمدن آن (در یک پاراگراف)",
-    "severity": "میزان خطر (کم/متوسط/کشنده)",
-    "is_infectious": "آیا به گیاهان دیگر سرایت میکند؟ (بله/خیر)",
-    "treatment_steps": [
-        "راهکار اول (مثلا: جدا کردن برگ‌های بیمار)",
-        "راهکار دوم (مثلا: نحوه آبیاری صحیح)",
-        "راهکار سوم (مثلا: نام سم یا قارچ‌کش مناسب خانگی یا شیمیایی)"
+    "disease_name_fa": "نام کامل بیماری به فارسی (مثلاً سفیدک سطحی خیار)",
+    "disease_name_en": "Full disease name in English (e.g., Powdery Mildew of Cucurbits)",
+    "description_fa": "توضیح کامل بیماری به فارسی: شامل عوامل بیماری‌زا (قارچ، باکتری، ویروس)، نحوه آلودگی، چرخه زندگی، شرایط مساعد برای بروز، و علائم اصلی (حداقل ۳ خط).",
+    "description_en": "Full description in English: causal agent (fungus, bacterium, virus), infection process, life cycle, favorable conditions, and key symptoms (at least 3 lines).",
+    "symptoms_fa": "علائم دقیق به فارسی: ظاهر لکه‌ها، تغییر رنگ، پژمردگی، تغییر شکل، رشد قارچی و ... (لیست یا پاراگراف).",
+    "symptoms_en": "Detailed symptoms in English: spot appearance, discoloration, wilting, deformation, fungal growth, etc.",
+    "severity": "one of: low, medium, high, critical",
+    "spread_rate": "one of: slow, moderate, fast",
+    "is_infectious": "yes/no (in Persian: بله/خیر)",
+    "is_infectious_en": "yes/no",
+    "treatment_steps_fa": [
+        "گام اول درمان: حذف برگ‌های آلوده و قرنطینه گیاه",
+        "گام دوم: استفاده از قارچ‌کش سیستمیک مانند ...",
+        "گام سوم: بهبود تهویه و کاهش رطوبت",
+        "حداقل ۳ و حداکثر ۶ گام واقعی و عملی"
     ],
-    "prevention": "یک توصیه کوتاه برای پیشگیری از ابتلای مجدد"
+    "treatment_steps_en": [
+        "Step 1: Remove infected leaves and isolate the plant",
+        "Step 2: Apply systemic fungicide (e.g., ...)",
+        "Step 3: Improve air circulation and reduce humidity",
+        "At least 3, up to 6 actionable steps"
+    ],
+    "prevention_fa": "روش‌های پیشگیری به فارسی: فاصله کاشت مناسب، آبیاری قطرهای، استفاده از ارقام مقاوم، ضدعفونی ابزار، کنترل علف‌های هرز و ...",
+    "prevention_en": "Prevention methods in English: proper spacing, drip irrigation, resistant varieties, tool disinfection, weed control, etc.",
+    "organic_treatment_fa": "درمان ارگانیک/طبیعی به فارسی (مثلاً مخلوط جوش شیرین و روغن، عصاره سیر، یا معرفی دشمنان طبیعی). اگر وجود ندارد بنویسید 'درمان ارگانیک شناخته شده‌ای نیست'.",
+    "organic_treatment_en": "Organic/natural treatment in English (e.g., baking soda and oil spray, garlic extract, beneficial insects). If none, write 'No known organic treatment'."
+    "is_infectious_en": "yes or no"
 }}
-IMPORTANT: 'treatment_steps' MUST be a JSON Array (List) of strings.
+
+---
+
+### IMPORTANT RULES
+
+1. **Accuracy**: Use real, scientifically verified information. Do not guess.
+2. **Completeness**: Every field must be filled. No empty strings.
+3. **Practicality**: Treatment steps must be actionable by a home gardener or farmer.
+4. **Language**: Persian text must be natural, fluent, and correctly spelled.
+5. **Severity & Spread**: Choose appropriately based on real disease characteristics.
+6. **Organic treatment**: Provide a real organic option if available; otherwise state clearly that none exists.
+
+Now, generate the JSON for disease: **{disease_name}**
 """
 
     try:
-        # 2. ارسال درخواست
         response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
             headers={
                 "Authorization": f"Bearer {OPENROUTER_API_KEY}",
                 "Content-Type": "application/json",
-                "HTTP-Referer": "https://your-plant-app.com",
-                "X-Title": "Plant Doctor App",
+                "HTTP-Referer": "https://your-plant-doctor-app.com",
+                "X-Title": "Plant Disease Expert",
             },
             json={
-                "model": "tngtech/deepseek-r1t2-chimera:free",  # یا هر مدل دلخواه دیگر
+                "model": "openai/gpt-4o-mini",  # or "tngtech/deepseek-r1t2-chimera:free"
                 "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Disease name: {disease_name}"}
+                    {"role": "system",
+                     "content": "You are a professional plant pathologist. Respond only with valid JSON as instructed."},
+                    {"role": "user", "content": system_prompt}
                 ],
-                "response_format": {"type": "json_object"}
+                "response_format": {"type": "json_object"},
+                "temperature": 0.2,
+                "max_tokens": 2000
             },
-            timeout=60  # زمان کمی بیشتر برای تولید لیست راهکارها
+            timeout=90
         )
 
-        # 3. دریافت و پردازش
         if response.status_code == 200:
             content = response.json()["choices"][0]["message"]["content"]
-
-            # تمیزکاری (همانند کد شما)
+            # Clean markdown if present
             if content.startswith("```json"):
                 content = content.replace("```json", "").replace("```", "")
             elif content.startswith("```"):
                 content = content.replace("```", "")
 
-            try:
-                disease_data = json.loads(content)
+            disease_data = json.loads(content)
 
-                # یک چک نهایی برای اطمینان از اینکه treatment_steps حتما لیست است
-                if not isinstance(disease_data.get('treatment_steps'), list):
-                    # اگر اشتباها رشته فرستاد، تبدیل به لیست تک‌آیتمی کن
-                    disease_data['treatment_steps'] = [str(disease_data.get('treatment_steps'))]
+            # Ensure treatment steps are lists
+            for lang in ['fa', 'en']:
+                key = f'treatment_steps_{lang}'
+                if not isinstance(disease_data.get(key), list):
+                    disease_data[key] = [str(disease_data.get(key, ''))]
+                else:
+                    disease_data[key] = [str(step) for step in disease_data[key]]
 
-                return disease_data
-
-            except json.JSONDecodeError:
-                print("Error Parsing Disease JSON:", repr(content))
-                return None
+            return disease_data
         else:
-            print("Error API:", response.status_code, repr(response.text))
+            print(f"Disease LLM error {response.status_code}: {response.text}")
             return None
-
     except Exception as e:
-        print(f"Error calling LLM API for Disease: {repr(e)}")
+        print(f"Exception in get_disease_details_from_llm: {repr(e)}")
         return None
 
 
-# ==========================================
-# نحوه استفاده (مثال)
-# ==========================================
-if __name__ == "__main__":
-    # سناریو: مدل تشخیص تصویر گفته بیماری "Root Rot" (پوسیدگی ریشه) است
-    disease_info = get_disease_details_from_llm("Root Rot", plant_name="Sansevieria")
+def create_or_update_disease_from_llm(disease_name):
+    """
+    Create or update a Disease record using LLM-generated data.
+    """
+    info = get_disease_details_from_llm(disease_name)
+    if not info:
+        return None
 
-    if disease_info:
-        print("\nنام بیماری:", disease_info['disease_name_fa'])
-        print("\nتوضیحات:", disease_info['description'])
-        print("\nمیزان خطر:", disease_info['severity'])
+    try:
+        # Extract fields
+        name_en = info.get('disease_name_en', disease_name)
+        name_fa = info.get('disease_name_fa', '')
+        description_en = info.get('description_en', '')
+        description_fa = info.get('description_fa', '')
+        symptoms_en = info.get('symptoms_en', '')
+        symptoms_fa = info.get('symptoms_fa', '')
+        prevention_en = info.get('prevention_en', '')
+        prevention_fa = info.get('prevention_fa', '')
+        severity = info.get('severity', 'medium')
+        # Convert severity to valid choice
+        if severity not in ['low', 'medium', 'high', 'critical']:
+            severity = 'medium'
 
-        print("\n--- راهکارهای درمانی ---")
-        for step in disease_info['treatment_steps']:
-            print(f"✅ {step}")
+        # Combine treatment steps into solution fields (optional)
+        treatment_steps_en = '\n'.join(info.get('treatment_steps_en', []))
+        treatment_steps_fa = '\n'.join(info.get('treatment_steps_fa', []))
+        organic_en = info.get('organic_treatment_en', '')
+        organic_fa = info.get('organic_treatment_fa', '')
 
-        print("\nپیشگیری:", disease_info['prevention'])
+        # Check if disease exists by name_fa (or name_en)
+        disease = Disease.objects.filter(name_fa=name_fa).first()
+        if not disease:
+            disease = Disease.objects.filter(name=name_en).first()
+
+        if disease:
+            # Update existing
+            disease.name = name_en
+            disease.name_fa = name_fa
+            disease.description = description_en
+            disease.description_fa = description_fa
+            disease.symptoms = symptoms_en
+            disease.symptoms_fa = symptoms_fa
+            disease.solution = treatment_steps_en + "\n\nOrganic: " + organic_en if organic_en else treatment_steps_en
+            disease.solution_fa = treatment_steps_fa + "\n\nارگانیک: " + organic_fa if organic_fa else treatment_steps_fa
+            disease.prevention_methods = prevention_en
+            disease.prevention_methods_fa = prevention_fa
+            disease.severity_level = severity
+            disease.spread_rate = info.get('spread_rate', 'moderate')
+            disease.save()
+        else:
+            # Create new
+            disease = Disease.objects.create(
+                name=name_en,
+                name_fa=name_fa,
+                description=description_en,
+                description_fa=description_fa,
+                symptoms=symptoms_en,
+                symptoms_fa=symptoms_fa,
+                solution=treatment_steps_en,
+                solution_fa=treatment_steps_fa,
+                prevention_methods=prevention_en,
+                prevention_methods_fa=prevention_fa,
+                severity_level=severity,
+                spread_rate=info.get('spread_rate', 'moderate'),
+            )
+        return disease
+    except Exception as e:
+        print(f"Error creating/updating disease: {e}")
+        return None

@@ -34,9 +34,12 @@ class CommentSerializer(serializers.ModelSerializer):
 class PostListSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     excerpt = serializers.SerializerMethodField()
+    excerpt_en = serializers.SerializerMethodField()
     # English title for language switching
     title_en = serializers.ReadOnlyField()
     comments_count = serializers.SerializerMethodField()
+    tags = serializers.StringRelatedField(many=True, read_only=True)
+    tags_en = serializers.StringRelatedField(many=True, read_only=True)
 
     class Meta:
         model = Post
@@ -49,15 +52,26 @@ class PostListSerializer(serializers.ModelSerializer):
             'cover_image',
             'publish',
             'excerpt',
+            'excerpt_en',
+            'view_count',
             'likes_count',
             'dislikes_count',
             'comments_count',
+            'tags',
+            'tags_en',
         ]
 
     def get_excerpt(self, obj):
         from django.utils.html import strip_tags
         # Safety check if content is empty
         content = obj.content or ""
+        text = strip_tags(content)
+        return text[:150] + '...' if len(text) > 150 else text
+
+    def get_excerpt_en(self, obj):
+        from django.utils.html import strip_tags
+        # Safety check if content is empty
+        content = obj.content_en or ""
         text = strip_tags(content)
         return text[:150] + '...' if len(text) > 150 else text
 

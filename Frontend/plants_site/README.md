@@ -1,7 +1,9 @@
-# PlantCare Pro - Plant Identification and Care Application
+# PlantCare - Plant Identification and Care Application
 
 ## Overview
-PlantCare Pro is a comprehensive plant identification and care application that allows users to:
+
+PlantCare is a comprehensive plant identification and care application that allows users to:
+
 - Identify plants by uploading photos
 - Detect plant diseases and get treatment recommendations
 - Access detailed plant care guides
@@ -11,26 +13,31 @@ PlantCare Pro is a comprehensive plant identification and care application that 
 ## Features
 
 ### Plant Identification
+
 - Upload photos of plants for instant identification
 - Detailed information about identified plants
 - Care instructions specific to each plant
 
 ### Disease Detection
+
 - Upload photos of diseased plants
 - Receive accurate disease diagnosis
 - Get treatment and prevention recommendations
 
 ### Care Guides
+
 - Comprehensive care instructions for different plant types
 - Watering, lighting, fertilizing, and pruning guidelines
 - Seasonal care adjustments
 
 ### Care Reminders
+
 - Set personalized watering and care reminders
 - Notifications for plant care tasks
 - Customizable schedules
 
 ### Plant Library
+
 - Extensive database of plants
 - Search and filter capabilities
 - Detailed plant information
@@ -38,12 +45,14 @@ PlantCare Pro is a comprehensive plant identification and care application that 
 ## Technology Stack
 
 ### Frontend
+
 - React 19 with TypeScript
 - Tailwind CSS for styling
 - React Router for navigation
 - Context API for state management
 
 ### Project Structure
+
 ```
 src/
 ├── components/           # Reusable UI components
@@ -68,6 +77,7 @@ src/
    cd Frontend/plants_site
    ```
 3. Install dependencies:
+
    ```bash
    npm install
    ```
@@ -92,6 +102,7 @@ src/
 ## API Integration
 
 The application is designed to connect with a backend API for:
+
 - Plant identification
 - Disease detection
 - User authentication
@@ -102,6 +113,7 @@ Mock API services are implemented for demonstration purposes.
 ## Responsive Design
 
 The application is fully responsive and optimized for:
+
 - Desktop browsers
 - Tablets
 - Mobile devices

@@ -1,16 +1,20 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import UserPlantViewSet, ReminderViewSet
+from .views import UserPlantViewSet, ReminderViewSet, GrowthRecordViewSet, PlantChatView, NotificationsView
 
-# Router for user plants (garden)
 user_plant_router = DefaultRouter()
 user_plant_router.register(r'', UserPlantViewSet, basename='userplant')
 
-# Router for reminders
 reminder_router = DefaultRouter()
 reminder_router.register(r'', ReminderViewSet, basename='reminder')
 
+growth_router = DefaultRouter()
+growth_router.register(r'', GrowthRecordViewSet, basename='growthrecord')
+
 urlpatterns = [
-    path('reminders/', include(reminder_router.urls)),  # For reminders: /api/my-garden/reminders/ (must be before '' to match)
-    path('', include(user_plant_router.urls)),  # For user plants: /api/my-garden/
+    path('chat/', PlantChatView.as_view(), name='plant-chat'),
+    path('reminders/', include(reminder_router.urls)),
+    path('growth/', include(growth_router.urls)),
+    path('notifications/', NotificationsView.as_view(), name='notifications'),
+    path('', include(user_plant_router.urls)),
 ]

@@ -7,14 +7,12 @@ export const useReminders = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Load reminders on mount
   useEffect(() => {
     const fetchReminders = async () => {
       try {
         const data = await reminderService.getReminders();
         setReminders(data);
       } catch (err) {
-        // Don't show error if it's a 401/403 (unauthenticated), just set empty array
         if (err instanceof Error && (err.message.includes('401') || err.message.includes('403') || err.message.includes('404'))) {
           setReminders([]);
         } else {

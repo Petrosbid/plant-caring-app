@@ -1,7 +1,7 @@
 # blog/admin.py
 
 from django.contrib import admin
-from .models import Post, Comment, UserVote
+from .models import Post, Comment, UserVote , PersianTag , EnglishTag
 
 @admin.register(Post)
 class PostAdmin(admin.ModelAdmin):
@@ -12,6 +12,8 @@ class PostAdmin(admin.ModelAdmin):
     raw_id_fields = ('author',)
     date_hierarchy = 'publish'
     ordering = ('status', '-publish')
+    admin.site.register(PersianTag)
+    admin.site.register(EnglishTag)
 
     fieldsets = (
         (None, {
@@ -24,7 +26,7 @@ class PostAdmin(admin.ModelAdmin):
             'fields': ('publish', 'view_count', 'likes_count', 'dislikes_count')
         }),
         ('SEO', {
-            'fields': ('meta_description', 'meta_description_en', 'tags')
+            'fields': ('meta_description', 'meta_description_en', 'tags' , 'tags_en')
         }),
     )
 

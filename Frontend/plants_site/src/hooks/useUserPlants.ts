@@ -1,37 +1,72 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import type { UserPlant } from '../types';
 import { gardenService } from '../services/api';
 
 export const useUserPlants = () => {
   const [userPlants, setUserPlants] = useState<UserPlant[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const isLoggedIn = !!localStorage.getItem('access_token');
 
-  // Load user plants on mount
+  const fetchUserPlants = useCallback(async () => {
+    if (!isLoggedIn) {
+      setUserPlants([]);
+      setLoading(false);
+      return;
+    }
+    setLoading(true);
+    try {
+      const data = await gardenService.getUserPlants();
+      const plants = Array.isArray(data) ? data : data.results || [];
+      setUserPlants(plants);
+    } catch (err) {
+      console.error('Failed to fetch user plants:', err);
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn]);
+
   useEffect(() => {
-    const fetchUserPlants = async () => {
-      try {
-        const data = await gardenService.getUserPlants();
-        setUserPlants(data);
-      } catch (err) {
-        // Don't show error if it's a 401/403 (unauthenticated), just set empty array
-        if (err instanceof Error && (err.message.includes('401') || err.message.includes('403') || err.message.includes('404'))) {
-          setUserPlants([]);
-        } else {
-          setError('Failed to load your plants');
-          console.error(err);
-        }
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchUserPlants();
-  }, []);
+  }, [fetchUserPlants]);
+
+
+  const addUserPlant = async (data: { plant: number; nickname?: string }) => {
+    try {
+      const newUp = await gardenService.addUserPlant(data);
+      setUserPlants((prev) => [...prev, newUp]);
+    } catch (err) {
+      console.error('Failed to add plant to garden:', err);
+    }
+  };
+
+  const removeUserPlant = async (id: number) => {
+    try {
+      await gardenService.removeUserPlant(id);
+      setUserPlants((prev) => prev.filter((up) => up.id !== id));
+    } catch (err) {
+      console.error('Failed to remove plant from garden:', err);
+    }
+  };
+
+  const updateUserPlant = async (id: number, data: Partial<UserPlant>) => {
+    try {
+      const updated = await gardenService.updateUserPlant(id, data);
+      setUserPlants((prev) => prev.map(up => up.id === id ? { ...up, ...updated } : up));
+    } catch (err) {
+      console.error('Update failed', err);
+    }
+  };
+
+   const refreshUserPlants = useCallback(() => {
+    fetchUserPlants();
+  }, [fetchUserPlants]);
 
   return {
     userPlants,
     loading,
-    error
+    addUserPlant,
+    removeUserPlant,
+    updateUserPlant,
+    refreshUserPlants,
   };
 };

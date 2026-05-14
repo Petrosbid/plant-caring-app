@@ -7,7 +7,9 @@ import type { PostDetail, PostListItem } from '../types/blog';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import { formatDate } from '../utils/date';
 import { blogService } from '../services/api';
-import styles from './BlogDetailPage.module.css';
+import styles from '../assets/css/BlogDetailPage.module.css';
+import { LoaderGooeyBlobs } from '../components/animation/gooey-loader';
+
 
 interface TableOfContentsItem {
   id: string;
@@ -24,7 +26,6 @@ interface Comment {
 
 const BlogDetailPage: React.FC = () => {
   const { slug } = useParams<{ slug: string }>();
-  // اگر در کانتکست خود theme را دارید می‌توانید استخراج کنید، در غیر این صورت فقط language کافیست
   const { language, theme } = useLanguageTheme();
   const isEn = language === 'en';
 
@@ -45,6 +46,8 @@ const BlogDetailPage: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('');
   const contentRef = useRef<HTMLDivElement>(null);
   const isLoggedIn = !!localStorage.getItem('access_token');
+
+  
   useEffect(() => {
     const fetchPost = async () => {
       try {
@@ -102,10 +105,12 @@ const BlogDetailPage: React.FC = () => {
   useEffect(() => {
     if (!post?.content) return;
 
-    // Use English content if available and language is English
     const contentToUse = isEn && post.content_en ? post.content_en : post.content;
-    
-    const cleanHtml = DOMPurify.sanitize(contentToUse);
+    let fixedContent = contentToUse;
+    const backendBaseUrl = 'http://localhost:8000'; // or from env
+    fixedContent = fixedContent.replace(/\/127\.0\.0\.1:8000/g, '');
+    fixedContent = fixedContent.replace(/src="\//g, `src="${backendBaseUrl}/`);
+    const cleanHtml = DOMPurify.sanitize(fixedContent);
     const parser = new DOMParser();
     const doc = parser.parseFromString(cleanHtml, 'text/html');
 
@@ -159,7 +164,7 @@ const BlogDetailPage: React.FC = () => {
   if (loading) {
     return (
       <div className={styles.loadingContainer}>
-        <div className={styles.loadingSpinner}></div>
+       <LoaderGooeyBlobs size={25} color="#10b981" duration={1} />
         <p>{language === 'fa' ? 'در حال بارگذاری...' : 'Loading post...'}</p>
       </div>
     );
@@ -179,7 +184,6 @@ const BlogDetailPage: React.FC = () => {
 
   const publishDate = formatDate(post.publish, language);
 
-  // Use English content if available and language is English
   const title = isEn && post.title_en ? post.title_en : post.title;
   const content = isEn && post.content_en ? post.content_en : post.content;
   const metaDescription = isEn && post.meta_description_en ? post.meta_description_en : post.meta_description;
@@ -229,7 +233,7 @@ const BlogDetailPage: React.FC = () => {
       <div className={styles.heroSection}>
         {post.cover_image && (
           <div className={styles.heroImage}>
-            <img src={post.cover_image} alt={title} />
+            <img src={post.cover_image || ""} alt={title} />
             <div className={styles.heroOverlay}></div>
           </div>
         )}
@@ -261,10 +265,8 @@ const BlogDetailPage: React.FC = () => {
         </div>
       </div>
 
-      {/* تغییرات گرید 3 ستونه در اینجا اعمال شده است */}
       <div className={styles.pageContainer}>
         
-        {/* ستون اول: سایدبار فهرست مطالب */}
         <aside className={`${styles.sidebar} ${styles.tocSidebar}`}>
           <div className={styles.sidebarCard}>
             <h3 className={styles.sidebarTitle}>
@@ -294,7 +296,6 @@ const BlogDetailPage: React.FC = () => {
           </div>
         </aside>
 
-        {/* ستون وسط: محتوای اصلی مقاله و نظرات */}
         <article className={styles.mainContent}>
           {backendError && (
             <div className={styles.errorBanner}>
@@ -321,7 +322,6 @@ const BlogDetailPage: React.FC = () => {
               </h3>
             </div>
 
-            {/* قسمت فرم نظرات با شرط ورود کاربر */}
             {isLoggedIn ? (
               <form onSubmit={handleAddComment} className={styles.addCommentForm}>
                 <textarea
@@ -382,9 +382,7 @@ const BlogDetailPage: React.FC = () => {
           </div>
         </article>
 
-        {/* ستون سوم: مقالات مرتبط و باکس لایک/اشتراک */}
         <aside className={`${styles.sidebar} ${styles.actionSidebar}`}>
-          {/* مقالات مرتبط */}
           <div className={styles.sidebarCard}>
             <h3 className={styles.sidebarTitle}>
               <span>🌿</span> {isEn ? 'Related' : 'مرتبط'}
@@ -418,7 +416,6 @@ const BlogDetailPage: React.FC = () => {
             )}
           </div>
 
-          {/* باکس لایک و اشتراک گذاری */}
           <div className={`${styles.sidebarCard} ${styles.interactionCard}`}>
             <div className={styles.voteContainer}>
               <span className={styles.voteQuestion}>

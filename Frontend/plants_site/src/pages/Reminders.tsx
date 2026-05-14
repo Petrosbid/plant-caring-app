@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useReminders } from '../hooks/useReminders';
 import { useUserPlants } from '../hooks/useUserPlants';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
+import { LoaderGooeyBlobs } from '../components/animation/gooey-loader';
 
 const Reminders: React.FC = () => {
   const { t } = useLanguageTheme();
@@ -82,7 +83,7 @@ const Reminders: React.FC = () => {
         // Don't include timestamps - backend will auto-populate
       };
 
-      await addReminderApi(apiPayload);
+     await addReminderApi(apiPayload as any);
 
       // Reset form
       setNewReminder({
@@ -105,7 +106,7 @@ const Reminders: React.FC = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-500 mx-auto"></div>
+          <LoaderGooeyBlobs size={25} color="#10b981" duration={1} />
           <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
             {t('home') === 'Home' ? 'Loading reminders...' : 'در حال بارگذاری یادآوری‌ها...'}
           </p>

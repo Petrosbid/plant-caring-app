@@ -1,36 +1,63 @@
-// PlantImage interface
+// 📁 src/types/index.ts
 export interface PlantImage {
   id: number;
-  image: string; // URL to the image
-  caption?: string;
+  image: string;                       
+  image_url: string | null;           
+  caption?: string | null;
   is_primary: boolean;
   created_at: string;
 }
 
-// Plant interface
 export interface Plant {
   id: number;
   farsi_name: string;
-  scientific_name: string;
-  description: string;
-  primary_image?: string; // URL to the primary image
+  english_name: string | null;
+  scientific_name: string | null;
+  description: string;                
+  description_en: string | null;
+       
+  is_favourited?: boolean;        
+  favourite_count: number;
+  comment_count: number;
+  
+  primary_image: string | null;
+
   is_toxic: boolean;
-  watering_frequency: string;
-  light_requirements: string;
-  fertilizer_schedule: string;
-  temperature_range: string;
-  humidity_level: string;
-  soil_type: string;
-  pruning_info: string;
-  propagation_methods: string;
-  care_difficulty: string;
+
+  watering_frequency: string | null;
+  light_requirements: string | null;
+  fertilizer_schedule: string | null;
+  temperature_range: string | null;
+  humidity_level: string | null;
+  soil_type: string | null;
+  pruning_info: string | null;
+  propagation_methods: string | null;
+
+  watering_frequency_en: string | null;
+  light_requirements_en: string | null;
+  fertilizer_schedule_en: string | null;
+  temperature_range_en: string | null;
+  humidity_level_en: string | null;
+  soil_type_en: string | null;
+  pruning_info_en: string | null;
+  propagation_methods_en: string | null;
+
+  care_difficulty: string;            
+  care_difficulty_display: {          
+    en: string;
+    fa: string;
+  };
+
+  view_count: number;                
+  garden_count: number;              
+
   created_at: string;
   updated_at: string;
-  images?: PlantImage[]; // List of all images for this plant
+
+  images?: PlantImage[];
   careInstructions?: CareInstruction[];
 }
 
-// Care instruction interface
 export interface CareInstruction {
   id: number;
   plantId: number;
@@ -40,8 +67,8 @@ export interface CareInstruction {
   enabled: boolean;
 }
 
-// User interface
 export interface User {
+  date_joined: any;
   id: number;
   username: string;
   email: string;
@@ -51,47 +78,19 @@ export interface User {
   phone?: string;
 }
 
-// Disease interface
-export interface Disease {
-  id: number;
-  name: string;
-  description: string;
-  symptoms: string;
-  solution: string;
-  prevention_methods: string[];
-  severity_level: string;
-  spread_rate: string;
-  affected_plants: any[];
-  created_at: string;
-  updated_at: string;
-  // Additional fields from LLM analysis
-  llm_analysis?: {
-    disease_name_fa: string;
-    description: string;
-    severity: string;
-    is_infectious: boolean;
-    treatment_steps: string[];
-    prevention: string;
-  };
-  detected_name?: string;
-  confidence?: number;
-}
-
-// Reminder interface
 export interface Reminder {
   id: number;
   user: number;
-  user_plant?: number; // Reference to the specific plant in user's garden
+  user_plant?: number;
   title: string;
   description: string;
-  care_type: 'watering' | 'fertilizing' | 'pruning' | 'pest_control' | 'repotting' | 'other'; // Type of care reminder
+  care_type: 'watering' | 'fertilizing' | 'pruning' | 'pest_control' | 'repotting' | 'other';
   scheduled_date: string;
   is_completed: boolean;
-  is_recurring: boolean; // Whether this is a recurring reminder
-  recurrence_interval?: number; // Interval in days for recurring reminders
+  is_recurring: boolean;
+  recurrence_interval?: number;
   created_at: string;
   updated_at: string;
-  // UI / form display fields (optional, may come from API or form)
   plantName?: string;
   task?: string;
   frequency?: string;
@@ -99,12 +98,12 @@ export interface Reminder {
   enabled?: boolean;
 }
 
-// UserPlant interface (for plants in user's garden)
 export interface UserPlant {
+  pot_size: any;
   id: number;
   user: number;
-  plant: number; // Reference to the plant in the main database
-  plant_details?: Plant; // Full plant details
+  plant: number;
+  plant_details?: Plant;          
   nickname?: string;
   added_date: string;
   last_watered: string;
@@ -118,4 +117,93 @@ export interface UserPlant {
   pruning_interval_days: number;
   health_status: 'healthy' | 'needs_attention' | 'unhealthy';
   notes?: string;
+   growth_records?: GrowthRecord[];    
+  reminders?: Reminder[];  
+}
+
+export interface PlantFavorite {
+  id: number;
+  user: number;
+  plant: number;
+  created_at: string;
+}
+
+export interface PlantComment {
+  id: number;
+  user: number;
+  user_name: string;      
+  plant: number;
+  parent?: number | null;
+  content: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+  replies?: PlantComment[]; 
+}
+
+export interface GrowthRecord {
+  id: number;
+  user_plant?: number;
+  date: string;
+  height: number | null;
+  width: number | null;
+  unit: string;
+  notes?: string;
+  created_at: string;
+  updated_at: string;
+}
+
+
+
+// ==============================
+// Disease & Related Types
+// ==============================
+export interface DiseaseLLMAnalysis {
+  disease_name_fa: string;
+  disease_name_en: string;
+  description_fa: string;
+  description_en: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  is_infectious: string;     
+  is_infectious_en: string;  
+  treatment_steps_fa: string[];
+  treatment_steps_en: string[];
+  prevention_fa: string;
+  prevention_en: string;
+}
+
+export interface DiseaseComment {
+  id: number;
+  user: number;
+  user_name: string;
+  disease: number;
+  parent: number | null;
+  content: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+  replies?: DiseaseComment[];
+}
+
+export interface Disease {
+  id: number;
+  name: string;                    
+  name_fa: string | null;          
+  description: string;             
+  description_fa: string | null;
+  symptoms: string;
+  symptoms_fa: string | null;
+  solution: string;
+  solution_fa: string | null;
+  prevention_methods: string;
+  prevention_methods_fa: string | null;
+  severity_level: 'low' | 'medium' | 'high' | 'critical';
+  spread_rate: 'slow' | 'moderate' | 'fast';
+  view_count: number;
+  comment_count?: number;
+  created_at: string;
+  updated_at: string;
+  llm_analysis?: DiseaseLLMAnalysis;
+  affected_plants_list?: string; 
+  is_infectious_en?: string; 
 }

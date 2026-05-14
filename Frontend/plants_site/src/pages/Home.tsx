@@ -2,10 +2,45 @@ import React from 'react';
 import { motion } from 'framer-motion';
 import Button from '../components/ui/Button';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
+import LatestPostsCarousel from '../components/home/LatestPostsCarousel';
+import CountUp from '../components/animation/CountUp';
+import FloatingLines from '../components/animation/background_Floating Lines';
+import PopularBlogsCarousel from "../components/home/PopularBlogsCarousel";
+import MostViewedBlogsCarousel from "../components/home/MostViewedBlogsCarousel";
+import FavoritePlantsCarousel from "../components/home/FavoritePlantsCarousel";
+import MostViewedDiseasesCarousel from "../components/home/MostViewedDiseasesCarousel";
 
 interface HomeProps {
   navigateTo: (page: string) => void;
 }
+
+const parseValue = (valueStr: string) => {
+  const match = valueStr.match(/^[\d.]+/);
+  if (!match) return { number: 0, suffix: valueStr };
+  
+  const number = parseFloat(match[0]);
+  const suffix = valueStr.replace(match[0], '');
+  return { number, suffix };
+};
+
+const AnimatedStat: React.FC<{ value: string; from?: number; duration?: number; delay?: number; className?: string; }> = ({ value, from = 0, duration = 1, delay = 0, className = '', ...rest }) => {
+  const { number, suffix } = parseValue(value);
+  
+  return (
+    <span className={className}>
+      <CountUp
+        from={from}
+        to={number}
+        duration={duration}
+        delay={delay}
+        direction="up"
+        separator=""
+        {...rest}
+      />
+      {suffix}
+    </span>
+  );
+};
 
 const container = {
   hidden: { opacity: 0 },
@@ -56,34 +91,39 @@ const stats = [
 ];
 
 const Home: React.FC<HomeProps> = ({ navigateTo }) => {
-  const { t } = useLanguageTheme();
+  const { t, theme } = useLanguageTheme(); 
   const isEn = t('home') === 'Home';
+
+  const linesGradientLight = ["#238161", "#8c3636", "#314f81"]; 
+  const linesGradientDark = ["#0c7351", "#482121", "#224988"]; 
+  const linesGradient = theme === 'dark' ? linesGradientDark : linesGradientLight;
+
+  const lineCount = theme === 'dark' ? 8 : 9;
+  const bendStrength = theme === 'dark' ? -1.5 : -2;
 
   return (
     <div className="min-h-screen">
-      {/* Hero */}
-      <section className="relative overflow-hidden h-[81vh] py-20 lg:py-28">
-        {/* Background Video */}
-        <div className="absolute inset-0 overflow-hidden">
-          <video
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="absolute inset-0 w-full h-full object-cover"
-          >
-            <source src="/Abstract_Gradient_Animation_Generation.mkv" type="video/webm" />
-          </video>
-          {/* Overlay for better text readability */}
-          <div className="absolute inset-0 bg-white/70 dark:bg-slate-900/70" />
+      {/* Hero section*/}
+      <section className="relative overflow-hidden h-[100vh] py-20 lg:py-28 -mt-[84px]">
+        <div className={`absolute inset-0 z-0 ${theme === 'light' ? 'mix-blend-color-burn' : ''}`} id="floating-lines-wrapper">
+          <FloatingLines 
+            enabledWaves={["middle", "top", "bottom"]}
+            lineCount={lineCount}
+            lineDistance={8}
+            bendRadius={8}
+            bendStrength={bendStrength}
+            interactive
+            parallax
+            animationSpeed={1}
+            linesGradient={linesGradient}
+          />
         </div>
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_80%_80%_at_50%_-20%,rgba(34,197,94,0.12),transparent)] dark:opacity-60" />
-        <div className="container mx-auto px-4 lg:px-6 relative z-10">
+        <div className="relative z-10 container mx-auto px-4 lg:px-6">
           <motion.div
             variants={container}
             initial="hidden"
             animate="visible"
-            className="text-center max-w-4xl mx-auto"
+            className="text-center max-w-4xl mx-auto pt-[85px]"
           >
             <motion.div variants={item} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 dark:bg-brand-500/20 text-brand-700 dark:text-brand-600 text-sm font-medium mb-6">
               <span className="animate-float">🌱</span>
@@ -93,7 +133,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               variants={item}
               className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight"
             >
-              PlantCare Pro
+              PlantCare
             </motion.h1>
             <motion.p
               variants={item}
@@ -174,8 +214,125 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
         </div>
       </section>
 
+      {/* Carousels*/}
+      <section className="py-20 lg:py-24 bg-slate-50/80 dark:bg-slate-900/50">
+        <div className="container mx-auto px-4 lg:px-6">
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5 }}
+          className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
+          style={{ width: "80%"}}
+        />
+        
+        <motion.h2
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true, margin: "-60px" }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+          className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+        >
+          {isEn ? "Our newest blogs" : "تازه ترین مقالات ما"}
+        </motion.h2>
+          
+          <motion.div>
+            <LatestPostsCarousel />
+          </motion.div>
+      </div>
+      <div className="container mx-auto px-4 lg:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5 }}
+              className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
+              style={{ width: "80%"}}
+            />
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+            >
+              {isEn ? 'Most favorite Plants' : 'محبوب‌ترین گیاهان'}
+            </motion.h2>
+           <motion.div>
+            <FavoritePlantsCarousel  />
+          </motion.div>
+
+      </div>
+      <div className="container mx-auto px-4 lg:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5 }}
+              className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
+              style={{ width: "80%"}}
+            />
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+            >
+              {isEn ? 'Most favorite blogs' : 'محبوب‌ترین مقالات '}
+            </motion.h2>
+           <motion.div>
+            <PopularBlogsCarousel  />
+          </motion.div>
+
+      </div>
+      <div className="container mx-auto px-4 lg:px-6">
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5 }}
+              className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
+              style={{ width: "80%"}}
+            />
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+            >
+              {isEn ? 'most viewd blogs' : 'پربازدیدترین بیماری‌ها'}
+            </motion.h2>
+           <motion.div>
+            <MostViewedDiseasesCarousel  />
+          </motion.div>
+      </div>
+      <div className="container mx-auto px-4 lg:px-6">  
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5 }}
+              className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
+              style={{ width: "80%"}}
+            />
+            <motion.h2
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-60px" }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+            >
+              {isEn ? 'Most viewd blogs' : 'پربیننده‌ترین مقالات '}
+            </motion.h2>
+           <motion.div>
+            <MostViewedBlogsCarousel  />
+          </motion.div>
+      </div>
+        </section>
       {/* Stats */}
-      <section className="py-20 lg:py-24 bg-white dark:bg-slate-900">
+      <section className="py-20 lg:py-24 bg-white dark:bg-slate-900 text-center">
         <div className="container mx-auto px-4 lg:px-6">
           <motion.div
             initial={{ opacity: 0 }}
@@ -184,17 +341,14 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
             className="grid grid-cols-2 md:grid-cols-4 gap-8"
           >
             {stats.map((s, i) => (
-              <motion.div
-                key={s.value}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="text-center"
-              >
-                <p className="font-display text-4xl lg:text-5xl font-bold text-brand-600 dark:text-brand-400 mb-2">
-                  {s.value}
-                </p>
+              <motion.div key={i} className="stat-item">
+                <AnimatedStat
+                  value={s.value}
+                  from={0}
+                  duration={1}
+                  delay={i * 0.2} 
+                  className="text-center font-display text-4xl lg:text-5xl font-bold text-brand-600 dark:text-brand-400 mb-2"
+                />
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
                   {isEn ? s.labelEn : s.labelFa}
                 </p>

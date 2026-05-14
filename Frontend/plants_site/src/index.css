@@ -2,8 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
+
 :root {
-  font-family: 'DM Sans', system-ui, sans-serif;
+  font-family: 'Vazirmatn', 'inter', 'DM Sans', system-ui;
   line-height: 1.6;
   font-weight: 400;
   color-scheme: light dark;
@@ -55,7 +56,7 @@ body {
 
 /* RTL Support */
 [dir="rtl"] {
-  font-family: 'Vazirmatn', 'DM Sans', system-ui, sans-serif;
+  font-family: Vazirmatn, Inter, sans-serif;
   text-align: right;
 }
 
@@ -109,7 +110,7 @@ html {
 
 /* Glass effect */
 .glass {
-  @apply bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl border border-white/20 dark:border-gray-700/50;
+  @apply bg-white/60 dark:bg-gray-900/60 border border-white/20 dark:border-gray-700/50;
 }
 
 /* Animated underline for nav links */
@@ -152,5 +153,95 @@ html {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
+  }
+}
+
+/* Circular ripple animation origin variables */
+:root {
+  --transition-speed: 0.5s;
+  --transition-blur: 0px;
+  --x: 50%;
+  --y: 50%;
+}
+
+/* Base View Transition Configuration */
+::view-transition-group(root) {
+  animation: none;
+  isolation: isolate;
+  overflow: hidden;
+}
+
+::view-transition-image-pair(root) {
+  isolation: isolate;
+  overflow: hidden;
+}
+
+/* Apply blur if specified */
+::view-transition-old(root),
+::view-transition-new(root) {
+  filter: blur(var(--transition-blur));
+  overflow: hidden;
+  backface-visibility: hidden;
+  contain: paint;
+}
+
+/* Light → Dark: Dark theme expands from click position */
+[data-theme-transition="to-dark"]::view-transition-old(root) {
+  animation: none;
+  z-index: -1;
+  mix-blend-mode: normal;
+}
+
+[data-theme-transition="to-dark"]::view-transition-new(root) {
+  animation: circle var(--transition-speed) ease-in-out;
+  will-change: clip-path;
+  mix-blend-mode: normal;
+  z-index: 1;
+  transform: translateZ(0);
+}
+
+/* Dark → Light: Dark shrinks away, revealing light underneath */
+[data-theme-transition="to-light"]::view-transition-old(root) {
+  animation: circle-reverse var(--transition-speed) ease-in-out;
+  will-change: clip-path;
+  z-index: 1;
+  transform: translateZ(0);
+}
+
+[data-theme-transition="to-light"]::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+  z-index: -1;
+}
+
+/* Circle expand animation */
+@keyframes circle {
+  from {
+    clip-path: circle(0% at var(--x) var(--y));
+  }
+
+  to {
+    clip-path: circle(150% at var(--x) var(--y));
+  }
+}
+
+/* Circle shrink animation */
+@keyframes circle-reverse {
+  from {
+    clip-path: circle(150% at var(--x) var(--y));
+  }
+
+  to {
+    clip-path: circle(0% at var(--x) var(--y));
+  }
+}
+
+/* Disable animations for reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }
