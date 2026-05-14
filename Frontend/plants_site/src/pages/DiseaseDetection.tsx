@@ -83,7 +83,7 @@ const DiseaseDetection: React.FC = () => {
 
     return (
       <div className="container mx-auto px-4 lg:px-6 py-10 lg:py-14">
-        <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-bold text-center text-brand-700 dark:text-brand-400 mb-10">
+        <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
           {t('disease')}
         </motion.h1>
         <motion.div
@@ -94,7 +94,7 @@ const DiseaseDetection: React.FC = () => {
           className="max-w-4xl mx-auto mt-10 bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 overflow-hidden"
         >
           <div className="bg-gradient-to-r from-amber-500 to-orange-600 p-6">
-            <h2 className="font-display text-2xl font-bold text-white mb-1">
+            <h2 className="font-display text-2xl font-semibold text-white mb-1">
               {isEn ? 'Disease Detected' : 'بیماری شناسایی شد'}
             </h2>
             <p className="text-white/90 text-sm">
@@ -115,7 +115,7 @@ const DiseaseDetection: React.FC = () => {
 
               <div className="lg:w-3/5 space-y-6">
                 <div>
-                  <h3 className="font-display text-2xl font-bold text-slate-900 dark:text-white">
+                  <h3 className="font-display text-2xl font-semibold text-slate-900 dark:text-white">
                     {diseaseName}
                   </h3>
                   <div className="flex flex-wrap gap-2 mt-3">
@@ -166,7 +166,7 @@ const DiseaseDetection: React.FC = () => {
 
                 <div className="pt-4 border-t border-slate-200 dark:border-slate-700 flex justify-between items-center">
                   <span className="text-slate-600 dark:text-slate-400 text-sm">{isEn ? 'Confidence' : 'اطمینان'}</span>
-                  <span className="font-display font-bold text-brand-600 dark:text-brand-400">
+                  <span className="font-display font-semibold text-brand-600 dark:text-brand-400">
                     {result.confidence ? `${result.confidence.toFixed(1)}%` : 'N/A'}
                   </span>
                 </div>
@@ -186,7 +186,7 @@ const DiseaseDetection: React.FC = () => {
   // Upload interface unchanged
   return (
     <div className="container mx-auto px-4 lg:px-6 py-10 lg:py-14">
-      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-bold text-center text-brand-700 dark:text-brand-400 mb-10">
+      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
         {t('disease')}
       </motion.h1>
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">

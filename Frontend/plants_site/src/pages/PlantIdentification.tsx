@@ -98,7 +98,7 @@ const PlantIdentification: React.FC = () => {
             <div className="sticky top-0 bg-gradient-to-r from-brand-500 to-emerald-600 p-6 rounded-t-2xl z-10">
               <div className="flex justify-between items-center">
                 <div>
-                  <h2 className="font-display text-2xl font-bold text-white mb-1">
+                  <h2 className="font-display text-2xl font-semibold text-white mb-1">
                     {isEn ? 'Identification Results' : 'نتایج شناسایی'}
                   </h2>
                   <p className="text-white/90 text-sm">
@@ -132,7 +132,7 @@ const PlantIdentification: React.FC = () => {
                 </div>
                 <div className="lg:w-3/5 space-y-6">
                   <div>
-                    <h3 className="font-display text-2xl font-bold text-slate-900 dark:text-white">{name}</h3>
+                    <h3 className="font-display text-2xl font-semibold text-slate-900 dark:text-white">{name}</h3>
                     <p className="text-brand-600 dark:text-brand-400 italic">{result.scientific_name}</p>
                     <span className={`inline-block mt-3 px-3 py-1 rounded-full text-sm font-medium ${result.is_toxic ? 'bg-red-100 text-red-800 dark:bg-red-900/50 dark:text-red-200' : 'bg-green-100 text-green-800 dark:bg-green-900/50 dark:text-green-200'}`}>
                       {result.is_toxic ? (isEn ? 'Toxic Plant' : 'گیاه سمی') : (isEn ? 'Non-toxic Plant' : 'گیاه غیرسمی')}
@@ -216,7 +216,7 @@ const PlantIdentification: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 py-10 lg:py-14">
-      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-bold text-center text-brand-700 dark:text-brand-400 mb-10">
+      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
         {t('identify')}
       </motion.h1>
       <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">

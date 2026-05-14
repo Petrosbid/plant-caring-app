@@ -72,7 +72,7 @@ const PlantDetailModal: React.FC<Props> = ({ userPlant, language, onClose, onUpd
         {/* Header */}
         <div className="flex justify-between items-center p-6 border-b border-slate-200 dark:border-slate-700">
           <div>
-            <h2 className="text-2xl font-bold text-slate-800 dark:text-white">
+            <h2 className="text-2xl font-semibold text-slate-800 dark:text-white">
               {userPlant.nickname || userPlant.plant_details?.farsi_name}
             </h2>
             {userPlant.nickname && userPlant.plant_details?.farsi_name && (
@@ -296,7 +296,7 @@ const EditTab: React.FC<{
             <input
               type="text"
               value={form.nickname}
-              onChange={(e) => setForm({ ...form, nickname: e.target.value })}
+              onChange={(e) => setForm((prev: any) => ({ ...prev, nickname: e.target.value }))}
               placeholder={isEn ? 'e.g. My Little Cactus' : 'مثلاً کاکتوس کوچولوی من'}
               className={inputClass}
             />

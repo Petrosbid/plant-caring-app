@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
 import { FiBell, FiX, FiDroplet, FiSun, FiScissors, FiAlertCircle } from 'react-icons/fi';
 import { fetchNotifications, type NotificationsResponse, type Notification } from '../../services/notificationService';
 import { useLanguageTheme } from '../../contexts/LanguageThemeContext';

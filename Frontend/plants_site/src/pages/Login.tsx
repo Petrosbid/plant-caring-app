@@ -153,9 +153,13 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
               <input type="checkbox" className="rounded border-slate-300 text-brand-500 focus:ring-brand-500" />
               {isEn ? 'Remember me' : 'مرا به خاطر بسپار'}
             </label>
-            <a href="#" className="font-medium text-brand-600 dark:text-brand-400 hover:underline">
-              {isEn ? 'Forgot password?' : 'فراموشی رمز عبور؟'}
-            </a>
+            <button
+                type="button"
+                onClick={() => { /* منطق فراموشی رمز */ }}
+                className="font-medium text-brand-600 dark:text-brand-400 hover:underline"
+              >
+                {isEn ? 'Forgot password?' : 'فراموشی رمز عبور؟'}
+              </button>
           </div>
           <motion.button
             type="submit"
@@ -386,7 +390,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
             >
               🌱
             </motion.div>
-            <h2 className="font-display text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white">
+            <h2 className="font-display text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white">
               {isSignUp
                 ? (isEn ? 'Create Account' : 'ایجاد حساب کاربری')
                 : (isEn ? 'Sign in to your account' : 'ورود به حساب کاربری')}

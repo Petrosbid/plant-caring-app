@@ -24,7 +24,7 @@ const PostCard: React.FC<{ post: PostListItem; language: 'en' | 'fa' }> = ({ pos
   const imageUrl = post.cover_image ;
 
   return (
-    <article className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md dark:shadow-gray-900/30 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full border border-gray-100 dark:border-gray-700 hover:border-green-100 dark:hover:border-green-800">
+    <article className="group bg-white dark:bg-gray-800 rounded-2xl shadow-md dark:shadow-gray-900/30 hover:shadow-xl transition-all duration-300 overflow-hidden flex flex-col h-full border border-slate-100 dark:border-slate-700 hover:border-green-100 dark:hover:border-green-800">
       <div className="relative overflow-hidden bg-gray-200 dark:bg-gray-700 h-48">
         <img
           src={imageUrl || ''}
@@ -40,12 +40,12 @@ const PostCard: React.FC<{ post: PostListItem; language: 'en' | 'fa' }> = ({ pos
                   {tag.trim()}
                 </span>
               ))}
-          {date && <time className="text-xs text-gray-500 dark:text-gray-400">{date}</time>}
+          {date && <time className="text-xs text-slate-500 dark:text-slate-400">{date}</time>}
         </div>
-        <h3 className="text-xl font-bold text-gray-900 dark:text-gray-100 mb-2 line-clamp-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
+        <h3 className="text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2 line-clamp-2 group-hover:text-green-600 dark:group-hover:text-green-400 transition-colors">
           {title}
         </h3>
-        <p className="text-gray-600 dark:text-gray-300 text-sm line-clamp-3 mb-4 text-justify">{excerpt}</p>
+        <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-3 mb-4 text-justify">{excerpt}</p>
         <div className="mt-auto">
           <a
             href={`/blog/${post.slug}`}
@@ -72,18 +72,18 @@ const Pagination: React.FC<{
       <button
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
-        className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+        className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-800 text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
         aria-label={language === 'en' ? 'Previous page' : 'صفحه قبلی'}
       >
         {language === 'en' ? '← Previous' : 'قبلی →'}
       </button>
-      <span className="text-sm text-gray-600 dark:text-gray-400">
+      <span className="text-sm text-slate-600 dark:text-slate-400">
         {language === 'en' ? `Page ${currentPage} of ${totalPages}` : `صفحه ${currentPage} از ${totalPages}`}
       </span>
       <button
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}
-        className="px-4 py-2 rounded-lg border border-gray-300 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
+        className="px-4 py-2 rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-gray-800 text-slate-700 dark:text-slate-300 disabled:opacity-50 disabled:cursor-not-allowed hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors focus:outline-none focus:ring-2 focus:ring-green-500"
         aria-label={language === 'en' ? 'Next page' : 'صفحه بعدی'}
       >
         {language === 'en' ? 'Next →' : 'بعدی ←'}
@@ -180,7 +180,7 @@ const BlogListPage: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center min-h-[60vh] bg-gray-50 dark:bg-gray-900">
         <LoaderGooeyBlobs size={25} color="#10b981" duration={1} />
-        <p className="mt-4 text-gray-600 dark:text-gray-400">
+        <p className="mt-4 text-slate-600 dark:text-slate-400">
           {language === 'fa' ? 'در حال بارگذاری...' : 'Loading posts...'}
         </p>
       </div>
@@ -207,7 +207,7 @@ const BlogListPage: React.FC = () => {
       dir={language === 'fa' ? 'rtl' : 'ltr'}
     >
       {/* Page Header */}
-      <h1 className="text-3xl md:text-4xl font-bold text-center text-gray-900 dark:text-gray-100 mb-8 lg:mb-12">
+      <h1 className="text-3xl md:text-4xl font-semibold text-center text-slate-900 dark:text-slate-100 mb-8 lg:mb-12">
         {language === 'en' ? 'From the Blog' : 'وبلاگ'}
       </h1>
 
@@ -219,11 +219,11 @@ const BlogListPage: React.FC = () => {
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
             placeholder={language === 'en' ? 'Search articles...' : 'جستجوی مطالب...'}
-            className="w-full pl-10 pr-10 py-3 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
+            className="w-full pl-10 pr-10 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-gray-800 text-slate-900 dark:text-slate-100 shadow-sm focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent transition"
             aria-label={language === 'en' ? 'Search posts' : 'جستجوی پست‌ها'}
           />
           <svg
-            className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 dark:text-gray-500 ${language === 'fa' ? 'right-3' : 'left-3'}`}
+            className={`absolute top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 dark:text-slate-500 ${language === 'fa' ? 'right-3' : 'left-3'}`}
             fill="none"
             stroke="currentColor"
             viewBox="0 0 24 24"
@@ -233,7 +233,7 @@ const BlogListPage: React.FC = () => {
           {searchTerm && (
             <button
               onClick={() => setSearchTerm('')}
-              className={`absolute top-1/2 -translate-y-1/2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 ${language === 'fa' ? 'left-3' : 'right-3'}`}
+              className={`absolute top-1/2 -translate-y-1/2 text-slate-400 dark:text-slate-500 hover:text-slate-600 dark:hover:text-slate-300 ${language === 'fa' ? 'left-3' : 'right-3'}`}
               aria-label="Clear search"
             >
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -256,7 +256,7 @@ const BlogListPage: React.FC = () => {
               className={`px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-green-500 ${
                 isActive
                   ? 'bg-green-600 dark:bg-green-500 text-white shadow-md'
-                  : 'bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'
+                  : 'bg-gray-100 dark:bg-gray-800 text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-gray-700'
               }`}
               aria-pressed={isActive}
             >
@@ -267,7 +267,7 @@ const BlogListPage: React.FC = () => {
         {(selectedCategory !== 'All' || searchTerm) && (
           <button
             onClick={handleClearFilters}
-            className="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
+            className="px-4 py-2 rounded-full text-sm font-medium bg-gray-100 dark:bg-gray-800 text-slate-600 dark:text-slate-400 hover:bg-gray-200 dark:hover:bg-gray-700 transition"
             aria-label="Clear all filters"
           >
             {language === 'en' ? 'Clear filters ✕' : 'پاک کردن فیلترها ✕'}
@@ -276,7 +276,7 @@ const BlogListPage: React.FC = () => {
       </div>
 
       {/* Results count */}
-      <div className="text-center text-sm text-gray-500 dark:text-gray-400 mb-6">
+      <div className="text-center text-sm text-slate-500 dark:text-slate-400 mb-6">
         {language === 'en'
           ? `Showing ${paginatedPosts.length} of ${filteredPosts.length} post${filteredPosts.length !== 1 ? 's' : ''}`
           : `نمایش ${paginatedPosts.length} از ${filteredPosts.length} مطلب`}
@@ -285,7 +285,7 @@ const BlogListPage: React.FC = () => {
       {/* Post Grid */}
       {filteredPosts.length === 0 ? (
         <div className="text-center py-16 bg-gray-100 dark:bg-gray-800/50 rounded-2xl">
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
+          <p className="text-slate-600 dark:text-slate-400 text-lg">
             {language === 'en' ? 'No posts match your filters.' : 'هیچ مطلبی با فیلترهای شما مطابقت ندارد.'}
           </p>
           <button

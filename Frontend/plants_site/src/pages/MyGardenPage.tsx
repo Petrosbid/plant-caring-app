@@ -76,7 +76,7 @@ const GardenPlantCard: React.FC<{
 
         {/* نام گیاه */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
-          <h3 className="text-white font-bold text-sm truncate">{displayName}</h3>
+          <h3 className="text-white font-semibold text-sm truncate">{displayName}</h3>
           {userPlant.nickname && (
             <p className="text-white/80 text-xs truncate">{originalName}</p>
           )}
@@ -229,7 +229,7 @@ const MyGardenPage: React.FC = () => {
       <motion.h1
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="text-3xl lg:text-4xl font-bold text-center text-brand-700 dark:text-brand-400 mb-8"
+        className="text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-8"
       >
         {isEn ? 'My Garden' : 'باغ من'}
       </motion.h1>

@@ -2,7 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import type { User } from '../types';
 import { authService } from '../services/api';
-
+import { use } from 'react';
 interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<void>;
@@ -127,7 +127,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
   const registerWithPhoneOtp = async (data: { phone?: string; email?: string; first_name?: string; last_name?: string; username: string; }) => {
-  await authService.registerRequestOtp('phone', data);
+  await Promise.all([
+    authService.registerRequestOtp('phone', data),
+  ]);
 };
 const registerWithEmailOtp = async (data: { phone?: string; email?: string; first_name?: string; last_name?: string; username: string; }) => {
   await authService.registerRequestOtp('email', data);
@@ -146,7 +148,7 @@ const verifyRegisterOtp = async (identifier: string, code: string) => {
 };
 
 export const useAuth = () => {
-  const context = useContext(AuthContext);
+  const context = use(AuthContext);
   if (!context) {
     throw new Error('useAuth must be used within an AuthProvider');
   }

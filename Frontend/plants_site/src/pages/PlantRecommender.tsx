@@ -12,6 +12,7 @@ import {
   FiCheckCircle, FiDroplet, FiSun, FiThermometer,
   FiWind, FiMapPin, FiUsers, FiAlertCircle, FiSmile
 } from 'react-icons/fi';
+import { storageKeys, getStorageItem, setStorageItem } from '../utils/storage';
 
 type Answers = Record<string, string | string[] | boolean>;
 
@@ -47,10 +48,15 @@ const PlantRecommender: React.FC = () => {
     }
   }, []);
 
-  useEffect(() => {
-    localStorage.setItem('plantRecommenderAnswers', JSON.stringify(answers));
-  }, [answers]);
 
+  useEffect(() => {
+    const saved = getStorageItem(storageKeys.recommenderAnswers, null);
+    if (saved) setAnswers(saved);
+  }, []);
+
+  useEffect(() => {
+    setStorageItem(storageKeys.recommenderAnswers, answers);
+  }, [answers]);
   const updateAnswer = (questionId: string, value: string | string[] | boolean) => {
     setAnswers(prev => ({ ...prev, [questionId]: value }));
     if (errors[questionId]) {
@@ -346,7 +352,7 @@ const PlantRecommender: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
         >
-          <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent mb-3">
+          <h1 className="text-4xl md:text-5xl font-semibold bg-gradient-to-r from-green-600 to-emerald-500 bg-clip-text text-transparent mb-3">
             {isEn ? 'Smart Plant Recommender' : 'پیشنهاددهنده هوشمند گیاه'}
           </h1>
           <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
@@ -382,7 +388,7 @@ const PlantRecommender: React.FC = () => {
                 className={`flex flex-col items-center transition-all duration-300 ${step <= currentSection ? 'text-green-600 dark:text-green-400' : 'text-slate-400 dark:text-slate-600'
                   }`}
               >
-                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${step < currentSection
+                <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold ${step < currentSection
                     ? 'bg-green-500 text-white'
                     : step === currentSection
                       ? 'bg-green-100 dark:bg-green-900/50 border-2 border-green-500 text-green-600 dark:text-green-400'
@@ -412,7 +418,7 @@ const PlantRecommender: React.FC = () => {
               {sectionIcons[currentSection - 1]}
             </div>
             <div>
-              <h2 className="text-xl font-bold text-white">
+              <h2 className="text-xl font-semibold text-white">
                 {isEn ? currentSectionData.titleEn : currentSectionData.titleFa}
               </h2>
               <p className="text-white/80 text-sm">
@@ -545,7 +551,7 @@ const PlantRecommender: React.FC = () => {
               <div className="sticky top-0 bg-gradient-to-r from-green-600 to-emerald-600 p-5 rounded-t-3xl flex justify-between items-center">
                 <div className="flex items-center gap-2">
                   <span className="text-2xl">🌿</span>
-                  <h2 className="text-xl font-bold text-white">
+                  <h2 className="text-xl font-semibold text-white">
                     {isEn ? 'Your Perfect Match' : 'گیاه مناسب شما'}
                   </h2>
                 </div>
@@ -569,13 +575,13 @@ const PlantRecommender: React.FC = () => {
                     </div>
                   )}
                   <div className="flex-1">
-                    <h3 className="font-display text-2xl font-bold text-slate-800 dark:text-white">
+                    <h3 className="font-display text-2xl font-semibold text-slate-800 dark:text-white">
                       {result.plant_name}
                     </h3>
                     <p className="text-green-600 dark:text-green-400 italic text-sm mb-3">
                       {result.scientific_name}
                     </p>
-                    <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl mb-4 border-l-4 border-green-500">
+                    <div className="bg-green-50 dark:bg-green-900/30 p-4 rounded-2xl mb-4 border-l-2 border-green-400/70 shadow-sm">
                       <p className="text-sm text-green-800 dark:text-green-200 leading-relaxed">
                         💡 {result.reason}
                       </p>

@@ -114,7 +114,7 @@ const CareGuide: React.FC = () => {
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
         >
-          <h1 className="font-display text-4xl lg:text-5xl font-bold text-brand-700 dark:text-brand-400 mb-4">{t('careGuide')}</h1>
+          <h1 className="font-display text-4xl lg:text-5xl font-semibold text-brand-700 dark:text-brand-400 mb-4">{t('careGuide')}</h1>
           <p className="text-lg text-slate-600 dark:text-slate-300 max-w-3xl mx-auto">
             {isEn
               ? 'Comprehensive care instructions to help your plants thrive and flourish'

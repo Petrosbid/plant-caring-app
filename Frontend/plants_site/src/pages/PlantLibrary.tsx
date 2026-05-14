@@ -139,7 +139,7 @@ const QuickInfoChip: React.FC<{ icon: string; label: string; value: string; clas
   className = '',
 }) => (
   <div
-    className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 ${className}`}
+    className={`flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-gray-100 dark:bg-gray-700 text-slate-600 dark:text-slate-300 ${className}`}
     title={`${label}: ${value}`}
   >
     <span className="text-sm leading-none">{icon}</span>
@@ -192,7 +192,7 @@ const PlantCard: React.FC<{ plant: Plant; language: 'en' | 'fa'; isInGarden: boo
         <div className="p-4">
           {/* Title & Difficulty */}
           <div className="flex justify-between items-start gap-2 mb-1">
-            <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white truncate">{name}</h2>
+            <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white truncate">{name}</h2>
             <span className="flex-shrink-0 px-2 py-0.5 rounded-lg bg-brand-100 dark:bg-brand-900/50 text-brand-700 dark:text-brand-300 text-xs font-semibold">
               {difficulty}
             </span>
@@ -307,7 +307,7 @@ const PlantLibrary: React.FC = () => {
       <motion.h1
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="font-display text-3xl lg:text-4xl font-bold text-center text-brand-700 dark:text-brand-400 mb-8"
+        className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-8"
       >
         {t('library')}
       </motion.h1>
@@ -336,7 +336,7 @@ const PlantLibrary: React.FC = () => {
                           className={`px-3 py-1 rounded-full text-xs font-medium transition ${
                             isActive
                               ? 'bg-green-600 text-white'
-                              : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                              : 'bg-gray-100 dark:bg-gray-700 text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                           }`}
                         >
                           {display}

@@ -19,7 +19,7 @@ export const LoginPopup: React.FC<LoginPopupProps> = ({ isOpen, onClose, onLogin
           >
             <div className="text-center">
               <div className="text-5xl mb-4">🔒</div>
-              <h3 className="text-2xl font-bold text-slate-900 dark:text-white mb-2">
+              <h3 className="text-2xl font-semibold text-slate-900 dark:text-white mb-2">
                 Login Required
               </h3>
               <p className="text-slate-600 dark:text-slate-300 mb-6">

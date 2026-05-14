@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, Children } from 'react';
 import type { ReactNode } from 'react';
+import { use } from 'react';
 
 type Language = 'en' | 'fa';
 type Theme = 'light' | 'dark';
@@ -218,7 +219,7 @@ const translations = {
 
 
 export const useLanguageTheme = () => {
-  const context = useContext(LanguageThemeContext);
+  const context = use(LanguageThemeContext);
   if (!context) {
     throw new Error('useLanguageTheme must be used within a LanguageThemeProvider');
   }

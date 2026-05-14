@@ -52,13 +52,16 @@ try {
   setIsTransitioning(false);
 }
 };
-return (
-<div
-  onClick={handleClick}
-  className={className}
-  style={{ pointerEvents: isTransitioning ? "none" : "auto" }}
->
-  {children}
-</div>
-);
+  return (
+    <div
+      onClick={handleClick}
+      onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && handleClick(e as any)}
+      role="button"
+      tabIndex={0}
+      className={className}
+      style={{ pointerEvents: isTransitioning ? "none" : "auto" }}
+    >
+      {children}
+    </div>
+  );
 }

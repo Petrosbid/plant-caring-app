@@ -171,7 +171,7 @@ const DiseaseDetailsPage: React.FC = () => {
           <div className="bg-gradient-to-r from-red-500 to-orange-600 px-6 py-8 text-white">
             <div className="flex justify-between items-start flex-wrap gap-4">
               <div>
-                <h1 className="text-3xl md:text-4xl font-bold mb-2">{name}</h1>
+                <h1 className="text-3xl md:text-4xl font-semibold mb-2">{name}</h1>
                 {disease.name_fa && !isEn && disease.name && (
                   <p className="text-white/80 text-sm">{disease.name}</p>
                 )}
@@ -207,7 +207,7 @@ const DiseaseDetailsPage: React.FC = () => {
           <div className="p-6 space-y-6">
             {/* توضیحات */}
             <div className="prose dark:prose-invert max-w-none">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                 <FiAlertCircle className="text-red-500" />
                 {isEn ? 'Description' : 'توضیحات'}
               </h2>
@@ -216,7 +216,7 @@ const DiseaseDetailsPage: React.FC = () => {
 
             {/* علائم */}
             <div className="prose dark:prose-invert max-w-none">
-              <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+              <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                 <FiActivity className="text-orange-500" />
                 {isEn ? 'Symptoms' : 'علائم'}
               </h2>
@@ -226,7 +226,7 @@ const DiseaseDetailsPage: React.FC = () => {
             {/* ===== بخش جدید: گیاهان آسیب‌دیده ===== */}
             {disease.affected_plants_list && (
               <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-3">
+                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-3">
                   <FiGrid className="text-emerald-600" />
                   {isEn ? 'Affected Plants' : 'گیاهان آسیب‌دیده'}
                 </h2>
@@ -240,7 +240,7 @@ const DiseaseDetailsPage: React.FC = () => {
                 onClick={() => setShowTreatment(!showTreatment)}
                 className="flex justify-between items-center w-full text-left"
               >
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                   <FiClipboard className="text-green-600" />
                   {isEn ? 'Treatment' : 'درمان'}
                 </h2>
@@ -279,7 +279,7 @@ const DiseaseDetailsPage: React.FC = () => {
                 onClick={() => setShowPrevention(!showPrevention)}
                 className="flex justify-between items-center w-full text-left"
               >
-                <h2 className="text-xl font-bold text-slate-800 dark:text-slate-200 flex items-center gap-2">
+                <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                   <FiShield className="text-blue-600" />
                   {isEn ? 'Prevention' : 'پیشگیری'}
                 </h2>
@@ -310,7 +310,7 @@ const DiseaseDetailsPage: React.FC = () => {
         <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-6 border border-white/30 dark:border-slate-700/50">
           <div className="flex items-center gap-2 mb-4">
             <FiMessageCircle className="w-5 h-5 text-green-600" />
-            <h3 className="text-xl font-bold text-slate-800 dark:text-slate-200">
+            <h3 className="text-xl font-semibold text-slate-800 dark:text-slate-200">
               {isEn ? `Comments (${comments.length})` : `نظرات (${comments.length})`}
             </h3>
           </div>
@@ -390,7 +390,7 @@ const DiseaseCommentItem: React.FC<{
       exit={{ opacity: 0 }}
       className={`flex gap-3 ${depth > 0 ? 'ml-6 pl-4 border-l-2 border-slate-200 dark:border-slate-700' : ''}`}
     >
-      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-bold text-sm flex-shrink-0">
+      <div className="w-8 h-8 rounded-full bg-gradient-to-br from-green-400 to-emerald-500 flex items-center justify-center text-white font-semibold text-sm flex-shrink-0">
         {comment.user_name[0]?.toUpperCase()}
       </div>
       <div className="flex-1">

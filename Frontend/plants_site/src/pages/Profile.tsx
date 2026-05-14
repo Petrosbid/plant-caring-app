@@ -47,7 +47,7 @@ const Sidebar: React.FC<{
   ];
 
   return (
-    <aside className="w-64 h-[74vh] bg-white dark:bg-gray-800 sticky top-24 h-[calc(100vh-6rem)] p-4 shadow-md rounded-2xl border-l border-gray-200 dark:border-gray-700">
+    <aside className="w-64 h-[74vh] bg-white dark:bg-gray-800 sticky top-24 h-[calc(100vh-6rem)] p-4 shadow-md rounded-2xl border-l border-slate-200 dark:border-slate-700">
       {/* User Summary */}
       <div className="flex flex-col items-center p-4 bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-700 dark:to-gray-800 rounded-xl shadow-inner">
         <img
@@ -55,10 +55,10 @@ const Sidebar: React.FC<{
           alt={user.username}
           className="w-20 h-20 rounded-full border-4 border-primary object-cover mb-2"
         />
-        <span className="font-bold text-gray-800 dark:text-white">
+        <span className="font-semibold text-slate-800 dark:text-white">
           {user.first_name ? `${user.first_name} ${user.last_name}` : user.username}
         </span>
-        <span className="text-sm text-gray-500 dark:text-gray-400">{user.email}</span>
+        <span className="text-sm text-slate-500 dark:text-slate-400">{user.email}</span>
       </div>
 
       {/* Navigation */}
@@ -71,7 +71,7 @@ const Sidebar: React.FC<{
                 className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl transition-all ${
                   activeTab === item.id
                     ? 'bg-primary/10 text-primary dark:bg-primary/20'
-                    : 'text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700'
+                    : 'text-slate-600 dark:text-slate-300 hover:bg-gray-100 dark:hover:bg-gray-700'
                 }`}
               >
                 {/* <lord-icon
@@ -134,7 +134,7 @@ const ProfileHeader: React.FC<{ user: any; onAvatarChange: (file: File) => void 
           <img
             src={user.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}`}
             alt={user.username}
-            className="w-28 h-28 rounded-full border-4 border-white dark:border-gray-800 object-cover shadow-lg"
+            className="w-28 h-28 rounded-full border-4 border-white dark:border-slate-800 object-cover shadow-lg"
           />
           <button
             onClick={() => fileInputRef.current?.click()}
@@ -154,7 +154,7 @@ const ProfileHeader: React.FC<{ user: any; onAvatarChange: (file: File) => void 
           />
         </div>
         <div className="mr-4 mb-2 text-white">
-          <h2 className="text-2xl font-bold">
+          <h2 className="text-2xl font-semibold">
             {user.first_name ? `${user.first_name} ${user.last_name}` : user.username}
           </h2>
           <p className="opacity-90">{user.email}</p>
@@ -217,40 +217,40 @@ const ProfileForm: React.FC<{ user: any; genderChoices: [string, string][] }> = 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Basic Info Section */}
         <div className="md:col-span-2">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white border-b pb-2">{t('basicInfo')}</h3>
+          <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white border-b pb-2">{t('basicInfo')}</h3>
         </div>
 
         <div>
           <label className="block text-sm font-medium mb-1">{t('username')}</label>
-          <input {...register('username', { required: true })} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('username', { required: true })} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('firstName')}</label>
-          <input {...register('first_name')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('first_name')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('lastName')}</label>
-          <input {...register('last_name')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('last_name')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('email')}</label>
-          <input {...register('email', { required: true })} type="email" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('email', { required: true })} type="email" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('phone')}</label>
-          <input {...register('phone')} type="tel" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('phone')} type="tel" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('nationalCode')}</label>
-          <input {...register('national_code')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('national_code')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('birthDate')}</label>
-          <input {...register('birth_date')} type="date" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('birth_date')} type="date" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('gender')}</label>
-          <select {...register('gender')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600">
+          <select {...register('gender')} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600">
             <option value="">{t('select')}</option>
             {genderChoices.map(([value, label]) => (
               <option key={value} value={value}>{label}</option>
@@ -259,24 +259,24 @@ const ProfileForm: React.FC<{ user: any; genderChoices: [string, string][] }> = 
         </div>
         <div className="md:col-span-2">
           <label className="block text-sm font-medium mb-1">{t('bio')}</label>
-          <textarea {...register('bio')} rows={3} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <textarea {...register('bio')} rows={3} className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
 
         {/* Password Change Section */}
         <div className="md:col-span-2 mt-4">
-          <h3 className="text-lg font-semibold mb-4 text-gray-800 dark:text-white border-b pb-2">{t('changePassword')}</h3>
+          <h3 className="text-lg font-semibold mb-4 text-slate-800 dark:text-white border-b pb-2">{t('changePassword')}</h3>
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('currentPassword')}</label>
-          <input {...register('current_password')} type="password" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('current_password')} type="password" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('newPassword')}</label>
-          <input {...register('new_password')} type="password" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('new_password')} type="password" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
         <div>
           <label className="block text-sm font-medium mb-1">{t('confirmNewPassword')}</label>
-          <input {...register('confirm_password')} type="password" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-gray-600" />
+          <input {...register('confirm_password')} type="password" className="w-full px-4 py-2 border rounded-xl dark:bg-gray-700 dark:border-slate-600" />
         </div>
       </div>
 
@@ -312,7 +312,7 @@ const PlantsTab: React.FC = () => {
     return (
       <div className="text-center py-12">
         <span className="text-6xl mb-4 block">🌱</span>
-        <p className="text-gray-500 dark:text-gray-400">{t('noPlants')}</p>
+        <p className="text-slate-500 dark:text-slate-400">{t('noPlants')}</p>
       </div>
     );
   }
@@ -337,7 +337,7 @@ const PlantsTab: React.FC = () => {
             </div>
             <div className="flex-1">
               <h4 className="font-semibold">{plant.nickname || plant.plant_details?.farsi_name}</h4>
-              <p className="text-sm text-gray-500">{t('lastWatered')}: {daysSince} {t('daysAgo')}</p>
+              <p className="text-sm text-slate-500">{t('lastWatered')}: {daysSince} {t('daysAgo')}</p>
             </div>
             <button className="text-primary hover:bg-primary/10 p-2 rounded-full">
               💧
@@ -380,7 +380,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ navigateTo }) => {
   if (!isAuthenticated) {
     return (
       <div className="container mx-auto px-4 py-16 text-center">
-        <h1 className="text-2xl font-bold mb-4">{t('pleaseLogin')}</h1>
+        <h1 className="text-2xl font-semibold mb-4">{t('pleaseLogin')}</h1>
         <button onClick={() => navigateTo('login')} className="bg-primary text-white px-6 py-2 rounded-xl">
           {t('login')}
         </button>
@@ -426,7 +426,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ navigateTo }) => {
                   exit={{ opacity: 0 }}
                 >
                   <div className="bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-sm">
-                    <h2 className="text-xl font-bold mb-6">{t('myPlants')}</h2>
+                    <h2 className="text-xl font-semibold mb-6">{t('myPlants')}</h2>
                     <PlantsTab />
                     <button
                       onClick={() => navigateTo('library')}

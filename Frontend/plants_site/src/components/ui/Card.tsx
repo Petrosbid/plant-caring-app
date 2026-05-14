@@ -19,7 +19,7 @@ const Card: React.FC<CardProps> = ({ children, className = '', title, subtitle }
       {(title || subtitle) && (
         <div className="border-b border-slate-200 dark:border-slate-700 p-6">
           {title && (
-            <h2 className="font-display text-xl font-bold text-slate-900 dark:text-white">
+            <h2 className="font-display text-xl font-semibold text-slate-900 dark:text-white">
               {title}
             </h2>
           )}

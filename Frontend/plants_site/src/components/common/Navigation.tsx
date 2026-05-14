@@ -113,7 +113,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
             whileTap={{ scale: 0.98 }}
           >
             <span className="text-xl">🌱</span>
-            <span className="font-display font-bold text-brand-600 dark:text-brand-400">PlantCare</span>
+            <span className="font-display font-semibold text-brand-600 dark:text-brand-400">PlantCare</span>
           </motion.button>
 
           <div className="flex items-center gap-2">
@@ -152,7 +152,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
             transition={{ duration: 0.25, ease: 'easeOut' }}
             className="overflow-hidden border-t border-slate-200/60 dark:border-slate-700/50"
           >
-            <ul className="py-4 space-y-1 px-4">
+            <ul className="p-4 space-y-1 ">
               {navItems.map((item) => (
                 <li key={item.key}>{renderNavItem(item)}</li>
               ))}

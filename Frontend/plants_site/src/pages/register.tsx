@@ -29,7 +29,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess, switchToLogin }) => {
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSendCode = async () => {

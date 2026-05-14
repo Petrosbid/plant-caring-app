@@ -62,7 +62,7 @@ const DiseaseCard: React.FC<{ disease: Disease; language: 'en' | 'fa'; delay?: n
           <div className="p-5">
             {/* Header with severity badge */}
             <div className="flex justify-between items-start gap-2 mb-2">
-              <h2 className="font-display text-lg font-bold text-slate-900 dark:text-white line-clamp-2 flex-1">
+              <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white line-clamp-2 flex-1">
                 {name}
               </h2>
               <span className={`flex-shrink-0 px-2 py-0.5 rounded-lg text-xs font-semibold ${severityColor}`}>
@@ -174,7 +174,7 @@ const DiseaseLibrary: React.FC = () => {
       <motion.h1
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
-        className="font-display text-3xl lg:text-4xl font-bold text-center text-brand-700 dark:text-brand-400 mb-8"
+        className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-8"
       >
         {isEn ? 'Disease Library' : 'کتابخانه بیماری‌ها'}
       </motion.h1>
@@ -200,7 +200,7 @@ const DiseaseLibrary: React.FC = () => {
                       className={`px-3 py-1 rounded-full text-xs font-medium transition ${
                         filters.severity_level === opt.value
                           ? 'bg-red-600 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          : 'bg-gray-100 dark:bg-gray-700 text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {isEn ? opt.labelEn : opt.labelFa}
@@ -222,7 +222,7 @@ const DiseaseLibrary: React.FC = () => {
                       className={`px-3 py-1 rounded-full text-xs font-medium transition ${
                         filters.spread_rate === opt.value
                           ? 'bg-green-600 text-white'
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                          : 'bg-gray-100 dark:bg-gray-700 text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                       }`}
                     >
                       {isEn ? opt.labelEn : opt.labelFa}

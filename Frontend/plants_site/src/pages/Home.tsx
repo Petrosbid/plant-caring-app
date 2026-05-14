@@ -131,7 +131,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
             </motion.div>
             <motion.h1
               variants={item}
-              className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-bold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight"
+              className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight"
             >
               PlantCare
             </motion.h1>
@@ -165,7 +165,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
             transition={{ duration: 0.5 }}
             className="text-center mb-14"
           >
-            <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4">
+            <h2 className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white mb-4">
               {isEn ? 'Powerful Plant Care Tools' : 'ابزارهای قدرتمند مراقبت از گیاه'}
             </h2>
             <p className="text-slate-600 dark:text-slate-300 max-w-2xl mx-auto text-lg">
@@ -194,7 +194,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                   <div className="w-14 h-14 rounded-2xl bg-brand-500/10 dark:bg-brand-500/20 flex items-center justify-center text-3xl mb-6 group-hover:scale-110 transition-transform duration-300">
                     {f.icon}
                   </div>
-                  <h3 className="font-display text-xl font-bold text-slate-900 dark:text-white mb-3">
+                  <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white mb-3">
                     {t(f.titleKey)}
                   </h3>
                   <p className="text-slate-600 dark:text-slate-300 mb-6 leading-relaxed">
@@ -231,7 +231,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
           transition={{ duration: 0.5, delay: 0.2 }}
-          className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+          className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
         >
           {isEn ? "Our newest blogs" : "تازه ترین مقالات ما"}
         </motion.h2>
@@ -254,7 +254,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+              className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'Most favorite Plants' : 'محبوب‌ترین گیاهان'}
             </motion.h2>
@@ -277,7 +277,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+              className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'Most favorite blogs' : 'محبوب‌ترین مقالات '}
             </motion.h2>
@@ -300,7 +300,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+              className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'most viewd blogs' : 'پربازدیدترین بیماری‌ها'}
             </motion.h2>
@@ -322,7 +322,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white text-center"
+              className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'Most viewd blogs' : 'پربیننده‌ترین مقالات '}
             </motion.h2>
@@ -347,7 +347,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                   from={0}
                   duration={1}
                   delay={i * 0.2} 
-                  className="text-center font-display text-4xl lg:text-5xl font-bold text-brand-600 dark:text-brand-400 mb-2"
+                  className="text-center font-display text-4xl lg:text-5xl font-semibold text-brand-600 dark:text-brand-400 mb-2"
                 />
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
                   {isEn ? s.labelEn : s.labelFa}
@@ -369,7 +369,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
             viewport={{ once: true }}
             className="text-center max-w-3xl mx-auto text-white"
           >
-            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold mb-6">
+            <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-semibold mb-6">
               {isEn ? 'Ready to become a plant expert?' : 'آماده شدن یک متخصص گیاه هستید؟'}
             </h2>
             <p className="text-white/90 text-lg mb-10">

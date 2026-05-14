@@ -107,7 +107,7 @@ const Reminders: React.FC = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 py-12 px-4">
         <div className="text-center">
           <LoaderGooeyBlobs size={25} color="#10b981" duration={1} />
-          <p className="mt-4 text-lg text-gray-700 dark:text-gray-300">
+          <p className="mt-4 text-lg text-slate-700 dark:text-slate-300">
             {t('home') === 'Home' ? 'Loading reminders...' : 'در حال بارگذاری یادآوری‌ها...'}
           </p>
         </div>
@@ -124,10 +124,10 @@ const Reminders: React.FC = () => {
           transition={{ duration: 0.5 }}
           className="text-center mb-10"
         >
-          <h1 className="text-4xl font-bold text-green-800 dark:text-green-300 mb-2">
+          <h1 className="text-4xl font-semibold text-green-800 dark:text-green-300 mb-2">
             {t('home') === 'Home' ? 'Plant Care Reminders' : 'یادآوری‌های مراقبت از گیاه'}
           </h1>
-          <p className="text-lg text-gray-600 dark:text-gray-400 max-w-2xl mx-auto">
+          <p className="text-lg text-slate-600 dark:text-slate-400 max-w-2xl mx-auto">
             {t('home') === 'Home'
               ? 'Set reminders to take care of your plants on time'
               : 'یادآوری‌ها را تنظیم کنید تا به موقع از گیاهان خود مراقبت کنید'}
@@ -152,12 +152,12 @@ const Reminders: React.FC = () => {
             transition={{ delay: 0.1 }}
             className="lg:col-span-1"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-slate-200 dark:border-slate-700">
               <div className="flex items-center mb-6">
                 <div className="w-10 h-10 rounded-full bg-green-100 dark:bg-green-900 flex items-center justify-center mr-3">
                   <span className="text-green-600 dark:text-green-400 text-xl">➕</span>
                 </div>
-                <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                <h2 className="text-xl font-semibold text-slate-800 dark:text-white">
                   {t('home') === 'Home' ? 'Add New Reminder' : 'افزودن یادآوری جدید'}
                 </h2>
               </div>
@@ -165,11 +165,11 @@ const Reminders: React.FC = () => {
               <form onSubmit={handleSubmit} className="space-y-5">
                 {/* Plant Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="user_plant">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="user_plant">
                     {t('home') === 'Home' ? 'Select Plant' : 'انتخاب گیاه'}
                   </label>
                   {plantsLoading ? (
-                    <div className="text-sm text-gray-500 dark:text-gray-400 py-2">
+                    <div className="text-sm text-slate-500 dark:text-slate-400 py-2">
                       {t('home') === 'Home' ? 'Loading plants...' : 'در حال بارگذاری گیاهان...'}
                     </div>
                   ) : (
@@ -178,7 +178,7 @@ const Reminders: React.FC = () => {
                       name="user_plant"
                       value={newReminder.user_plant || ''}
                       onChange={handleInputChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                      className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white transition-all"
                       required
                     >
                       <option value="">-- {t('home') === 'Home' ? 'Select a plant' : 'انتخاب یک گیاه'} --</option>
@@ -193,7 +193,7 @@ const Reminders: React.FC = () => {
 
                 {/* Care Type Selection */}
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="care_type">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="care_type">
                     {t('home') === 'Home' ? 'Care Type' : 'نوع مراقبت'}
                   </label>
                   <div className="grid grid-cols-2 gap-2">
@@ -205,7 +205,7 @@ const Reminders: React.FC = () => {
                         className={`px-3 py-2 rounded-lg text-sm font-medium transition-all ${
                           newReminder.care_type === type
                             ? 'bg-green-500 text-white shadow-md'
-                            : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-600'
+                            : 'bg-gray-100 dark:bg-gray-700 text-slate-700 dark:text-slate-300 hover:bg-gray-200 dark:hover:bg-gray-600'
                         }`}
                       >
                         {t('home') === 'Home'
@@ -224,7 +224,7 @@ const Reminders: React.FC = () => {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="title">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="title">
                     {t('home') === 'Home' ? 'Title' : 'عنوان'}
                   </label>
                   <input
@@ -233,14 +233,14 @@ const Reminders: React.FC = () => {
                     name="title"
                     value={newReminder.title}
                     onChange={handleInputChange}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white transition-all"
                     placeholder={t('home') === 'Home' ? 'Enter reminder title...' : 'عنوان یادآوری را وارد کنید...'}
                     required
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="description">
+                  <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="description">
                     {t('home') === 'Home' ? 'Description' : 'توضیحات'}
                   </label>
                   <textarea
@@ -249,14 +249,14 @@ const Reminders: React.FC = () => {
                     value={newReminder.description}
                     onChange={handleInputChange}
                     rows={3}
-                    className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                    className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white transition-all"
                     placeholder={t('home') === 'Home' ? 'Enter reminder details...' : 'جزئیات یادآوری را وارد کنید...'}
                   />
                 </div>
 
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="scheduled_date">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="scheduled_date">
                       {t('home') === 'Home' ? 'Date' : 'تاریخ'}
                     </label>
                     <input
@@ -265,12 +265,12 @@ const Reminders: React.FC = () => {
                       name="scheduled_date"
                       value={newReminder.scheduled_date}
                       onChange={handleDateChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                      className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white transition-all"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="time">
+                    <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="time">
                       {t('home') === 'Home' ? 'Time' : 'زمان'}
                     </label>
                     <input
@@ -279,7 +279,7 @@ const Reminders: React.FC = () => {
                       name="time"
                       value={newReminder.time}
                       onChange={handleTimeChange}
-                      className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                      className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white transition-all"
                     />
                   </div>
                 </div>
@@ -287,7 +287,7 @@ const Reminders: React.FC = () => {
                 {/* Recurring Reminder Options */}
                 <div className="pt-2">
                   <div className="flex items-center justify-between mb-3">
-                    <label className="text-sm font-medium text-gray-700 dark:text-gray-300">
+                    <label className="text-sm font-medium text-slate-700 dark:text-slate-300">
                       {t('home') === 'Home' ? 'Recurring reminder' : 'یادآوری تکرارشونده'}
                     </label>
                     <div className="relative inline-block w-10 mr-2 align-middle select-none">
@@ -320,7 +320,7 @@ const Reminders: React.FC = () => {
                         exit={{ opacity: 0, height: 0 }}
                         className="overflow-hidden"
                       >
-                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2" htmlFor="recurrence_interval">
+                        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2" htmlFor="recurrence_interval">
                           {t('home') === 'Home' ? 'Repeat every (days)' : 'تکرار هر (روز)'}
                         </label>
                         <input
@@ -330,7 +330,7 @@ const Reminders: React.FC = () => {
                           min="1"
                           value={newReminder.recurrence_interval}
                           onChange={handleInputChange}
-                          className="w-full px-4 py-3 border border-gray-300 dark:border-gray-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white transition-all"
+                          className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white transition-all"
                         />
                       </motion.div>
                     )}
@@ -354,13 +354,13 @@ const Reminders: React.FC = () => {
             transition={{ delay: 0.2 }}
             className="lg:col-span-2"
           >
-            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-gray-200 dark:border-gray-700">
+            <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6 border border-slate-200 dark:border-slate-700">
               <div className="flex items-center justify-between mb-6">
                 <div className="flex items-center">
                   <div className="w-10 h-10 rounded-full bg-emerald-100 dark:bg-emerald-900 flex items-center justify-center mr-3">
                     <span className="text-emerald-600 dark:text-emerald-400 text-xl">📅</span>
                   </div>
-                  <h2 className="text-xl font-bold text-gray-800 dark:text-white">
+                  <h2 className="text-xl font-semibold text-slate-800 dark:text-white">
                     {t('home') === 'Home' ? 'Your Reminders' : 'یادآوری‌های شما'}
                   </h2>
                 </div>
@@ -385,14 +385,14 @@ const Reminders: React.FC = () => {
                           exit={{ opacity: 0, y: -20 }}
                           className={`bg-gradient-to-r ${
                             !reminder.is_completed
-                              ? 'from-white to-green-50 dark:from-gray-800 dark:to-gray-800/50 border-l-4 border-green-500'
-                              : 'from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800 border-l-4 border-gray-400'
+                              ? 'from-white to-green-50 dark:from-gray-800 dark:to-gray-800/50 border-l-2 border-green-400/70 shadow-sm'
+                              : 'from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-800 border-l-4 border-slate-400'
                           } rounded-xl shadow-sm p-5 transition-all`}
                         >
                           <div className="flex justify-between items-start">
                             <div className="flex-1 min-w-0">
                               <div className="flex items-center mb-2">
-                                <h3 className="font-bold text-lg text-gray-800 dark:text-white truncate">
+                                <h3 className="font-semibold text-lg text-slate-800 dark:text-white truncate">
                                   {reminder.title}
                                 </h3>
                                 {reminder.is_recurring && (
@@ -402,7 +402,7 @@ const Reminders: React.FC = () => {
                                 )}
                               </div>
 
-                              <p className="text-gray-600 dark:text-gray-300 text-sm mb-3 line-clamp-2">
+                              <p className="text-slate-600 dark:text-slate-300 text-sm mb-3 line-clamp-2">
                                 {reminder.description}
                               </p>
 
@@ -452,7 +452,7 @@ const Reminders: React.FC = () => {
                                 className={`p-2 rounded-full transition-all ${
                                   !reminder.is_completed
                                     ? 'bg-green-100 text-green-600 hover:bg-green-200 dark:bg-green-900/30 dark:text-green-400 dark:hover:bg-green-800/50'
-                                    : 'bg-gray-100 text-gray-400 hover:bg-gray-200 dark:bg-gray-700 dark:text-gray-400 dark:hover:bg-gray-600'
+                                    : 'bg-gray-100 text-slate-400 hover:bg-gray-200 dark:bg-gray-700 dark:text-slate-400 dark:hover:bg-gray-600'
                                 }`}
                                 title={t('home') === 'Home' ? 'Toggle completion' : 'تغییر وضعیت'}
                               >
@@ -468,11 +468,11 @@ const Reminders: React.FC = () => {
                             </div>
                           </div>
 
-                          <div className="mt-3 pt-3 border-t border-gray-200 dark:border-gray-700">
+                          <div className="mt-3 pt-3 border-t border-slate-200 dark:border-slate-700">
                             <span className={`inline-flex items-center px-3 py-1 rounded-full text-sm font-medium ${
                               !reminder.is_completed
                                 ? 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-200'
-                                : 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200'
+                                : 'bg-gray-100 text-slate-800 dark:bg-gray-700 dark:text-slate-200'
                             }`}>
                               {!reminder.is_completed
                                 ? (t('home') === 'Home' ? 'Pending' : 'در انتظار')
@@ -491,10 +491,10 @@ const Reminders: React.FC = () => {
                       <div className="mx-auto w-24 h-24 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mb-4">
                         <span className="text-4xl">🌱</span>
                       </div>
-                      <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+                      <h3 className="text-lg font-medium text-slate-900 dark:text-white mb-1">
                         {t('home') === 'Home' ? 'No reminders yet' : 'هنوز یادآوری‌ای وجود ندارد'}
                       </h3>
-                      <p className="text-gray-500 dark:text-gray-400">
+                      <p className="text-slate-500 dark:text-slate-400">
                         {t('home') === 'Home'
                           ? 'Add your first reminder to stay on top of your plant care routine'
                           : 'اولین یادآوری خود را اضافه کنید تا مراقبت از گیاهان خود را به موقع انجام دهید'}

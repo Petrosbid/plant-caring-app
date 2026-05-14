@@ -150,7 +150,7 @@ const Header: React.FC<HeaderProps> = ({ navigateTo, currentPage, onSearch }) =>
               whileTap={{ scale: 0.98 }}
             >
               <span className="text-2xl transition-transform duration-300 group-hover:scale-110">🌱</span>
-              <span className="font-display text-xl font-bold text-brand-800 dark:text-brand-400">PlantCare</span>
+              <span className="font-display text-xl font-semibold text-brand-800 dark:text-brand-400">PlantCare</span>
             </motion.button>
 
             <ul className="flex items-center gap-1 list-none">

@@ -359,6 +359,7 @@ export const diseaseService = {
       page_size: limit,
     });
     return data.results;
+    
   },
 
   getDiseasesPaginated: async (params?: {
@@ -690,28 +691,6 @@ export const favouriteService = {
       body: JSON.stringify({ plant: plantId }),
     });
     if (!response.ok) throw new Error('Failed to remove favourite');
-  },
-};
-
-// ==============================
-// Recommendation Service
-// ==============================
-export const recommendationService = {
-  recommendPlant: async (data: {
-    language: 'en' | 'fa';
-    answers: Record<string, string | string[] | boolean>;
-    additional_notes: string;
-  }): Promise<any> => {
-    const response = await fetch(`${API_BASE_URL}/plants/recommend-plant/`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify(data),
-    });
-    if (!response.ok) {
-      const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || 'Recommendation failed');
-    }
-    return response.json();
   },
 };
 
