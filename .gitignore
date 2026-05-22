@@ -52,16 +52,44 @@ Icon?
 .directory
 .CFUserTextEncoding
 
-# Flutter build outputs
-Frontend/plants_app/build/
-Frontend/plants_app/.dart_tool/
-plants_app/
-Frontend/plants_site/bugs
+node_modules/
+
+# Expo
+Frontend/plants_app/.expo/
+Frontend/plants_app/dist/
+Frontend/plants_app/web-build/
+Frontend/plants_app/expo-env.d.ts
+Frontend/plants_app/# Native
+Frontend/plants_app/.kotlin/
+Frontend/plants_app/*.orig.*
+Frontend/plants_app/*.jks
+Frontend/plants_app/*.p8
+Frontend/plants_app/*.p12
+Frontend/plants_app/*.key
+Frontend/plants_app/*.mobileprovision
+Frontend/plants_app/# Metro
+Frontend/plants_app/.metro-health-check*
+Frontend/plants_app/# debug
+Frontend/plants_app/npm-debug.*
+Frontend/plants_app/yarn-debug.*
+Frontend/plants_app/yarn-error.*
+Frontend/plants_app/# macOS
+Frontend/plants_app/.DS_Store
+Frontend/plants_app/*.pem
+Frontend/plants_app/# local env files
+Frontend/plants_app/.env*.local
+Frontend/plants_app/# typescript
+Frontend/plants_app/*.tsbuildinfo
+Frontend/plants_app/app-example
+Frontend/plants_app/# generated native folders
+Frontend/plants_app/ios
+Frontend/plants_app/android
 
 # Node modules
 Frontend/plants_site/node_modules/
 Frontend/plants_site/dist/
 Frontend/plants_site/.vite/
+Frontend/plants_site/bugs/
 
 # Environment variables
 .env
@@ -69,3 +97,4 @@ Frontend/plants_site/.vite/
 .env.development.local
 .env.test.local
 .env.production.local
+Frontend/New Microsoft Word Document.docx
