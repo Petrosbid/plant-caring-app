@@ -10,7 +10,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from .llm_identifier import create_or_update_plant_from_llm
-from .ml_models import predict_plant
+from .ml_models import predict_plant, logger
 from .models import Plant, PlantImage, PlantFavourite, PlantComment
 from .permissions import IsOwnerOrAdminOrReadOnly
 from .serializers import (PlantSerializer, PlantDetailSerializer, PlantCommentSerializer)
@@ -199,7 +199,6 @@ class PlantViewSet(viewsets.ModelViewSet):
 
 
 class PlantIdentifyView(APIView):
-    # بدون تغییر باقی می‌ماند، فقط در صورت نیاز جستجوی انگلیسی اضافه می‌شود
     permission_classes = [IsAuthenticated]
     parser_classes = [MultiPartParser, FormParser]
 
@@ -209,8 +208,12 @@ class PlantIdentifyView(APIView):
 
         image_file = request.data['image']
         prediction_result = predict_plant(image_file)
+
         plant_id = prediction_result.get('id')
-        predicted_plant_name = prediction_result.get('name')
+        scientific_name = prediction_result.get('scientific_name')
+        common_name = prediction_result.get('common_name')
+        error_msg = prediction_result.get('error')
+        predicted_name = prediction_result.get('name')
 
         if plant_id is not None:
             try:
@@ -224,10 +227,12 @@ class PlantIdentifyView(APIView):
                 serializer = PlantDetailSerializer(plant, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
             except Plant.DoesNotExist:
-                pass
+                logger.warning(f"Plant with id {plant_id} not found, will create new.")
 
-        if predicted_plant_name:
-            plant = create_or_update_plant_from_llm(predicted_plant_name)
+        plant_name_to_use = scientific_name or common_name or predicted_name
+
+        if plant_name_to_use:
+            plant = create_or_update_plant_from_llm(plant_name_to_use)
             if plant:
                 PlantImage.objects.create(
                     plant=plant,
@@ -237,6 +242,12 @@ class PlantIdentifyView(APIView):
                 )
                 serializer = PlantDetailSerializer(plant, context={'request': request})
                 return Response(serializer.data, status=status.HTTP_200_OK)
+            else:
+                return Response({'error': 'Plant name detected but could not create/update in database.'},
+                                status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        if error_msg:
+            return Response({'error': error_msg}, status=status.HTTP_404_NOT_FOUND)
 
         return Response({'error': 'Could not identify the plant.'}, status=status.HTTP_404_NOT_FOUND)
 
