@@ -1,0 +1,59 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+/* ========== تم روشن (پیش‌فرض) ========== */
+:root {
+    font-family: 'DM Sans', system-ui, sans-serif;
+    line-height: 1.6;
+    font-weight: 400;
+    color-scheme: light dark;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+
+    --color-bg: #fafbfc;
+    --color-text: #0f172a;
+    --color-text-muted: #64748b;
+    --color-border: #e2e8f0;
+    --color-brand: #16a34a;
+    --color-brand-hover: #15803d;
+
+    /* Blog and component colors */
+    --color-primary: #16a34a;
+    --color-secondary: #64748b;
+    --text-color: #0f172a;
+    --text-color-secondary: #64748b;
+    --background-light: #f8fafc;
+}
+
+.dark {
+    color-scheme: dark;
+    --color-bg: #0c1222;
+    --color-text: #f1f5f9;
+    --color-text-muted: #94a3b8;
+    --color-border: #1e293b;
+    --color-brand: #4ade80;
+    --color-brand-hover: #22c55e;
+
+    /* Blog and component colors */
+    --color-primary: #4ade80;
+    --color-secondary: #94a3b8;
+    --text-color: #f1f5f9;
+    --text-color-secondary: #94a3b8;
+    --background-light: #1e293b;
+}
+
+@media (prefers-color-scheme: dark) {
+    :root:not(.light) {
+        --color-background-500: 15 23 42;
+        /* #0F172A */
+        --color-background-900: 2 6 23;
+        /* #020617 */
+        --color-typography-500: 248 250 252;
+        /* #F8FAFC */
+        --color-typography-900: 255 255 255;
+        --color-primary-500: 59 130 246;
+        /* #3B82F6 */
+    }
+}
