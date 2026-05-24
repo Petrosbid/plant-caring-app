@@ -44,6 +44,7 @@ const AnimatedStat: React.FC<{ value: string; from?: number; duration?: number; 
 
 const container = {
   hidden: { opacity: 0 },
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   visible: (_i = 1) => ({
     opacity: 1,
     transition: { staggerChildren: 0.12, delayChildren: 0.08 },
@@ -101,6 +102,8 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
   const lineCount = theme === 'dark' ? 8 : 9;
   const bendStrength = theme === 'dark' ? -1.5 : -2;
 
+    const { language } = useLanguageTheme();
+
   return (
     <div className="min-h-screen">
       {/* Hero section*/}
@@ -133,7 +136,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               variants={item}
               className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight"
             >
-              PlantCare
+              {language === 'fa' ? 'ورنا' : 'Verna'}
             </motion.h1>
             <motion.p
               variants={item}
@@ -214,6 +217,109 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
         </div>
       </section>
 
+      {/* Verna Meaning & Story Section */}
+      <section className="py-24 overflow-hidden dark:bg-slate-900 border-t border-b border-slate-100 dark:border-slate-800/50">
+        <div className="container mx-auto px-4 lg:px-6">
+            <h2 className="font-display text-3xl sm:text-4xl font-bold text-slate-900 dark:text-white mb-4 tracking-tight leading-tight text-center">
+                {t('vernaStoryTitle')}
+            </h2>
+            <p className="text-base sm:text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-xl leading-relaxed m-auto text-center">
+                {t('vernaStoryDesc')}
+            </p>
+          <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center ${language === 'fa' ? 'lg:rtl' : ''}`}>
+            <motion.div
+              initial={{ opacity: 0, x: language === 'fa' ? 50 : -50 }}
+              whileInView={{ opacity: 1, x: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, ease: " Pall Out" as any }}
+              className="relative group mx-auto lg:mx-0 w-full max-w-lg lg:max-w-none"
+            >
+              <div className="absolute -inset-4 bg-gradient-to-tr from-brand-500/20 to-emerald-500/20 rounded-3xl blur-2xl opacity-70 group-hover:opacity-100 transition duration-1000 group-hover:duration-200 animate-pulse" />
+              
+              <div className="relative overflow-hidden rounded-3xl border border-slate-200/80 dark:border-slate-700/80 bg-slate-100 dark:bg-slate-800 aspect-[4/3] sm:aspect-[16/11] shadow-2xl">
+                <img 
+                  src="https://i.shgcdn.com/4d7aa34f-77aa-4b28-b119-d8a9fa5ca4f2/-/format/auto/-/quality/normal/" 
+                  alt="AI and Plants Concept"
+                  className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out mix-blend-normal dark:opacity-90"
+                />
+                
+                <motion.div 
+                  animate={{ y: [0, -10, 0] }}
+                  transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
+                  className="absolute bottom-6 left-6 right-6 backdrop-blur-md bg-white/70 dark:bg-slate-900/70 p-4 rounded-2xl border border-white/20 dark:border-slate-700/30 shadow-lg flex items-center gap-4"
+                >
+                  <div className="w-10 h-10 rounded-xl bg-brand-500 flex items-center justify-center text-white text-xl shadow-md shadow-brand-500/30">
+                    🤖
+                  </div>
+                  <div>
+                    <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Project Name Identity</p>
+                    <p className="text-sm font-semibold text-slate-800 dark:text-white font-display">Verna • ورنا</p>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: "-100px" }}
+              transition={{ duration: 0.6, delay: 0.2 }}
+              className="flex flex-col justify-center text-right"
+            >
+
+              <div className="space-y-6 max-w-xl">
+                
+                <motion.div 
+                  whileHover={{ x: language === 'fa' ? -6 : 6 }}
+                  className="flex gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 transition-colors"
+                >
+                  <div className="text-2xl mt-1 select-none">🇮🇷</div>
+                  <div>
+                    <h4 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                      {language === 'fa' ? 'ریشه در فرهنگ پارسی' : 'Persian Roots'}
+                    </h4>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {t('vernaFaMeaning')}
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div 
+                  whileHover={{ x: language === 'fa' ? -6 : 6 }}
+                  className="flex gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 transition-colors"
+                >
+                  <div className="text-2xl mt-1 select-none">🇺🇸</div>
+                  <div>
+                    <h4 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-1">
+                      {language === 'fa' ? 'هم‌خانواده با واژه Vernal' : 'Vernal Connection'}
+                    </h4>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {t('vernaEnMeaning')}
+                    </p>
+                  </div>
+                </motion.div>
+
+                <motion.div 
+                  whileHover={{ x: language === 'fa' ? -6 : 6 }}
+                  className="flex gap-4 p-5 rounded-2xl bg-brand-500/5 dark:bg-brand-500/10 border border-brand-500/20 dark:border-brand-500/20 transition-colors"
+                >
+                  <div className="text-2xl mt-1 select-none">🌱</div>
+                  <div>
+                    <h4 className="font-display text-lg font-semibold text-brand-700 dark:text-brand-400 mb-1">
+                      {t('vernaMatchTitle')}
+                    </h4>
+                    <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed">
+                      {t('vernaMatchDesc')}
+                    </p>
+                  </div>
+                </motion.div>
+
+              </div>
+            </motion.div>
+
+          </div>
+        </div>
+      </section>
       {/* Carousels*/}
       <section className="py-20 lg:py-24 bg-slate-50/80 dark:bg-slate-900/50">
         <div className="container mx-auto px-4 lg:px-6">

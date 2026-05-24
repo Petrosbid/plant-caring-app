@@ -127,6 +127,12 @@ const translations = {
     plantWatered: 'Plant watered!',
     newTrip: 'New Trip',
     myPlants: 'My Plants',
+    vernaStoryTitle: 'The Story Behind Verna',
+    vernaStoryDesc: 'Discover how ancient Persian heritage meets modern AI technology.',
+    vernaFaMeaning: 'In Persian culture, Verna represents youth, freshness, and the vibrant force of nature.',
+    vernaEnMeaning: 'Etymologically linked to "Vernal", it signifies the spring season, growth, and the rebirth of plants.',
+    vernaMatchTitle: 'A Perfect Harmony',
+    vernaMatchDesc: 'A beautiful bilingual connection that bridges ancient roots with the future of AI-powered plant care.',
   },
 
   fa: {
@@ -195,6 +201,12 @@ const translations = {
     plantWatered: 'گیاه آبیاری شد!',
     newTrip: 'سفر جدید',
     myPlants: 'گیاهان من',
+    vernaStoryTitle: 'داستان پشت نام ورنا',
+    vernaStoryDesc: 'کشف کنید چگونه اصالت ایران باستان با فناوری مدرن هوش مصنوعی تلاقی می‌کند.',
+    vernaFaMeaning: 'در فرهنگ و زبان فارسی باستان، ورنا به معنای جوانی، شادابی و نیروی سرزنده طبیعت است.',
+    vernaEnMeaning: 'در ریشه‌شناسی انگلیسی، هم‌خانواده واژه "Vernal" به معنای بهاری، مرتبط با رویش و نوزایی گیاهان است.',
+    vernaMatchTitle: 'یک تطابق بی‌نظیر',
+    vernaMatchDesc: 'یک هم‌راستایی معنایی دوگانه و مدرن که اصالت گذشته را به آیندهٔ مراقبت هوشمند از گیاهان پیوند می‌زند.',
   }
 };
 

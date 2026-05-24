@@ -1,8 +1,8 @@
-# PlantCare - Plant Identification and Care Application
+# Verna - Plant Identification and Care Application
 
 ## Overview
 
-PlantCare is a comprehensive plant identification and care application that allows users to:
+Verna is a comprehensive plant identification and care application that allows users to:
 
 - Identify plants by uploading photos
 - Detect plant diseases and get treatment recommendations

@@ -113,7 +113,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
             whileTap={{ scale: 0.98 }}
           >
             <span className="text-xl">🌱</span>
-            <span className="font-display font-semibold text-brand-600 dark:text-brand-400">PlantCare</span>
+            <span className="font-display font-semibold text-brand-600 dark:text-brand-400">{language === 'fa' ? 'ورنا' : 'Verna'}</span>
           </motion.button>
 
           <div className="flex items-center gap-2">

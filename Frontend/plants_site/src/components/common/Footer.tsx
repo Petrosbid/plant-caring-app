@@ -40,7 +40,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
               whileHover={{ scale: 1.02 }}
             >
               <span className="text-2xl">🌱</span>
-              <span className="font-display text-xl font-semibold text-white">PlantCare</span>
+              <span className="font-display text-xl font-semibold text-white">Verna</span>
             </motion.div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
               {isEn
@@ -98,7 +98,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
             </h3>
             <ul className="space-y-3 text-slate-400 text-sm">
               <li className="flex items-center gap-2">
-                <span>📧</span> support@plantcarepro.com
+                <span>📧</span> support@Verna.com
               </li>
               <li className="flex items-center gap-2">
                 <span>📍</span> San Francisco, CA
@@ -125,7 +125,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
 
         <div className="border-t border-slate-700/80 mt-10 pt-8 text-center">
           <p suppressHydrationWarning className="text-slate-500 text-sm">
-            &copy; {new Date().getFullYear()} PlantCare. {isEn ? 'All rights reserved.' : 'تمامی حقوق محفوظ است.'}
+            &copy; {new Date().getFullYear()}  {isEn ? 'Verna. All rights reserved.' : 'تمامی حقوق محفوظ است. ورنا'}
           </p>
         </div>
       </div>

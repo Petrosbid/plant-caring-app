@@ -46,19 +46,14 @@ const navItems: NavItem[] = [
   }
 ];
 
-const Header: React.FC<HeaderProps> = ({ navigateTo, currentPage, onSearch }) => {
-  const { user, isAuthenticated, logout } = useAuth();
+const Header: React.FC<HeaderProps> = ({ navigateTo, currentPage, }) => {
+  const { isAuthenticated } = useAuth();
   const { language, theme, toggleLanguage, toggleTheme, t } = useLanguageTheme();
-  const [searchQuery, setSearchQuery] = useState("");
   const [showLoginPopup, setShowLoginPopup] = useState(false);
   const isActive = (key: string) => currentPage === key;
   const [showNotifications, setShowNotifications] = useState(false);
-  const [notificationCount, setNotificationCount] = useState(0);
+  const [notificationCount,] = useState(0);
 
-  const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setSearchQuery(e.target.value);
-    onSearch?.(e.target.value);
-  };
 
   const flags = {
     en: <>English <CountryFlag countryCode="US" svg /></>,
@@ -150,7 +145,7 @@ const Header: React.FC<HeaderProps> = ({ navigateTo, currentPage, onSearch }) =>
               whileTap={{ scale: 0.98 }}
             >
               <span className="text-2xl transition-transform duration-300 group-hover:scale-110">🌱</span>
-              <span className="font-display text-xl font-semibold text-brand-800 dark:text-brand-400">PlantCare</span>
+              <span className="font-display text-xl font-semibold text-brand-800 dark:text-brand-400">{language === 'fa' ? 'ورنا' : 'Verna'}</span>
             </motion.button>
 
             <ul className="flex items-center gap-1 list-none">

@@ -1,11 +1,10 @@
-// Configuration file for PlantCare app
 export const config = {
   api: {
     baseUrl: import.meta.env.VITE_API_URL || 'http://localhost:8000/api',
     blogUrl: import.meta.env.VITE_BLOG_API_URL || 'http://localhost:8000/api/blog',
   },
   app: {
-    name: 'PlantCare',
+    name: 'Verna',
     version: '1.0.0',
   },
   features: {
