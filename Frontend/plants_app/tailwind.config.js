@@ -1,17 +1,12 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
-  darkMode: process.env.DARK_MODE ? process.env.DARK_MODE : "class",
+  darkMode: "class",
   content: [
-    "./app/**/*.{html,js,jsx,ts,tsx,mdx}",
-    "./components/**/*.{html,js,jsx,ts,tsx,mdx}",
-    "./utils/**/*.{html,js,jsx,ts,tsx,mdx}",
-    "./*.{html,js,jsx,ts,tsx,mdx}",
-    "./src/**/*.{html,js,jsx,ts,tsx,mdx}",
-    "./App.{js,jsx,ts,tsx}",
-    "./node_modules/@gluestack-ui/**/*.{js,jsx,ts,tsx}",
+    "./src/**/*.{js,jsx,ts,tsx}",
+    "./app/**/*.{js,jsx,ts,tsx}",
+    "./components/**/*.{js,jsx,ts,tsx}",
   ],
   presets: [require("nativewind/preset")],
-  important: "html",
   safelist: [
     {
       pattern:
@@ -22,11 +17,21 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          50: "#f0fdf4",
-          100: "#dcfce7",
-          500: "#22c55e", // Primary Green
-          600: "#16a34a",
-          900: "#14532d",
+          50: '#f0fdf4',
+          100: '#dcfce7',
+          200: '#bbf7d0',
+          300: '#86efac',
+          400: '#4ade80',
+          500: '#0d7332',
+          600: '#16a34a',
+          700: '#15803d',
+          800: '#166534',
+          900: '#14532d',
+          950: '#052e16',
+        },
+        surface: {
+          light: '#fafbfc',
+          dark: '#0c1222',
         },
         glass: {
           light: "rgba(255, 255, 255, 0.75)",

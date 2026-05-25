@@ -1,0 +1,29 @@
+{
+  "common": {
+    "home": "خانه",
+    "identify": "شناسایی گیاه",
+    "disease": "بررسی بیماری",
+    "careGuide": "راهنمای مراقبت",
+    "reminders": "یادآوری‌ها",
+    "library": "کتابخانه گیاهان",
+    "signIn": "ورود",
+    "profile": "پروفایل",
+    "logout": "خروج",
+    "language": "زبان",
+    "theme": "تم",
+    "dark": "تاریک",
+    "light": "روشن",
+    "english": "انگلیسی",
+    "persian": "فارسی",
+    "blog": "وبلاگ",
+    "AI": "هوش مصنوعی",
+    "recommend": "پیشنهاد گیاه",
+    "garden": "باغچه",
+    "mygarden": "باغچه من",
+    "diseases": "بیماری‌ها",
+    "cancel": "لغو",
+    "saveChanges": "ذخیره تغییرات",
+    "back": "بازگشت",
+    "loading": "در حال بارگذاری..."
+  }
+}

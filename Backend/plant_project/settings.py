@@ -27,9 +27,7 @@ SECRET_KEY = 'django-insecure-39$&o9-!&%+e@xc0xb27vh7zi0zb1lk#5qwchn*2+$kz2eq2*y
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    'localhost',
-    '127.0.0.1',
-    '192.168.1.10',  # The IP used in the Flutter app
+    '*'
 ]
 
 SMS_IR_API_KEY = "YOUR_API_KEY"

@@ -1,0 +1,29 @@
+{
+  "common": {
+    "home": "Home",
+    "identify": "Identify Plant",
+    "disease": "Disease Check",
+    "careGuide": "Care Guide",
+    "reminders": "Reminders",
+    "library": "Plant Library",
+    "signIn": "Sign In",
+    "profile": "Profile",
+    "logout": "Logout",
+    "language": "Language",
+    "theme": "Theme",
+    "dark": "Dark",
+    "light": "Light",
+    "english": "English",
+    "persian": "Persian",
+    "blog": "Blog",
+    "AI": "AI",
+    "recommend": "Recommend",
+    "garden": "Garden",
+    "mygarden": "My Garden",
+    "diseases": "Diseases",
+    "cancel": "Cancel",
+    "saveChanges": "Save Changes",
+    "back": "Back",
+    "loading": "Loading..."
+  }
+}

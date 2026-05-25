@@ -90,7 +90,7 @@ Frontend/plants_site/node_modules/
 Frontend/plants_site/dist/
 Frontend/plants_site/.vite/
 Frontend/plants_site/bugs/
-
+Frontend/figma/
 # Environment variables
 .env
 .env.local

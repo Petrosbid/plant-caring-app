@@ -1,4 +1,5 @@
-// 📁 src/types/index.ts
+// src/types/index.ts
+
 export interface PlantImage {
   id: number;
   image: string;                       
@@ -15,15 +16,11 @@ export interface Plant {
   scientific_name: string | null;
   description: string;                
   description_en: string | null;
-       
   is_favourited?: boolean;        
   favourite_count: number;
   comment_count: number;
-  
   primary_image: string | null;
-
   is_toxic: boolean;
-
   watering_frequency: string | null;
   light_requirements: string | null;
   fertilizer_schedule: string | null;
@@ -32,7 +29,6 @@ export interface Plant {
   soil_type: string | null;
   pruning_info: string | null;
   propagation_methods: string | null;
-
   watering_frequency_en: string | null;
   light_requirements_en: string | null;
   fertilizer_schedule_en: string | null;
@@ -41,19 +37,15 @@ export interface Plant {
   soil_type_en: string | null;
   pruning_info_en: string | null;
   propagation_methods_en: string | null;
-
   care_difficulty: string;            
   care_difficulty_display: {          
     en: string;
     fa: string;
   };
-
   view_count: number;                
   garden_count: number;              
-
   created_at: string;
   updated_at: string;
-
   images?: PlantImage[];
   careInstructions?: CareInstruction[];
 }
@@ -68,44 +60,54 @@ export interface CareInstruction {
 }
 
 export interface User {
-  date_joined: any;
   id: number;
   username: string;
   email: string;
   first_name?: string;
   last_name?: string;
   bio?: string;
-  phone?: string;
+  phone_number?: string;
+  profile_picture?: string | null;
+  date_joined: string;
 }
 
 export interface Disease {
   id: number;
-  name: string;             
-  name_fa: string | null;   
-  description: string;
+  name: string;                    
+  name_fa: string | null;          
+  description: string;             
   description_fa: string | null;
   symptoms: string;
   symptoms_fa: string | null;
   solution: string;
   solution_fa: string | null;
-  prevention_methods: string;   
+  prevention_methods: string;
   prevention_methods_fa: string | null;
-  severity_level: string;
-  spread_rate: string;
-  affected_plants: Plant[];    
+  severity_level: 'low' | 'medium' | 'high' | 'critical';
+  spread_rate: 'slow' | 'moderate' | 'fast';
   view_count: number;
+  comment_count?: number;
   created_at: string;
   updated_at: string;
-  llm_analysis?: {
-    disease_name_fa: string;
-    description: string;
-    severity: string;
-    is_infectious: boolean;
-    treatment_steps: string[];
-    prevention: string;
-  };
+  llm_analysis?: DiseaseLLMAnalysis;
+  affected_plants_list?: string; 
+  is_infectious_en?: string; 
   detected_name?: string;
   confidence?: number;
+}
+
+export interface DiseaseLLMAnalysis {
+  disease_name_fa: string;
+  disease_name_en: string;
+  description_fa: string;
+  description_en: string;
+  severity: 'low' | 'medium' | 'high' | 'critical';
+  is_infectious: string;     
+  is_infectious_en: string;  
+  treatment_steps_fa: string[];
+  treatment_steps_en: string[];
+  prevention_fa: string;
+  prevention_en: string;
 }
 
 export interface Reminder {
@@ -121,11 +123,6 @@ export interface Reminder {
   recurrence_interval?: number;
   created_at: string;
   updated_at: string;
-  plantName?: string;
-  task?: string;
-  frequency?: string;
-  time?: string;
-  enabled?: boolean;
 }
 
 export interface UserPlant {
@@ -146,15 +143,21 @@ export interface UserPlant {
   pruning_interval_days: number;
   health_status: 'healthy' | 'needs_attention' | 'unhealthy';
   notes?: string;
+  pot_size?: string;
+  growth_records?: GrowthRecord[];    
+  reminders?: Reminder[];  
 }
 
-
-
-export interface PlantFavorite {
+export interface GrowthRecord {
   id: number;
-  user: number;
-  plant: number;
+  user_plant?: number;
+  date: string;
+  height: number | null;
+  width: number | null;
+  unit: string;
+  notes?: string;
   created_at: string;
+  updated_at: string;
 }
 
 export interface PlantComment {
@@ -168,4 +171,17 @@ export interface PlantComment {
   created_at: string;
   updated_at: string;
   replies?: PlantComment[]; 
+}
+
+export interface DiseaseComment {
+  id: number;
+  user: number;
+  user_name: string;
+  disease: number;
+  parent: number | null;
+  content: string;
+  is_approved: boolean;
+  created_at: string;
+  updated_at: string;
+  replies?: DiseaseComment[];
 }

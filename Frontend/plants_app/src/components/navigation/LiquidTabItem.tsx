@@ -16,7 +16,6 @@ interface LiquidTabItemProps {
   onPress: () => void;
 }
 
-// Spring configuration for liquid effect
 const springConfig = {
   damping: 15,
   stiffness: 120,
@@ -41,7 +40,7 @@ export const LiquidTabItem: React.FC<LiquidTabItemProps> = ({
       backgroundColor: interpolateColor(
         progress.value,
         [0, 1],
-        ['transparent', '#3B82F6'] // Transition to primary blue
+        ['transparent', '#16a34a'] // Brand 600
       ),
     };
   });
@@ -49,7 +48,7 @@ export const LiquidTabItem: React.FC<LiquidTabItemProps> = ({
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
       opacity: progress.value,
-      width: progress.value * 60, 
+      width: progress.value * 70, 
       transform: [{ scale: progress.value }],
     };
   });
@@ -63,7 +62,7 @@ export const LiquidTabItem: React.FC<LiquidTabItemProps> = ({
     >
       <Animated.View style={[styles.container, animatedContainerStyle]}>
         <Icon
-          size={24}
+          size={22}
           color={isFocused ? '#FFFFFF' : '#64748b'}
           strokeWidth={isFocused ? 2.5 : 2}
         />
@@ -90,16 +89,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 10,
-    paddingHorizontal: 16,
-    borderRadius: 9999, // fully rounded pill
-    height: 48,
+    paddingVertical: 8,
+    paddingHorizontal: 12,
+    borderRadius: 9999,
+    height: 44,
   },
   text: {
     color: '#FFFFFF',
-    fontFamily: 'Vazirmatn-Bold',
-    fontSize: 14,
-    marginLeft: 8,
+    fontSize: 12,
+    fontWeight: 'bold',
+    marginLeft: 6,
     overflow: 'hidden',
   },
 });
+

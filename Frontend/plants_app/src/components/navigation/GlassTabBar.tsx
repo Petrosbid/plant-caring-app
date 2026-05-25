@@ -1,17 +1,19 @@
 // src/components/navigation/GlassTabBar.tsx
 import React from 'react';
-import { View, StyleSheet, useColorScheme } from 'react-native';
+import { View, StyleSheet, Platform } from 'react-native';
 import { BottomTabBarProps } from '@react-navigation/bottom-tabs';
 import { BlurView } from 'expo-blur';
 import { LiquidTabItem } from './LiquidTabItem';
-import { Home, Phone, PlusCircle, Star, MoreHorizontal } from 'lucide-react-native';
+import { Home, Flower2, Cpu, Bell, User } from 'lucide-react-native';
+import { useTranslation } from 'react-i18next';
+import { useTheme } from '../../context/ThemeContext';
 
 const iconMap: Record<string, any> = {
   Home: Home,
-  Calls: Phone,
-  Activate: PlusCircle,
-  Favorites: Star,
-  More: MoreHorizontal,
+  Garden: Flower2,
+  AI: Cpu,
+  Reminders: Bell,
+  Profile: User,
 };
 
 export const GlassTabBar: React.FC<BottomTabBarProps> = ({
@@ -19,19 +21,20 @@ export const GlassTabBar: React.FC<BottomTabBarProps> = ({
   descriptors,
   navigation,
 }) => {
-  const colorScheme = useColorScheme();
-  const isDark = colorScheme === 'dark';
+  const { t } = useTranslation();
+  const { theme } = useTheme();
+  const isDark = theme === 'dark';
 
   return (
     <View style={styles.container}>
       <BlurView
-        intensity={isDark ? 40 : 80}
+        intensity={Platform.OS === 'ios' ? (isDark ? 40 : 80) : 100}
         tint={isDark ? 'dark' : 'light'}
         style={[
           styles.blurView,
           {
-            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(255,255,255,0.3)',
-            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.6)' : 'rgba(255, 255, 255, 0.7)',
+            borderColor: isDark ? 'rgba(255,255,255,0.1)' : 'rgba(0,0,0,0.05)',
+            backgroundColor: isDark ? 'rgba(15, 23, 42, 0.8)' : 'rgba(255, 255, 255, 0.8)',
           },
         ]}
       >
@@ -61,7 +64,7 @@ export const GlassTabBar: React.FC<BottomTabBarProps> = ({
           return (
             <LiquidTabItem
               key={route.key}
-              label={label as string}
+              label={t(`common.${label.toString().toLowerCase()}`)}
               Icon={Icon}
               isFocused={isFocused}
               onPress={onPress}
@@ -76,23 +79,24 @@ export const GlassTabBar: React.FC<BottomTabBarProps> = ({
 const styles = StyleSheet.create({
   container: {
     position: 'absolute',
-    bottom: 24,
-    left: 20,
-    right: 20,
-    elevation: 8, // Shadow for Android
-    shadowColor: '#000', // Shadow for iOS
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.15,
-    shadowRadius: 12,
+    bottom: Platform.OS === 'ios' ? 30 : 20,
+    left: 16,
+    right: 16,
+    elevation: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 10 },
+    shadowOpacity: 0.1,
+    shadowRadius: 20,
   },
   blurView: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
-    paddingVertical: 8,
+    paddingHorizontal: 10,
+    paddingVertical: 10,
     borderRadius: 30,
     borderWidth: 1,
     overflow: 'hidden',
   },
 });
+
