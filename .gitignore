@@ -21,17 +21,17 @@ wheels/
 *.egg
 
 # Virtual environments
-.venv/
-venv/
-env/
-
-# Django
-*.log
-local_settings.py
-db.sqlite3
-.db.sqlite3
-media/
-staticfiles/
+Backend/.venv/
+Backend/venv/
+Backend/env/
+Backend/.env
+Backend/# Django
+Backend/*.log
+Backend/local_settings.py
+Backend/db.sqlite3
+Backend/.db.sqlite3
+Backend/media/
+Backend/staticfiles/
 
 # ML Models - These are typically too large for Git
 Backend/models/

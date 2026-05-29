@@ -9,7 +9,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { formatDate } from '../utils/date';
 import { ChevronRight, ChevronLeft } from 'lucide-react-native';
-import { cn } from '../utils/cn';
+import { FilterSortBar } from '../components/common/FilterSortBar';
+import { FilterSortModal } from '../components/common/FilterSortModal';
+import { BLOG_SORT_OPTIONS } from '../constants/filters';
 
 const BlogListScreen = () => {
   const { t, i18n } = useTranslation();
@@ -17,13 +19,33 @@ const BlogListScreen = () => {
   const isEn = i18n.language === 'en';
 
   const [posts, setPosts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<string[]>(['All']);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [search, setSearch] = useState('');
+  const [selectedCategory, setSelectedCategory] = useState('All');
+  const [ordering, setOrdering] = useState('-publish');
+  const [modalType, setModalType] = useState<'filter' | 'sort' | null>(null);
 
   const fetchPosts = async () => {
     try {
-      const data = await blogService.getPosts();
-      setPosts(data.results);
+      if (!refreshing) setLoading(true);
+      const data = await blogService.getPosts({
+        search: search || undefined,
+        ordering,
+        category: selectedCategory === 'All' ? undefined : selectedCategory
+      });
+      const results = data.results || [];
+      setPosts(results);
+      
+      // Extract unique categories
+      const uniqueCats = new Set<string>();
+      results.forEach((p: any) => {
+        if (p.category) uniqueCats.add(p.category);
+      });
+      if (uniqueCats.size > 0) {
+          setCategories(['All', ...Array.from(uniqueCats).sort()]);
+      }
     } catch (err) {
       console.error(err);
     } finally {
@@ -33,21 +55,50 @@ const BlogListScreen = () => {
   };
 
   useEffect(() => {
-    fetchPosts();
-  }, []);
+    const delayDebounce = setTimeout(() => {
+      fetchPosts();
+    }, 500);
+    return () => clearTimeout(delayDebounce);
+  }, [search, ordering, selectedCategory]);
+
+  const blogFilters = {
+    category: {
+      labelEn: 'Category',
+      labelFa: 'دسته بندی',
+      values: categories.map(cat => ({ 
+        en: cat, 
+        fa: cat === 'All' ? 'همه' : cat, 
+        query: cat 
+      }))
+    }
+  };
+
+  const handleFilterChange = (key: string, value: string) => {
+    if (key === 'category') {
+      setSelectedCategory(value);
+    }
+  };
 
   return (
     <ScreenWrapper withScroll={false}>
       <View className="px-2 pt-2 mb-6">
-        <Text className="text-3xl font-black text-slate-900 dark:text-white">
+        <Text className="text-3xl font-black text-slate-900 dark:text-white mb-2">
           {t('common.blog')}
         </Text>
-        <Text className="text-slate-500 dark:text-slate-400">
+        <Text className="text-slate-500 dark:text-slate-400 mb-6">
           {isEn ? "Learn how to care for your plants like a pro" : "یاد بگیرید چطور حرفه‌ای از گیاهانتان مراقبت کنید"}
         </Text>
+
+        <FilterSortBar 
+          search={search}
+          onSearchChange={setSearch}
+          onFilterPress={() => setModalType('filter')}
+          onSortPress={() => setModalType('sort')}
+          activeFiltersCount={selectedCategory !== 'All' ? 1 : 0}
+        />
       </View>
 
-      {loading ? (
+      {loading && !refreshing ? (
         <View className="flex-1 items-center justify-center">
           <Loader size={16} />
         </View>
@@ -88,8 +139,30 @@ const BlogListScreen = () => {
               </View>
             </TouchableOpacity>
           )}
+          ListEmptyComponent={
+            !loading ? (
+              <View className="items-center justify-center py-20">
+                <Text className="text-slate-400">
+                  {isEn ? "No articles found" : "مطلبی یافت نشد"}
+                </Text>
+              </View>
+            ) : null
+          }
         />
       )}
+
+      <FilterSortModal 
+        isVisible={!!modalType}
+        onClose={() => setModalType(null)}
+        type={modalType || 'sort'}
+        sortOptions={BLOG_SORT_OPTIONS}
+        currentSort={ordering}
+        onSortChange={setOrdering}
+        filterCategories={blogFilters as any}
+        currentFilters={{ category: selectedCategory }}
+        onFilterChange={handleFilterChange}
+        onClearFilters={() => setSelectedCategory('All')}
+      />
     </ScreenWrapper>
   );
 };

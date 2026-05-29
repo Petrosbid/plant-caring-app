@@ -34,8 +34,7 @@ export default function AppIndex() {
   if (isFirstLaunch) {
     console.log('[App] Rendering Onboarding');
     const slides = [
-// ...
-
+      {
         key: '1',
         title: 'Welcome to Verna',
         text: 'Your intelligent companion for plant care and identification.',

@@ -9,11 +9,16 @@ https://docs.djangoproject.com/en/5.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
+import os
 from datetime import timedelta
 from pathlib import Path
+from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Load environment variables from .env file
+load_dotenv(os.path.join(BASE_DIR, '.env'))
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
@@ -21,18 +26,18 @@ AUTH_USER_MODEL = 'users.CustomUser'
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-39$&o9-!&%+e@xc0xb27vh7zi0zb1lk#5qwchn*2+$kz2eq2*y'
+SECRET_KEY = os.getenv('SECRET_KEY', 'django-insecure-default-key-change-me')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = os.getenv('DEBUG', 'True') == 'True'
 
 ALLOWED_HOSTS = [
     '*'
 ]
 
-SMS_IR_API_KEY = "YOUR_API_KEY"
-SMS_IR_LINE_NUMBER = "YOUR_LINE_NUMBER"
-SMS_IR_OTP_TEMPLATE_ID = "YOUR_OTP_TEMPLATE_ID"
+SMS_IR_API_KEY = os.getenv('SMS_IR_API_KEY', "YOUR_API_KEY")
+SMS_IR_LINE_NUMBER = os.getenv('SMS_IR_LINE_NUMBER', "YOUR_LINE_NUMBER")
+SMS_IR_OTP_TEMPLATE_ID = os.getenv('SMS_IR_OTP_TEMPLATE_ID', "YOUR_OTP_TEMPLATE_ID")
 
 # Application definition
 
@@ -250,7 +255,7 @@ CORS_ALLOW_HEADERS = [
 ]
 
 # OpenRouter API Key
-OPENROUTER_API_KEY = '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'
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', 'sk-or-v1-default-key-change-me')
 
 # API Documentation (drf-spectacular)
 SPECTACULAR_SETTINGS = {

@@ -2,7 +2,7 @@ import requests
 import json
 from django.conf import settings
 
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', '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')
+OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
 
 
 def get_plant_recommendation_from_llm(answers: dict, language: str, additional_notes: str = ""):
@@ -60,7 +60,7 @@ Additional notes: {additional_notes}
                 "X-Title": "Plant Care App",
             },
             json={
-                "model": "tngtech/deepseek-r1t2-chimera:free",
+                "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": user_prompt}

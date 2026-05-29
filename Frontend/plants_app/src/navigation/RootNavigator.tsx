@@ -19,8 +19,9 @@ import PlantRecommenderScreen from '../screens/PlantRecommenderScreen';
 import IdentifyScreen from '../screens/IdentifyScreen';
 import DiseaseCheckScreen from '../screens/DiseaseCheckScreen';
 import LibraryScreen from '../screens/LibraryScreen';
+import DiseaseLibraryScreen from '../screens/DiseaseLibraryScreen';
 
-import { NavigationContainer } from '@react-navigation/native';
+import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
@@ -36,34 +37,37 @@ export const RootNavigator = () => {
   }
 
   return (
-    <NavigationContainer independent={true}>
-      <Stack.Navigator
-        screenOptions={{
-          headerShown: false,
-          animation: 'slide_from_right',
-        }}
-      >
-        {!isAuthenticated ? (
-          <>
-            <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Signup" component={SignupScreen} />
-          </>
-        ) : (
-          <>
-            <Stack.Screen name="MainTabs" component={MainTabs} />
-            <Stack.Screen name="Library" component={LibraryScreen} />
-            <Stack.Screen name="PlantDetails" component={PlantDetailsScreen} />
-            <Stack.Screen name="DiseaseDetails" component={DiseaseDetailsScreen} />
-            <Stack.Screen name="BlogList" component={BlogListScreen} />
-            <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
-            <Stack.Screen name="CareGuide" component={CareGuideScreen} />
-            <Stack.Screen name="PlantRecommender" component={PlantRecommenderScreen} />
-            <Stack.Screen name="Identify" component={IdentifyScreen} />
-            <Stack.Screen name="DiseaseCheck" component={DiseaseCheckScreen} />
-          </>
-        )}
-      </Stack.Navigator>
-    </NavigationContainer>
+    <NavigationIndependentTree>
+      <NavigationContainer>
+        <Stack.Navigator
+          screenOptions={{
+            headerShown: false,
+            animation: 'slide_from_right',
+          }}
+        >
+          {!isAuthenticated ? (
+            <>
+              <Stack.Screen name="Login" component={LoginScreen} />
+              <Stack.Screen name="Signup" component={SignupScreen} />
+            </>
+          ) : (
+            <>
+              <Stack.Screen name="MainTabs" component={MainTabs} />
+              <Stack.Screen name="Library" component={LibraryScreen} />
+              <Stack.Screen name="DiseaseLibrary" component={DiseaseLibraryScreen} />
+              <Stack.Screen name="PlantDetails" component={PlantDetailsScreen} />
+              <Stack.Screen name="DiseaseDetails" component={DiseaseDetailsScreen} />
+              <Stack.Screen name="BlogList" component={BlogListScreen} />
+              <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
+              <Stack.Screen name="CareGuide" component={CareGuideScreen} />
+              <Stack.Screen name="PlantRecommender" component={PlantRecommenderScreen} />
+              <Stack.Screen name="Identify" component={IdentifyScreen} />
+              <Stack.Screen name="DiseaseCheck" component={DiseaseCheckScreen} />
+            </>
+          )}
+        </Stack.Navigator>
+      </NavigationContainer>
+    </NavigationIndependentTree>
   );
 };
 

@@ -16,15 +16,28 @@ import {
 } from 'lucide-react-native';
 import { cn } from '../utils/cn';
 import { formatDate } from '../utils/date';
-
 import { ThemeTransition } from '../components/common/ThemeTransition';
+import { EditProfileModal } from '../components/common/EditProfileModal';
+import { authService } from '../services/api';
 
 const ProfileScreen = () => {
   const { t, i18n } = useTranslation();
-  const { user, logout, isAuthenticated } = useAuth();
+  const { user, logout, isAuthenticated, setUser } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const isEn = i18n.language === 'en';
+
+  const [showEditModal, setShowEditModal] = useState(false);
+
+  const handleUpdateProfile = async (data: any) => {
+    try {
+      const updated = await authService.updateProfile(data);
+      setUser(updated);
+    } catch (err) {
+      console.error(err);
+      throw err;
+    }
+  };
 
   const handleLogout = () => {
     Alert.alert(
@@ -59,7 +72,7 @@ const ProfileScreen = () => {
             variant="primary" 
             size="lg" 
             className="w-full max-w-[250px]"
-            onPress={() => navigation.navigate('Login' as any)}
+            onPress={() => navigation.navigate('Login')}
           >
             {t('common.signIn')}
           </Button>
@@ -77,7 +90,10 @@ const ProfileScreen = () => {
             source={{ uri: user.profile_picture || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user.username}` }} 
             className="w-32 h-32 rounded-full border-4 border-white dark:border-slate-800 shadow-xl"
           />
-          <TouchableOpacity className="absolute bottom-0 right-0 bg-brand-500 p-2 rounded-full border-4 border-white dark:border-slate-900">
+          <TouchableOpacity 
+            onPress={() => setShowEditModal(true)}
+            className="absolute bottom-0 right-0 bg-brand-500 p-2 rounded-full border-4 border-white dark:border-slate-900"
+          >
             <Settings size={18} color="white" />
           </TouchableOpacity>
         </View>
@@ -177,6 +193,13 @@ const ProfileScreen = () => {
           <Text className="ml-2 text-red-500 font-black">{t('common.logout')}</Text>
         </Button>
       </View>
+
+      <EditProfileModal
+        isVisible={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        onSubmit={handleUpdateProfile}
+        user={user}
+      />
     </ScreenWrapper>
   );
 };
@@ -197,4 +220,3 @@ const SettingsItem = ({ icon, label, value, noBorder }: any) => (
 );
 
 export default ProfileScreen;
-

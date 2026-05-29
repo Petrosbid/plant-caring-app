@@ -59,13 +59,23 @@ const AIScreen = () => {
                 ? "Noticed yellow spots or pests? Scan the leaves to get a diagnosis and treatment plan." 
                 : "متوجه لکه‌های زرد یا آفت شده‌اید؟ برگ‌ها را اسکن کنید تا تشخیص و طرح درمان دریافت کنید."}
             </Text>
-            <Button 
-              variant="danger" 
-              onPress={() => navigation.navigate('DiseaseCheck')}
-            >
-              <Camera size={20} color="white" />
-              <Text className="ml-2 text-white font-bold">{isEn ? "Check Health" : "بررسی سلامت"}</Text>
-            </Button>
+            <View className="flex-row gap-2">
+              <Button 
+                variant="danger" 
+                className="flex-1"
+                onPress={() => navigation.navigate('DiseaseCheck')}
+              >
+                <Camera size={20} color="white" />
+                <Text className="ml-2 text-white font-bold">{isEn ? "Check Health" : "بررسی سلامت"}</Text>
+              </Button>
+              <Button 
+                variant="outline" 
+                className="px-4"
+                onPress={() => navigation.navigate('DiseaseLibrary')}
+              >
+                <Search size={20} color="#ef4444" />
+              </Button>
+            </View>
           </Card>
 
           <Card 

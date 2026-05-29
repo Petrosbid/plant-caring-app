@@ -2,12 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenWrapper } from '../components/common/ScreenWrapper';
-import { Input } from '../components/common/Input';
 import { PlantCard } from '../components/plants/PlantCard';
 import { plantService } from '../services/api';
 import { Plant } from '../types';
 import { Loader } from '../components/common/Loader';
-import { Search, Sliders } from 'lucide-react-native';
+import { FilterSortBar } from '../components/common/FilterSortBar';
+import { FilterSortModal } from '../components/common/FilterSortModal';
+import { PLANT_FILTERS, PLANT_SORT_OPTIONS } from '../constants/filters';
 
 const LibraryScreen = () => {
   const { t, i18n } = useTranslation();
@@ -18,10 +19,20 @@ const LibraryScreen = () => {
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
+  // Filter & Sort State
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [ordering, setOrdering] = useState('-created_at');
+  const [modalType, setModalType] = useState<'filter' | 'sort' | null>(null);
+
   const fetchPlants = async (pageNum = 1, isRefreshing = false) => {
     try {
       if (!isRefreshing && pageNum === 1) setLoading(true);
-      const res = await plantService.getPlants({ page: pageNum, search: search || undefined });
+      const res = await plantService.getPlants({ 
+        page: pageNum, 
+        search: search || undefined,
+        ordering,
+        ...filters
+      });
       
       if (isRefreshing || pageNum === 1) {
         setPlants(res.results);
@@ -44,7 +55,7 @@ const LibraryScreen = () => {
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [search]);
+  }, [search, filters, ordering]);
 
   const onRefresh = () => {
     setRefreshing(true);
@@ -60,6 +71,17 @@ const LibraryScreen = () => {
     }
   };
 
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => {
+      if (prev[key] === value) {
+        const newFilters = { ...prev };
+        delete newFilters[key];
+        return newFilters;
+      }
+      return { ...prev, [key]: value };
+    });
+  };
+
   return (
     <ScreenWrapper withScroll={false}>
       <View className="px-2 pt-2">
@@ -67,12 +89,12 @@ const LibraryScreen = () => {
           {t('common.library')}
         </Text>
         
-        <Input
-          placeholder={i18n.language === 'en' ? "Search plants..." : "جستجوی گیاهان..."}
-          value={search}
-          onChangeText={setSearch}
-          leftIcon={<Search size={20} color="#94a3b8" />}
-          rightIcon={<Sliders size={20} color="#16a34a" />}
+        <FilterSortBar 
+          search={search}
+          onSearchChange={setSearch}
+          onFilterPress={() => setModalType('filter')}
+          onSortPress={() => setModalType('sort')}
+          activeFiltersCount={Object.keys(filters).length}
         />
       </View>
 
@@ -105,6 +127,19 @@ const LibraryScreen = () => {
           }
         />
       )}
+
+      <FilterSortModal 
+        isVisible={!!modalType}
+        onClose={() => setModalType(null)}
+        type={modalType || 'filter'}
+        sortOptions={PLANT_SORT_OPTIONS}
+        currentSort={ordering}
+        onSortChange={setOrdering}
+        filterCategories={PLANT_FILTERS as any}
+        currentFilters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={() => setFilters({})}
+      />
     </ScreenWrapper>
   );
 };

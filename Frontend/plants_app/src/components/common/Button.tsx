@@ -1,7 +1,10 @@
 import React from 'react';
-import { Text, Pressable, ActivityIndicator } from 'react-native';
-import { Motion } from '@legendapp/motion';
+import { Text, Pressable } from 'react-native';
+import { Motion as _Motion } from '@legendapp/motion';
 import { cn } from '../../utils/cn';
+import { GooeyLoader } from './GooeyLoader';
+
+const MotionL = _Motion as any;
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -47,7 +50,7 @@ export const Button: React.FC<ButtonProps> = ({
 
   return (
     // @ts-ignore
-    <Motion.Pressable
+    <MotionL.Pressable
       onPress={onPress}
       disabled={disabled || isLoading}
       className={cn(
@@ -61,7 +64,10 @@ export const Button: React.FC<ButtonProps> = ({
       whileTap={{ scale: 0.98 }}
     >
       {isLoading ? (
-        <ActivityIndicator color={variant === 'outline' || variant === 'ghost' ? '#16a34a' : 'white'} />
+        <GooeyLoader 
+          size={8} 
+          color={variant === 'outline' || variant === 'ghost' ? '#16a34a' : 'white'} 
+        />
       ) : (
         <Text className={cn(
           textSizes[size],
@@ -73,7 +79,7 @@ export const Button: React.FC<ButtonProps> = ({
           {children}
         </Text>
         )}
-        </Motion.Pressable>
+        </MotionL.Pressable>
         );
         };
 

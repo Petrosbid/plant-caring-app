@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, Image, Dimensions, ScrollView } from 'react-native';
+import { View, Text, Image, Dimensions, ScrollView, Alert } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRoute, useNavigation } from '@react-navigation/native';
 import { ScreenWrapper } from '../components/common/ScreenWrapper';
@@ -20,6 +20,7 @@ const PlantDetailsScreen = () => {
 
   const [plant, setPlant] = useState<Plant | null>(null);
   const [loading, setLoading] = useState(true);
+  const [adding, setAdding] = useState(false);
 
   useEffect(() => {
     const fetchDetails = async () => {
@@ -35,6 +36,24 @@ const PlantDetailsScreen = () => {
     };
     fetchDetails();
   }, [id]);
+
+  const handleAddToGarden = async () => {
+    try {
+      setAdding(true);
+      await gardenService.addUserPlant({ plant: parseInt(id) });
+      Alert.alert(
+        isEn ? "Success" : "موفقیت",
+        isEn ? "Plant added to your garden!" : "گیاه با موفقیت به باغچه شما اضافه شد!"
+      );
+    } catch (err: any) {
+      Alert.alert(
+        isEn ? "Error" : "خطا",
+        err.message || (isEn ? "Failed to add plant" : "خطا در افزودن گیاه")
+      );
+    } finally {
+      setAdding(false);
+    }
+  };
 
   if (loading || !plant) {
     return (
@@ -137,7 +156,13 @@ const PlantDetailsScreen = () => {
 
         {/* Action Buttons */}
         <View className="mt-10 gap-4">
-          <Button variant="primary" size="lg" className="w-full shadow-brand-500/20">
+          <Button 
+            variant="primary" 
+            size="lg" 
+            className="w-full shadow-brand-500/20"
+            onPress={handleAddToGarden}
+            isLoading={adding}
+          >
             {isEn ? 'Add to My Garden' : 'افزودن به باغچه من'}
           </Button>
           <Button variant="outline" size="lg" className="w-full">

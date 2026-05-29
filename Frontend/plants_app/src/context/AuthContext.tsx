@@ -25,17 +25,24 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = await AsyncStorage.getItem('access_token');
       console.log('[Auth] Checking token:', token ? 'Found' : 'Not found');
       if (token) {
-        const profile = await authService.getProfile();
-        console.log('[Auth] Profile fetched:', profile.username);
-        setUser(profile);
-        await AsyncStorage.setItem('user', JSON.stringify(profile));
+        try {
+          const profile = await authService.getProfile();
+          console.log('[Auth] Profile fetched:', profile.username);
+          setUser(profile);
+          await AsyncStorage.setItem('user', JSON.stringify(profile));
+        } catch (profileError) {
+          console.error('[Auth] Failed to fetch profile with existing token:', profileError);
+          // If profile fetch fails but token exists, token is likely invalid/expired
+          await AsyncStorage.removeItem('access_token');
+          await AsyncStorage.removeItem('refresh_token');
+          await AsyncStorage.removeItem('user');
+          setUser(null);
+        }
       } else {
         setUser(null);
       }
     } catch (error) {
-      console.error('[Auth] Auth check failed:', error);
-      await AsyncStorage.removeItem('access_token');
-      await AsyncStorage.removeItem('refresh_token');
+      console.error('[Auth] Auth check internal error:', error);
       setUser(null);
     } finally {
       setIsLoading(false);

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, ScrollView, Platform } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 import { useTheme } from '../../context/ThemeContext';
 import { cn } from '../../utils/cn';
@@ -19,6 +19,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   padding = true,
 }) => {
   const { theme } = useTheme();
+  const insets = useSafeAreaInsets();
   
   const content = (
     <View className={cn(
@@ -31,7 +32,13 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
   );
 
   return (
-    <SafeAreaView className="flex-1 bg-surface-light dark:bg-surface-dark">
+    <View 
+      style={{ 
+        flex: 1, 
+        paddingTop: Platform.OS === 'ios' ? insets.top : 0 
+      }} 
+      className="bg-surface-light dark:bg-surface-dark"
+    >
       <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
       {withScroll ? (
         <ScrollView
@@ -44,7 +51,7 @@ export const ScreenWrapper: React.FC<ScreenWrapperProps> = ({
       ) : (
         content
       )}
-    </SafeAreaView>
+    </View>
   );
 };
 

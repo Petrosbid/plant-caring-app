@@ -3,20 +3,16 @@ import re
 import json
 import tempfile
 import logging
-import random
-from PIL import Image
+import base64
+import requests
 from django.conf import settings
 from django.db.models import Q
-import torch
-from transformers import AutoProcessor, AutoModelForCausalLM
 
 logger = logging.getLogger(__name__)
 
-# Global variables for model and processor
-model = None
-processor = None
+OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
+VISION_MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
 
-# Professional prompt for plant identification
 SYSTEM_PROMPT = """You are an expert botanist and plant identification specialist. Your task is to analyze the provided image and determine whether it contains a plant.
 
 Follow these rules strictly:
@@ -46,49 +42,31 @@ Guidelines:
 - If multiple plants exist, focus on the central or largest one.
 - If unsure, reduce confidence accordingly.
 - Do not guess if the image is blurry or ambiguous; return is_plant=false in that case."""
-def load_model():
-    """Load Gemma 4 multimodal model and processor."""
-    global model, processor
-    if model is not None and processor is not None:
-        return
 
+
+def encode_image_to_base64(image_path):
+    """تبدیل تصویر به فرمت Base64 برای ارسال به API"""
     try:
-        logger.info("Loading Gemma 4 model for plant identification...")
-        model_name = "google/gemma-4-E4B-it"
-
-        # Set cache directory
-        cache_dir = os.path.join(settings.BASE_DIR, 'models', 'huggingface', 'hub')
-
-        processor = AutoProcessor.from_pretrained(
-            model_name,
-            cache_dir=cache_dir,
-            trust_remote_code=True
-        )
-        model = AutoModelForCausalLM.from_pretrained(
-            model_name,
-            cache_dir=cache_dir,
-            torch_dtype=torch.float16 if torch.cuda.is_available() else torch.float32,
-            device_map="auto" if torch.cuda.is_available() else None,
-            trust_remote_code=True
-        )
-        logger.info("Gemma 4 model loaded successfully")
+        with open(image_path, "rb") as image_file:
+            return base64.b64encode(image_file.read()).decode('utf-8')
     except Exception as e:
-        logger.error(f"Error loading Gemma 4 model: {e}", exc_info=True)
-        model = None
-        processor = None
+        logger.error(f"Error encoding image to base64: {e}")
+        return None
 
 
 def predict_plant(image_data):
     from .models import Plant
 
-    load_model()
-    model_loaded = (model is not None and processor is not None)
+    # بررسی وجود روت کلید API
+    if not OPENROUTER_API_KEY:
+        logger.error("OpenRouter API key is missing in settings.")
+        return {'id': None, 'name': None, 'error': 'API key configuration error'}
 
+    # تشخیص پسوند فایل
     if hasattr(image_data, 'name') and image_data.name:
         ext = os.path.splitext(image_data.name)[1]
     elif isinstance(image_data, str) and image_data.strip():
         if image_data.startswith('data:'):
-            import base64
             match = re.match(r'data:image/(\w+)', image_data)
             ext = '.' + match.group(1) if match else '.jpg'
         else:
@@ -98,6 +76,7 @@ def predict_plant(image_data):
 
     tmp_path = None
     try:
+        # ذخیره موقت فایل جهت استانداردسازی و انکود
         with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp_file:
             tmp_path = tmp_file.name
             if hasattr(image_data, 'chunks'):
@@ -105,8 +84,7 @@ def predict_plant(image_data):
                     tmp_file.write(chunk)
             elif isinstance(image_data, str) and image_data.strip():
                 if image_data.startswith('data:'):
-                    import base64
-                    header, encoded = image_data.split(',', 1)
+                    _, encoded = image_data.split(',', 1)
                     img_data = base64.b64decode(encoded)
                     tmp_file.write(img_data)
                 else:
@@ -119,67 +97,85 @@ def predict_plant(image_data):
         logger.error(f"Failed to save image temporarily: {e}")
         return {'id': None, 'name': None, 'error': 'Image processing failed'}
 
-    # --- Step 2: If model not loaded, fallback to random plant or return None ---
-    if not model_loaded:
-        logger.warning("Model not loaded, using fallback (random plant)")
-        plant_ids = list(Plant.objects.values_list('id', flat=True))
-        if plant_ids:
-            return {'id': random.choice(plant_ids), 'name': None, 'error': 'Model unavailable, random fallback'}
-        else:
-            return {'id': None, 'name': None, 'error': 'Model not loaded and no plants in DB'}
-
-    # --- Step 3: Run inference with Gemma 4 ---
     try:
-        image = Image.open(tmp_path).convert('RGB')
+        # تبدیل عکس به Base64
+        base64_image = encode_image_to_base64(tmp_path)
+        if not base64_image:
+            return {'id': None, 'name': None, 'error': 'Failed to process image bytes'}
 
-        messages = [
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {"role": "user", "content": [
-                {"type": "text", "text": "Analyze this image and return JSON as instructed."},
-                {"type": "image", "image": image}
-            ]}
-        ]
+        # تعیین Content-Type تصویر بر اساس پسوند
+        mime_type = f"image/{ext.replace('.', '')}"
+        if mime_type == "image/jpg":
+            mime_type = "image/jpeg"
 
-        prompt = processor.apply_chat_template(messages, tokenize=False, add_generation_prompt=True)
+        # آماده‌سازی بدنه درخواست مالتی‌مدیال بر اساس مستندات OpenRouter
+        headers = {
+            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
+            "Content-Type": "application/json",
+            "HTTP-Referer": "https://your-plant-app.com",
+            "X-Title": "Plant Care App",
+        }
 
-        inputs = processor(
-            text=prompt,
-            images=image,
-            return_tensors="pt",
-            padding=True
+        payload = {
+            "model": VISION_MODEL,
+            "messages": [
+                {
+                    "role": "user",
+                    "content": [
+                        {
+                            "type": "text",
+                            "text": f"{SYSTEM_PROMPT}\n\nAnalyze this image and return JSON as instructed."
+                        },
+                        {
+                            "type": "image_url",
+                            "image_url": {
+                                "url": f"data:{mime_type};base64,{base64_image}"
+                            }
+                        }
+                    ]
+                }
+            ],
+            "temperature": 0.2
+        }
+
+        # ارسال درخواست به OpenRouter
+        response = requests.post(
+            url="https://openrouter.ai/api/v1/chat/completions",
+            headers=headers,
+            json=payload,
+            timeout=40
         )
 
-        device = next(model.parameters()).device
-        inputs = {k: v.to(device) for k, v in inputs.items()}
+        if response.status_code != 200:
+            logger.error(f"OpenRouter API Error: {response.status_code} - {response.text}")
+            return {'id': None, 'name': None, 'error': f'API Error {response.status_code}'}
 
-        with torch.no_grad():
-            outputs = model.generate(
-                **inputs,
-                max_new_tokens=200,
-                temperature=0.2,
-                do_sample=False,
-                pad_token_id=processor.tokenizer.eos_token_id
-            )
+        content = response.json()["choices"][0]["message"]["content"].strip()
 
-        response = processor.decode(outputs[0], skip_special_tokens=True)
+        # پاک‌سازی تگ‌های مارک‌داون احتمالی در پاسخ متنی
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
 
-        json_match = re.search(r'\{.*\}', response, re.DOTALL)
+        # استخراج ساختار شیء جی‌سان با رگرسیون مطمئن‌تر
+        json_match = re.search(r'\{.*\}', content, re.DOTALL)
         if not json_match:
-            logger.warning(f"No JSON found in model response: {response}")
+            logger.warning(f"No JSON found in model response: {content}")
             return {'id': None, 'name': None, 'error': 'Model response format invalid'}
 
         result = json.loads(json_match.group())
 
-        # --- Step 4: Map result to Plant database ---
-        if result.get('is_plant') == True:
+        # --- نگاشت نتیجه با دیتابیس گیاهان ---
+        if result.get('is_plant') is True:
             scientific_name = result.get('scientific_name', '')
             common_name = result.get('common_name', '')
 
-            # Try to find matching plant in DB
+            # جستجوی فازی در دیتابیس برای پیدا کردن گیاه
             detected_plant = Plant.objects.filter(
                 Q(scientific_name__icontains=scientific_name) |
                 Q(farsi_name__icontains=common_name) |
-                Q(common_name__icontains=common_name)
+                Q(english_name__icontains=common_name)
             ).first()
 
             if detected_plant:
@@ -211,8 +207,9 @@ def predict_plant(image_data):
         logger.error(f"Prediction error: {e}", exc_info=True)
         return {'id': None, 'name': None, 'error': f'Prediction failed: {str(e)}'}
     finally:
+        # پاک‌سازی فایل موقت
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.unlink(tmp_path)
-            except:
+            except Exception:
                 pass

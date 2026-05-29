@@ -36,20 +36,23 @@ export const LiquidTabItem: React.FC<LiquidTabItemProps> = ({
 
   const animatedContainerStyle = useAnimatedStyle(() => {
     return {
-      flex: isFocused ? 2 : 1,
       backgroundColor: interpolateColor(
         progress.value,
         [0, 1],
-        ['transparent', '#16a34a'] // Brand 600
+        ['transparent', '#16a34a']
       ),
+      paddingHorizontal: withSpring(isFocused ? 16 : 12),
     };
   });
 
   const animatedTextStyle = useAnimatedStyle(() => {
     return {
       opacity: progress.value,
-      width: progress.value * 70, 
-      transform: [{ scale: progress.value }],
+      maxWidth: isFocused ? 100 : 0,
+      transform: [
+        { translateX: (1 - progress.value) * -10 },
+        { scale: progress.value },
+      ],
     };
   });
 
@@ -58,12 +61,11 @@ export const LiquidTabItem: React.FC<LiquidTabItemProps> = ({
       onPress={onPress}
       style={styles.pressable}
       accessibilityRole="button"
-      accessibilityState={{ selected: isFocused }}
     >
       <Animated.View style={[styles.container, animatedContainerStyle]}>
         <Icon
-          size={22}
-          color={isFocused ? '#FFFFFF' : '#64748b'}
+          size={20}
+          color={isFocused ? '#FFFFFF' : '#94a3b8'}
           strokeWidth={isFocused ? 2.5 : 2}
         />
         {isFocused && (
@@ -81,25 +83,24 @@ export const LiquidTabItem: React.FC<LiquidTabItemProps> = ({
 
 const styles = StyleSheet.create({
   pressable: {
-    flex: 1,
-    alignItems: 'center',
+    height: 50,
     justifyContent: 'center',
+    alignItems: 'center',
   },
   container: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 8,
-    paddingHorizontal: 12,
-    borderRadius: 9999,
-    height: 44,
+    height: 46,
+    borderRadius: 23,
   },
   text: {
     color: '#FFFFFF',
     fontSize: 12,
-    fontWeight: 'bold',
-    marginLeft: 6,
-    overflow: 'hidden',
+    fontWeight: '900',
+    marginLeft: 8,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
 });
 

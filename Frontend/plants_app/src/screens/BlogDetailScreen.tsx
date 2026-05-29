@@ -10,13 +10,17 @@ import RenderHtml from 'react-native-render-html';
 import { formatDate } from '../utils/date';
 import { ArrowLeft, Eye, MessageCircle } from 'lucide-react-native';
 
+import { useTheme } from '../context/ThemeContext';
+
 const BlogDetailScreen = () => {
   const route = useRoute();
   const navigation = useNavigation();
   const { slug } = route.params as { slug: string };
   const { i18n } = useTranslation();
   const { width } = useWindowDimensions();
+  const { theme } = useTheme();
   const isEn = i18n.language === 'en';
+  const isDark = theme === 'dark';
 
   const [post, setPost] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -108,7 +112,7 @@ const BlogDetailScreen = () => {
           contentWidth={width - 48}
           source={htmlSource}
           baseStyle={{
-            color: i18n.language === 'en' ? '#475569' : '#cbd5e1',
+            color: isDark ? '#cbd5e1' : '#475569',
             fontSize: 16,
           }}
           tagsStyles={{

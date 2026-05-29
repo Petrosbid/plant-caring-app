@@ -4,8 +4,7 @@ import json
 from django.conf import settings
 from .models import Disease
 
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY',
-                             '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')
+OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
 
 
 def get_disease_details_from_llm(disease_name, plant_name=None):

@@ -1,11 +1,13 @@
 // src/types/navigation.ts
 import { LucideIcon } from 'lucide-react-native';
+import { NavigatorScreenParams } from '@react-navigation/native';
 
 export type RootStackParamList = {
-  MainTabs: undefined;
+  MainTabs: NavigatorScreenParams<RootTabParamList>;
   Login: undefined;
   Signup: undefined;
   Library: undefined;
+  DiseaseLibrary: undefined;
   PlantDetails: { id: string };
   DiseaseDetails: { id: string };
   BlogList: undefined;

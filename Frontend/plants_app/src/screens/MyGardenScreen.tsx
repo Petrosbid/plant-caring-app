@@ -10,6 +10,9 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { Loader } from '../components/common/Loader';
 import { Search, Plus, Droplet, TrendingUp } from 'lucide-react-native';
+import { FilterSortBar } from '../components/common/FilterSortBar';
+import { FilterSortModal } from '../components/common/FilterSortModal';
+import { GARDEN_SORT_OPTIONS } from '../constants/filters';
 import { cn } from '../utils/cn';
 import { UserPlant } from '../types';
 
@@ -18,17 +21,42 @@ const MyGardenScreen = () => {
   const isEn = i18n.language === 'en';
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const { userPlants, loading, refreshUserPlants } = useUserPlants();
+  
   const [search, setSearch] = useState('');
+  const [ordering, setOrdering] = useState('-created_at');
+  const [modalType, setModalType] = useState<'filter' | 'sort' | null>(null);
 
-  const filteredPlants = useMemo(() => {
-    if (!search.trim()) return userPlants;
-    const query = search.toLowerCase();
-    return userPlants.filter((up: UserPlant) => 
-      up.nickname?.toLowerCase().includes(query) || 
-      up.plant_details?.farsi_name.toLowerCase().includes(query) ||
-      up.plant_details?.english_name?.toLowerCase().includes(query)
-    );
-  }, [userPlants, search]);
+  const processedPlants = useMemo(() => {
+    let result = [...userPlants];
+
+    // Search
+    if (search.trim()) {
+      const query = search.toLowerCase();
+      result = result.filter((up: UserPlant) => 
+        up.nickname?.toLowerCase().includes(query) || 
+        up.plant_details?.farsi_name.toLowerCase().includes(query) ||
+        up.plant_details?.english_name?.toLowerCase().includes(query)
+      );
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (ordering === 'plant__english_name') {
+        const nameA = (a.plant_details?.english_name || a.plant_details?.farsi_name || '').toLowerCase();
+        const nameB = (b.plant_details?.english_name || b.plant_details?.farsi_name || '').toLowerCase();
+        return nameA.localeCompare(nameB);
+      }
+      if (ordering === '-created_at') {
+        return new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime();
+      }
+      if (ordering === '-health_status') {
+        return (b.health_status || '').localeCompare(a.health_status || '');
+      }
+      return 0;
+    });
+
+    return result;
+  }, [userPlants, search, ordering]);
 
   if (loading && userPlants.length === 0) {
     return (
@@ -40,26 +68,35 @@ const MyGardenScreen = () => {
 
   return (
     <ScreenWrapper withScroll={false}>
-      <View className="px-2 pt-2 flex-row justify-between items-center mb-6">
-        <View>
-          <Text className="text-3xl font-black text-slate-900 dark:text-white">
-            {t('common.mygarden')}
-          </Text>
-          <Text className="text-slate-500 dark:text-slate-400">
-            {isEn ? "Manage your collection" : "مدیریت کلکسیون شما"}
-          </Text>
+      <View className="px-2 pt-2 mb-6">
+        <View className="flex-row justify-between items-center mb-4">
+          <View>
+            <Text className="text-3xl font-black text-slate-900 dark:text-white">
+              {t('common.mygarden')}
+            </Text>
+            <Text className="text-slate-500 dark:text-slate-400">
+              {isEn ? "Manage your collection" : "مدیریت کلکسیون شما"}
+            </Text>
+          </View>
+          <Button 
+            variant="primary" 
+            className="w-12 h-12 p-0 rounded-2xl"
+            onPress={() => navigation.navigate('Library')}
+          >
+            <Plus size={24} color="white" />
+          </Button>
         </View>
-        <Button 
-          variant="primary" 
-          className="w-12 h-12 p-0 rounded-2xl"
-          onPress={() => navigation.navigate('MainTabs', { screen: 'Garden' } as any)}
-        >
-          <Plus size={24} color="white" />
-        </Button>
+
+        <FilterSortBar 
+          search={search}
+          onSearchChange={setSearch}
+          onFilterPress={() => setModalType('filter')}
+          onSortPress={() => setModalType('sort')}
+        />
       </View>
 
       <FlatList
-        data={filteredPlants}
+        data={processedPlants}
         keyExtractor={(item) => item.id.toString()}
         contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 120 }}
         refreshControl={
@@ -126,12 +163,21 @@ const MyGardenScreen = () => {
             </Text>
             <Button 
               variant="outline" 
-              onPress={() => navigation.navigate('MainTabs', { screen: 'Garden' } as any)}
+              onPress={() => navigation.navigate('Library')}
             >
               {isEn ? "Browse Plants" : "مشاهده گیاهان"}
             </Button>
           </View>
         }
+      />
+
+      <FilterSortModal 
+        isVisible={!!modalType}
+        onClose={() => setModalType(null)}
+        type={modalType || 'sort'}
+        sortOptions={GARDEN_SORT_OPTIONS}
+        currentSort={ordering}
+        onSortChange={setOrdering}
       />
     </ScreenWrapper>
   );

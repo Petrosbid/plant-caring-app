@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { View, Text, FlatList, TouchableOpacity, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenWrapper } from '../components/common/ScreenWrapper';
@@ -8,37 +8,99 @@ import { Badge } from '../components/common/Badge';
 import { useReminders } from '../hooks/useReminders';
 import { useUserPlants } from '../hooks/useUserPlants';
 import { Loader } from '../components/common/Loader';
-import { Bell, Trash2, CheckCircle2, Clock, Plus, X } from 'lucide-react-native';
-import { Motion, AnimatePresence } from '@legendapp/motion';
+import { Bell, Trash2, CheckCircle2, Clock, Plus } from 'lucide-react-native';
+import { FilterSortBar } from '../components/common/FilterSortBar';
+import { FilterSortModal } from '../components/common/FilterSortModal';
+import { AddReminderModal } from '../components/common/AddReminderModal';
+import { REMINDER_FILTERS, REMINDER_SORT_OPTIONS } from '../constants/filters';
+import { Motion } from '@legendapp/motion';
 import { formatDate } from '../utils/date';
-import { UserPlant } from '../types';
+import { UserPlant, Reminder } from '../types';
 import { cn } from '../utils/cn';
 
 const RemindersScreen = () => {
   const { t, i18n } = useTranslation();
   const isEn = i18n.language === 'en';
-  const { reminders, loading, toggleReminder, deleteReminder, refreshReminders } = useReminders();
+  const { reminders, loading, toggleReminder, deleteReminder, addReminder, refreshReminders } = useReminders();
   const { userPlants } = useUserPlants();
-  const [showAddForm, setShowAddForm] = useState(false);
+  
+  const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [ordering, setOrdering] = useState('scheduled_date');
+  const [modalType, setModalType] = useState<'filter' | 'sort' | null>(null);
+  const [showAddModal, setShowAddModal] = useState(false);
+
+  const processedReminders = useMemo(() => {
+    let result = [...reminders];
+
+    // Search
+    if (search.trim()) {
+      const query = search.toLowerCase();
+      result = result.filter((r: Reminder) => 
+        r.title.toLowerCase().includes(query) || 
+        r.description?.toLowerCase().includes(query)
+      );
+    }
+
+    // Filter
+    if (filters.care_type) {
+      result = result.filter(r => r.care_type === filters.care_type);
+    }
+    if (filters.status) {
+      const isCompleted = filters.status === 'completed';
+      result = result.filter(r => r.is_completed === isCompleted);
+    }
+
+    // Sort
+    result.sort((a, b) => {
+      if (ordering === 'title') return a.title.localeCompare(b.title);
+      const dateA = new Date(a.scheduled_date).getTime();
+      const dateB = new Date(b.scheduled_date).getTime();
+      return ordering === 'scheduled_date' ? dateA - dateB : dateB - dateA;
+    });
+
+    return result;
+  }, [reminders, search, filters, ordering]);
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => {
+      if (prev[key] === value) {
+        const newFilters = { ...prev };
+        delete newFilters[key];
+        return newFilters;
+      }
+      return { ...prev, [key]: value };
+    });
+  };
 
   return (
     <ScreenWrapper withScroll={false}>
-      <View className="px-2 pt-2 flex-row justify-between items-center mb-6">
-        <View>
-          <Text className="text-3xl font-black text-slate-900 dark:text-white">
-            {t('common.reminders')}
-          </Text>
-          <Text className="text-slate-500 dark:text-slate-400">
-            {isEn ? "Keep your plants thriving" : "گیاهان خود را شاداب نگه دارید"}
-          </Text>
+      <View className="px-2 pt-2 mb-6">
+        <View className="flex-row justify-between items-center mb-4">
+          <View>
+            <Text className="text-3xl font-black text-slate-900 dark:text-white">
+              {t('common.reminders')}
+            </Text>
+            <Text className="text-slate-500 dark:text-slate-400">
+              {isEn ? "Keep your plants thriving" : "گیاهان خود را شاداب نگه دارید"}
+            </Text>
+          </View>
+          <Button 
+            variant="success" 
+            className="w-12 h-12 p-0 rounded-2xl"
+            onPress={() => setShowAddModal(true)}
+          >
+            <Plus size={24} color="white" />
+          </Button>
         </View>
-        <Button 
-          variant="success" 
-          className="w-12 h-12 p-0 rounded-2xl"
-          onPress={() => setShowAddForm(true)}
-        >
-          <Plus size={24} color="white" />
-        </Button>
+
+        <FilterSortBar 
+          search={search}
+          onSearchChange={setSearch}
+          onFilterPress={() => setModalType('filter')}
+          onSortPress={() => setModalType('sort')}
+          activeFiltersCount={Object.keys(filters).length}
+        />
       </View>
 
       {loading && reminders.length === 0 ? (
@@ -47,7 +109,7 @@ const RemindersScreen = () => {
         </View>
       ) : (
         <FlatList
-          data={reminders}
+          data={processedReminders}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 120 }}
           refreshControl={
@@ -127,12 +189,32 @@ const RemindersScreen = () => {
             <View className="items-center justify-center py-20">
               <Text className="text-5xl mb-4">📅</Text>
               <Text className="text-slate-400 text-center px-10">
-                {isEn ? "No reminders yet. Add one to start tracking your plant care." : "هنوز یادآوری ندارید. برای شروع مراقبت از گیاهان یکی اضافه کنید."}
+                {isEn ? "No reminders match your criteria." : "هیچ یادآوری با این فیلترها یافت نشد."}
               </Text>
             </View>
           }
         />
       )}
+
+      <FilterSortModal 
+        isVisible={!!modalType}
+        onClose={() => setModalType(null)}
+        type={modalType || 'filter'}
+        sortOptions={REMINDER_SORT_OPTIONS}
+        currentSort={ordering}
+        onSortChange={setOrdering}
+        filterCategories={REMINDER_FILTERS as any}
+        currentFilters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={() => setFilters({})}
+      />
+
+      <AddReminderModal
+        isVisible={showAddModal}
+        onClose={() => setShowAddModal(false)}
+        onSubmit={addReminder}
+        userPlants={userPlants}
+      />
     </ScreenWrapper>
   );
 };

@@ -32,9 +32,17 @@ export const authService = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
     });
+    
+    const contentType = response.headers.get("content-type");
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || "Registration failed");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Registration failed");
+      } else {
+        const text = await response.text();
+        console.error("Registration failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Registration failed (${response.status}): Server returned HTML or text.`);
+      }
     }
     return response.json();
   },
@@ -47,14 +55,29 @@ export const authService = {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
+    
+    const contentType = response.headers.get("content-type");
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.detail || "Login failed");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Login failed");
+      } else {
+        const text = await response.text();
+        console.error("Login failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Login failed (${response.status}): Server returned HTML or text.`);
+      }
     }
-    const data = await response.json();
-    await AsyncStorage.setItem("access_token", data.access);
-    await AsyncStorage.setItem("refresh_token", data.refresh);
-    return data;
+    
+    if (contentType && contentType.includes("application/json")) {
+      const data = await response.json();
+      await AsyncStorage.setItem("access_token", data.access);
+      await AsyncStorage.setItem("refresh_token", data.refresh);
+      return data;
+    } else {
+      const text = await response.text();
+      console.error("Login succeeded but returned non-JSON:", text.substring(0, 100));
+      throw new Error("Server returned an invalid response format.");
+    }
   },
 
   logout: async (): Promise<void> => {
@@ -77,7 +100,19 @@ export const authService = {
       method: "GET",
       headers,
     });
-    if (!response.ok) throw new Error("Failed to fetch profile");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fetch profile");
+      } else {
+        const text = await response.text();
+        console.error("Profile fetch failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Profile fetch failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
+    
     return response.json();
   },
 
@@ -88,7 +123,19 @@ export const authService = {
       headers,
       body: JSON.stringify(userData),
     });
-    if (!response.ok) throw new Error("Failed to update profile");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to update profile");
+      } else {
+        const text = await response.text();
+        console.error("Profile update failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Profile update failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
+    
     return response.json();
   },
 };
@@ -131,7 +178,39 @@ export const plantService = {
       headers: headers as any,
       body: formData,
     });
-    if (!response.ok) throw new Error("Plant identification failed");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Plant identification failed");
+      } else {
+        const text = await response.text();
+        console.error("Identification failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Identification failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
+    return response.json();
+  },
+
+  recommendPlant: async (answers: any, language: string = "en"): Promise<any> => {
+    const response = await fetch(`${API_BASE_URL}/plants/recommend-plant/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ answers, language }),
+    });
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Recommendation failed");
+      } else {
+        const text = await response.text();
+        console.error("Recommendation failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Recommendation failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 };
@@ -152,13 +231,35 @@ export const diseaseService = {
     const response = await fetch(
       `${API_BASE_URL}/diseases/?${query.toString()}`,
     );
-    if (!response.ok) throw new Error("Failed to fetch diseases");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fetch diseases");
+      } else {
+        const text = await response.text();
+        console.error("Fetch diseases failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Fetch diseases failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 
   getDiseaseById: async (id: number): Promise<Disease> => {
     const response = await fetch(`${API_BASE_URL}/diseases/${id}/`);
-    if (!response.ok) throw new Error("Failed to fetch disease");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fetch disease");
+      } else {
+        const text = await response.text();
+        console.error("Fetch disease failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Fetch disease failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 
@@ -176,7 +277,18 @@ export const diseaseService = {
       headers: headers as any,
       body: formData,
     });
-    if (!response.ok) throw new Error("Disease diagnosis failed");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Disease diagnosis failed");
+      } else {
+        const text = await response.text();
+        console.error("Diagnosis failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Diagnosis failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 };
@@ -188,7 +300,18 @@ export const gardenService = {
   getUserPlants: async (): Promise<UserPlant[]> => {
     const headers = await getAuthHeaders();
     const response = await fetch(`${API_BASE_URL}/my-garden/`, { headers });
-    if (!response.ok) throw new Error("Failed to fetch garden");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fetch garden");
+      } else {
+        const text = await response.text();
+        console.error("Fetch garden failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Fetch garden failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 
@@ -202,7 +325,18 @@ export const gardenService = {
       headers,
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to add plant");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to add plant");
+      } else {
+        const text = await response.text();
+        console.error("Add plant failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Add plant failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 
@@ -216,16 +350,37 @@ export const gardenService = {
       headers,
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to update plant");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to update plant");
+      } else {
+        const text = await response.text();
+        console.error("Update plant failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Update plant failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 
   removeUserPlant: async (id: number): Promise<void> => {
     const headers = await getAuthHeaders();
-    await fetch(`${API_BASE_URL}/my-garden/${id}/`, {
+    const response = await fetch(`${API_BASE_URL}/my-garden/${id}/`, {
       method: "DELETE",
       headers,
     });
+    
+    if (!response.ok) {
+      const contentType = response.headers.get("content-type");
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to remove plant");
+      } else {
+        throw new Error(`Remove plant failed (${response.status})`);
+      }
+    }
   },
 };
 
@@ -238,7 +393,18 @@ export const reminderService = {
     const response = await fetch(`${API_BASE_URL}/my-garden/reminders/`, {
       headers,
     });
-    if (!response.ok) throw new Error("Failed to fetch reminders");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to fetch reminders");
+      } else {
+        const text = await response.text();
+        console.error("Fetch reminders failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Fetch reminders failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 
@@ -249,24 +415,43 @@ export const reminderService = {
       headers,
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error("Failed to create reminder");
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to create reminder");
+      } else {
+        const text = await response.text();
+        console.error("Create reminder failed with non-JSON response:", text.substring(0, 100));
+        throw new Error(`Create reminder failed (${response.status}): Server returned HTML or text.`);
+      }
+    }
     return response.json();
   },
 
   toggleReminder: async (id: number): Promise<void> => {
     const headers = await getAuthHeaders();
-    await fetch(`${API_BASE_URL}/my-garden/reminders/${id}/mark_completed/`, {
+    const response = await fetch(`${API_BASE_URL}/my-garden/reminders/${id}/mark_completed/`, {
       method: "POST",
       headers,
     });
+    
+    if (!response.ok) {
+      throw new Error(`Toggle reminder failed (${response.status})`);
+    }
   },
 
   deleteReminder: async (id: number): Promise<void> => {
     const headers = await getAuthHeaders();
-    await fetch(`${API_BASE_URL}/my-garden/reminders/${id}/`, {
+    const response = await fetch(`${API_BASE_URL}/my-garden/reminders/${id}/`, {
       method: "DELETE",
       headers,
     });
+    
+    if (!response.ok) {
+      throw new Error(`Delete reminder failed (${response.status})`);
+    }
   },
 };
 

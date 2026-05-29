@@ -1,11 +1,11 @@
 import requests
 import json
+import re
 from django.conf import settings
 from .models import Plant
 
+OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
 
-# 1. تنظیمات اولیه
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', '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')
 
 def get_plant_info_from_llm(plant_name):
     system_prompt = """
@@ -15,9 +15,7 @@ I will give you the name of a plant (in any language).
 Return a **raw JSON object** (no markdown, no ```json fences, no commentary)  
 that follows the structure below.
 
-**RULES FOR DESCRIPTION FIELDS**  
-
-- **`description` (Persian)**:  
+**RULES FOR DESCRIPTION FIELDS** - **`description` (Persian)**:  
   ابتدا یک یا دو پاراگراف معرفی (بدون هیچ تگ HTML) بنویسید که شامل: ظاهر گیاه، قیمت تقریبی در ایران، زیستگاه اصلی، حقایق جالب و هر اطلاعات عمومی دیگر باشد.  
   سپس بلافاصله `<h2>راهنمای مراقبت</h2>` اضافه کنید.  
   بعد از آن، برای هر یک از موارد مراقبت به ترتیب زیر، یک `<h3>` و یک `<p>` بنویسید:  
@@ -36,35 +34,25 @@ that follows the structure below.
 
 ### Allowed values for filtering fields
 
-**watering_frequency / watering_frequency_en**  
-"very low", "low", "medium", "high", "very high"
+**watering_frequency / watering_frequency_en** "very low", "low", "medium", "high", "very high"
 
-**fertilizer_schedule / fertilizer_schedule_en**  
-"never", "once a year", "every 3 months", "monthly", "every 2 weeks", "weekly"
+**fertilizer_schedule / fertilizer_schedule_en** "never", "once a year", "every 3 months", "monthly", "every 2 weeks", "weekly"
 
-**light_requirements / light_requirements_en**  
-"low light", "medium indirect light", "bright indirect light", "direct sun", "full sun to partial shade"
+**light_requirements / light_requirements_en** "low light", "medium indirect light", "bright indirect light", "direct sun", "full sun to partial shade"
 
-**humidity_level / humidity_level_en**  
-"low", "moderate", "high", "very high"
+**humidity_level / humidity_level_en** "low", "moderate", "high", "very high"
 
-**temperature_range / temperature_range_en**  
-"10-15°C", "15-20°C", "18-24°C", "20-30°C", "above 15°C", "above 20°C"
+**temperature_range / temperature_range_en** "10-15°C", "15-20°C", "18-24°C", "20-30°C", "above 15°C", "above 20°C"
 
-**soil_type / soil_type_en**  
-"cactus mix", "succulent mix", "standard potting mix", "peat-based mix", "loamy soil", "orchid bark mix"
+**soil_type / soil_type_en** "cactus mix", "succulent mix", "standard potting mix", "peat-based mix", "loamy soil", "orchid bark mix"
 
-**pruning_info / pruning_info_en**  
-"minimal", "light pruning", "regular pruning", "heavy pruning"
+**pruning_info / pruning_info_en** "minimal", "light pruning", "regular pruning", "heavy pruning"
 
-**propagation_methods / propagation_methods_en**  
-One or two from: "stem cuttings", "leaf cuttings", "root division", "seeds", "air layering", "offsets / pups"
+**propagation_methods / propagation_methods_en** One or two from: "stem cuttings", "leaf cuttings", "root division", "seeds", "air layering", "offsets / pups"
 
-**care_difficulty**  
-"easy", "medium", "hard"
+**care_difficulty** "easy", "medium", "hard"
 
-**is_toxic**  
-True or False (must be capital T/F)
+**is_toxic** True or False (must be capital T/F)
 
 ---
 
@@ -109,23 +97,23 @@ Return ONLY the raw JSON object.
                 "X-Title": "Plant Care App",
             },
             json={
-                "model": "tngtech/deepseek-r1t2-chimera:free",
+                "model": "openrouter/owl-alpha",
                 "messages": [
                     {"role": "system", "content": system_prompt},
                     {"role": "user", "content": f"Plant name: {plant_name}"}
                 ],
-                "response_format": {"type": "json_object"}
-            },
-            timeout=50
+                "timeout": 50
+            }
         )
 
         if response.status_code == 200:
-            content = response.json()["choices"][0]["message"]["content"]
-            # پاک‌سازی احتمالی تگ‌های markdown
-            if content.startswith("```json"):
-                content = content.replace("```json", "").replace("```", "")
-            elif content.startswith("```"):
-                content = content.replace("```", "")
+            content = response.json()["choices"][0]["message"]["content"].strip()
+
+            if "```json" in content:
+                content = content.split("```json")[1].split("```")[0].strip()
+            elif "```" in content:
+                content = content.split("```")[1].split("```")[0].strip()
+
             try:
                 care_data = json.loads(content)
                 return care_data
@@ -141,7 +129,6 @@ Return ONLY the raw JSON object.
 
 
 def create_or_update_plant_from_llm(plant_name):
-
     plant_info = get_plant_info_from_llm(plant_name)
     if not plant_info:
         return None
@@ -162,7 +149,6 @@ def create_or_update_plant_from_llm(plant_name):
         diff_lower = difficulty.lower().strip()
         if diff_lower in valid:
             return diff_lower
-        # نگاشت فارسی
         if any(w in diff_lower for w in ['آسان', 'ساده', 'easy']):
             return 'easy'
         if any(w in diff_lower for w in ['متوسط', 'moderate', 'medium']):
