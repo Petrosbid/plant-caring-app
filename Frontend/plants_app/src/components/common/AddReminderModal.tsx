@@ -3,11 +3,13 @@ import { View, Text, Modal, TouchableOpacity, ScrollView, Pressable, Platform, A
 import { BlurView } from 'expo-blur';
 import { X, Calendar, Leaf, Type, AlignLeft, Clock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Motion } from '@legendapp/motion';
+import { Motion as _Motion } from '@legendapp/motion';
 import { cn } from '../../utils/cn';
 import { Button } from './Button';
 import { Input } from './Input';
 import { UserPlant } from '../../types';
+
+const MotionL = _Motion as any;
 
 interface AddReminderModalProps {
   isVisible: boolean;
@@ -28,7 +30,7 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
   isVisible,
   onClose,
   onSubmit,
-  userPlants,
+  userPlants = [],
 }) => {
   const { i18n } = useTranslation();
   const isEn = i18n.language === 'en';
@@ -86,7 +88,7 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
       <View className="flex-1 justify-end">
         <Pressable className="absolute inset-0 bg-black/60" onPress={handleClose} />
 
-        <Motion.View
+        <MotionL.View
           initial={{ y: 900 }}
           animate={{ y: 0 }}
           exit={{ y: 900 }}
@@ -238,7 +240,7 @@ export const AddReminderModal: React.FC<AddReminderModalProps> = ({
               </Button>
             </View>
           </View>
-        </Motion.View>
+        </MotionL.View>
       </View>
     </Modal>
   );

@@ -3,11 +3,13 @@ import { View, Text, Modal, TouchableOpacity, ScrollView, Pressable, Platform, A
 import { BlurView } from 'expo-blur';
 import { X, User, Phone, Mail, Fingerprint, Calendar, Info, Lock } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
-import { Motion } from '@legendapp/motion';
+import { Motion as _Motion } from '@legendapp/motion';
 import { Button } from './Button';
 import { Input } from './Input';
 import { User as UserType } from '../../types';
 import { cn } from '../../utils/cn';
+
+const MotionL = _Motion as any;
 
 interface EditProfileModalProps {
   isVisible: boolean;
@@ -79,7 +81,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
       <View className="flex-1 justify-end">
         <Pressable className="absolute inset-0 bg-black/40" onPress={onClose} />
 
-        <Motion.View
+        <MotionL.View
           initial={{ y: 800 }}
           animate={{ y: 0 }}
           exit={{ y: 800 }}
@@ -228,7 +230,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
               </Button>
             </View>
           </View>
-        </Motion.View>
+        </MotionL.View>
       </View>
     </Modal>
   );

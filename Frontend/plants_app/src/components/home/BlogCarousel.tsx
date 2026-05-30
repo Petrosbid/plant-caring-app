@@ -88,7 +88,7 @@ export const BlogCarousel: React.FC<BlogCarouselProps> = ({
   );
 
   return (
-    <View className="mt-12">
+    <View className="mt-12 min-h-[250px]">
       <View className="flex-row justify-between items-center px-6 mb-6">
         <Text className="text-2xl font-black text-slate-900 dark:text-white">{title}</Text>
         {onSeeAll && (
@@ -108,6 +108,13 @@ export const BlogCarousel: React.FC<BlogCarouselProps> = ({
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 20 }}
         snapToInterval={ITEM_WIDTH + ITEM_SPACING}
         decelerationRate="fast"
+        ListEmptyComponent={
+            <View style={{ width: width - 40 }} className="h-40 bg-slate-50 dark:bg-slate-800/30 rounded-[32px] items-center justify-center border border-dashed border-slate-200 dark:border-slate-700">
+              <Text className="text-slate-400 font-bold">
+                {isEn ? "No articles to show" : "مقاله‌ای برای نمایش نیست"}
+              </Text>
+            </View>
+          }
       />
     </View>
   );

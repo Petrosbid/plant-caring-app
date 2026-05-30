@@ -2,9 +2,8 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Disease, Plant, Reminder, User, UserPlant } from "../types";
 
-export const API_BASE_URL = "https://spending-bubble-smooth.ngrok-free.dev/api";
-const BLOG_API_BASE_URL =
-  "https://spending-bubble-smooth.ngrok-free.dev/api/blog";
+export const API_BASE_URL = 'http://192.168.183.1:8000/api';
+const BLOG_API_BASE_URL = 'http://192.168.183.1:8000/api/blog';
 
 const getToken = async () => await AsyncStorage.getItem("access_token");
 const getRefreshToken = async () => await AsyncStorage.getItem("refresh_token");
@@ -381,6 +380,46 @@ export const gardenService = {
         throw new Error(`Remove plant failed (${response.status})`);
       }
     }
+  },
+
+  chatWithPlant: async (plantId: number, message: string): Promise<any> => {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/my-garden/chat/`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify({ plant_id: plantId, message }),
+    });
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Chat request failed");
+      } else {
+        throw new Error(`Chat request failed (${response.status})`);
+      }
+    }
+    return response.json();
+  },
+
+  addGrowthRecord: async (data: any): Promise<any> => {
+    const headers = await getAuthHeaders();
+    const response = await fetch(`${API_BASE_URL}/my-garden/growth-records/`, {
+      method: "POST",
+      headers,
+      body: JSON.stringify(data),
+    });
+    
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(errorData.detail || "Failed to add growth record");
+      } else {
+        throw new Error(`Add growth record failed (${response.status})`);
+      }
+    }
+    return response.json();
   },
 };
 

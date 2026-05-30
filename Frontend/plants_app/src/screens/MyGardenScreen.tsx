@@ -9,9 +9,10 @@ import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { Loader } from '../components/common/Loader';
-import { Search, Plus, Droplet, TrendingUp } from 'lucide-react-native';
+import { Plus, Droplet, TrendingUp, Calendar } from 'lucide-react-native';
 import { FilterSortBar } from '../components/common/FilterSortBar';
 import { FilterSortModal } from '../components/common/FilterSortModal';
+import { PlantManageModal } from '../components/garden/PlantManageModal';
 import { GARDEN_SORT_OPTIONS } from '../constants/filters';
 import { cn } from '../utils/cn';
 import { UserPlant } from '../types';
@@ -23,8 +24,10 @@ const MyGardenScreen = () => {
   const { userPlants, loading, refreshUserPlants } = useUserPlants();
   
   const [search, setSearch] = useState('');
+  const [filters, setFilters] = useState<Record<string, string>>({});
   const [ordering, setOrdering] = useState('-created_at');
   const [modalType, setModalType] = useState<'filter' | 'sort' | null>(null);
+  const [selectedPlant, setSelectedPlant] = useState<UserPlant | null>(null);
 
   const processedPlants = useMemo(() => {
     let result = [...userPlants];
@@ -37,6 +40,11 @@ const MyGardenScreen = () => {
         up.plant_details?.farsi_name.toLowerCase().includes(query) ||
         up.plant_details?.english_name?.toLowerCase().includes(query)
       );
+    }
+
+    // Filter by health status
+    if (filters.health_status) {
+        result = result.filter(up => up.health_status === filters.health_status);
     }
 
     // Sort
@@ -56,7 +64,18 @@ const MyGardenScreen = () => {
     });
 
     return result;
-  }, [userPlants, search, ordering]);
+  }, [userPlants, search, ordering, filters]);
+
+  const handleFilterChange = (key: string, value: string) => {
+    setFilters(prev => {
+      if (prev[key] === value) {
+        const newFilters = { ...prev };
+        delete newFilters[key];
+        return newFilters;
+      }
+      return { ...prev, [key]: value };
+    });
+  };
 
   if (loading && userPlants.length === 0) {
     return (
@@ -92,6 +111,7 @@ const MyGardenScreen = () => {
           onSearchChange={setSearch}
           onFilterPress={() => setModalType('filter')}
           onSortPress={() => setModalType('sort')}
+          activeFiltersCount={Object.keys(filters).length}
         />
       </View>
 
@@ -108,44 +128,49 @@ const MyGardenScreen = () => {
           
           return (
             <TouchableOpacity 
-              onPress={() => navigation.navigate('PlantDetails', { id: plant.id.toString() })}
+              onPress={() => setSelectedPlant(item)}
               activeOpacity={0.9}
               className="mb-4"
             >
-              <Card className="p-0 overflow-hidden">
-                <View className="flex-row h-32">
+              <Card className="p-0 overflow-hidden rounded-[32px] border-slate-50 dark:border-slate-800">
+                <View className="flex-row h-36">
                   <Image 
                     source={{ uri: plant.primary_image || 'https://via.placeholder.com/150' }} 
-                    className="w-32 h-full"
+                    className="w-36 h-full"
                     resizeMode="cover"
                   />
-                  <View className="flex-1 p-4 justify-between">
+                  <View className="flex-1 p-5 justify-between">
                     <View>
-                      <View className="flex-row justify-between items-center mb-1">
-                        <Text className="text-lg font-bold text-slate-900 dark:text-white" numberOfLines={1}>
+                      <View className="flex-row justify-between items-start mb-1">
+                        <Text className="flex-1 text-lg font-black text-slate-900 dark:text-white mr-2" numberOfLines={1}>
                           {name}
                         </Text>
                         <View className={cn(
-                          "w-2 h-2 rounded-full",
-                          item.health_status === 'healthy' ? "bg-green-500" : "bg-yellow-500"
-                        )} />
+                          "px-2 py-0.5 rounded-full",
+                          item.health_status === 'healthy' ? "bg-green-100 dark:bg-green-900/30" : "bg-yellow-100 dark:bg-yellow-900/30"
+                        )}>
+                            <Text className={cn(
+                                "text-[8px] font-black",
+                                item.health_status === 'healthy' ? "text-green-600 dark:text-green-400" : "text-yellow-600 dark:text-yellow-400"
+                            )}>{item.health_status.toUpperCase()}</Text>
+                        </View>
                       </View>
-                      <Text className="text-xs text-slate-400" numberOfLines={1}>
-                        {isEn ? plant.scientific_name : plant.farsi_name}
+                      <Text className="text-xs text-slate-400 font-bold italic" numberOfLines={1}>
+                        {plant.scientific_name || plant.farsi_name}
                       </Text>
                     </View>
 
-                    <View className="flex-row gap-4 mt-2">
-                      <View className="flex-row items-center gap-1">
-                        <Droplet size={12} color="#3B82F6" />
-                        <Text className="text-[10px] text-slate-500 font-bold">
+                    <View className="flex-row gap-3">
+                      <View className="flex-1 bg-blue-50 dark:bg-blue-900/20 rounded-2xl p-2 items-center justify-center border border-blue-100 dark:border-blue-800/30">
+                        <Droplet size={14} color="#3B82F6" />
+                        <Text className="text-[10px] text-blue-600 dark:text-blue-400 font-black mt-1">
                           {item.watering_interval_days}d
                         </Text>
                       </View>
-                      <View className="flex-row items-center gap-1">
-                        <TrendingUp size={12} color="#16A34A" />
-                        <Text className="text-[10px] text-slate-500 font-bold uppercase">
-                          {item.health_status}
+                      <View className="flex-1 bg-brand-50 dark:bg-brand-900/20 rounded-2xl p-2 items-center justify-center border border-brand-100 dark:border-brand-800/30">
+                        <Calendar size={14} color="#16A34A" />
+                        <Text className="text-[10px] text-brand-600 dark:text-brand-400 font-black mt-1">
+                          Tasks
                         </Text>
                       </View>
                     </View>
@@ -158,14 +183,15 @@ const MyGardenScreen = () => {
         ListEmptyComponent={
           <View className="items-center justify-center py-20">
             <Text className="text-6xl mb-4">🪴</Text>
-            <Text className="text-slate-500 dark:text-slate-400 text-center px-10 mb-6">
+            <Text className="text-slate-500 dark:text-slate-400 text-center px-10 mb-6 font-bold">
               {isEn ? "Your garden is empty. Start adding plants to track their growth!" : "باغچه شما خالی است. برای پیگیری رشد، گیاهان خود را اضافه کنید!"}
             </Text>
             <Button 
-              variant="outline" 
+              variant="primary" 
+              className="rounded-2xl px-8"
               onPress={() => navigation.navigate('Library')}
             >
-              {isEn ? "Browse Plants" : "مشاهده گیاهان"}
+              <Text className="text-white font-black">{isEn ? "Browse Plants" : "مشاهده گیاهان"}</Text>
             </Button>
           </View>
         }
@@ -178,7 +204,33 @@ const MyGardenScreen = () => {
         sortOptions={GARDEN_SORT_OPTIONS}
         currentSort={ordering}
         onSortChange={setOrdering}
+        filterCategories={{
+            health_status: {
+                labelEn: 'Health',
+                labelFa: 'وضعیت سلامت',
+                values: [
+                    { en: 'Healthy', fa: 'سالم', query: 'healthy' },
+                    { en: 'Needs Attention', fa: 'نیاز به توجه', query: 'needs_attention' },
+                    { en: 'Unhealthy', fa: 'ناسالم', query: 'unhealthy' },
+                ]
+            }
+        }}
+        currentFilters={filters}
+        onFilterChange={handleFilterChange}
+        onClearFilters={() => setFilters({})}
       />
+
+      {selectedPlant && (
+          <PlantManageModal 
+            isVisible={!!selectedPlant}
+            onClose={() => setSelectedPlant(null)}
+            userPlant={selectedPlant}
+            onUpdate={(data) => {
+                refreshUserPlants();
+            }}
+            onRefresh={refreshUserPlants}
+          />
+      )}
     </ScreenWrapper>
   );
 };

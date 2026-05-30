@@ -7,7 +7,7 @@ export interface Author {
   last_name: string;
 }
 
-export interface Comment {
+export interface BlogComment {
   id: number;
   author: string;
   content: string;
@@ -17,11 +17,11 @@ export interface Comment {
 // Interface for the blog post list view
 export interface PostListItem {
   view_count: number;
-  date: any;
-  published_date: any;
+  date: string;
+  published_date: string;
   category: string;
-  meta_description_en: boolean;
-  meta_description: any;
+  meta_description_en: boolean | string | null;
+  meta_description: string | null;
   views_count: number;
   id: number;
   title: string;
@@ -49,7 +49,7 @@ export interface PostDetail extends Omit<PostListItem, 'excerpt'> {
   likes_count: number;
   dislikes_count: number;
   comments_count: number;
-  comments: Comment[];
+  comments: BlogComment[];
   user_has_liked: boolean;
   user_has_disliked: boolean;
 }

@@ -68,7 +68,7 @@ export interface CareInstruction {
 }
 
 export interface User {
-  date_joined: any;
+  date_joined: string;
   id: number;
   username: string;
   email: string;
@@ -99,7 +99,7 @@ export interface Reminder {
 }
 
 export interface UserPlant {
-  pot_size: any;
+  pot_size: 'no_pot' | 'small' | 'medium' | 'large' | 'extra_large';
   id: number;
   user: number;
   plant: number;
@@ -206,4 +206,11 @@ export interface Disease {
   llm_analysis?: DiseaseLLMAnalysis;
   affected_plants_list?: string; 
   is_infectious_en?: string; 
+}
+
+export interface PaginatedResponse<T> {
+  count: number;
+  next: string | null;
+  previous: string | null;
+  results: T[];
 }

@@ -110,7 +110,7 @@ export const PlantCarousel: React.FC<PlantCarouselProps> = ({
   );
 
   return (
-    <View className="mt-10">
+    <View className="mt-10 min-h-[300px]">
       <View className="flex-row justify-between items-end px-6 mb-6">
         <View>
           <Text className="text-2xl font-black text-slate-900 dark:text-white leading-7">{title}</Text>
@@ -133,6 +133,13 @@ export const PlantCarousel: React.FC<PlantCarouselProps> = ({
         contentContainerStyle={{ paddingHorizontal: 20, paddingBottom: 30 }}
         snapToInterval={ITEM_WIDTH + ITEM_SPACING}
         decelerationRate="fast"
+        ListEmptyComponent={
+          <View style={{ width: width - 40 }} className="h-64 bg-slate-50 dark:bg-slate-800/30 rounded-[40px] items-center justify-center border border-dashed border-slate-200 dark:border-slate-700">
+            <Text className="text-slate-400 font-bold">
+              {isEn ? "No plants to show" : "گیاهی برای نمایش نیست"}
+            </Text>
+          </View>
+        }
       />
     </View>
   );

@@ -105,7 +105,7 @@ export const FilterSortModal: React.FC<FilterSortModalProps> = ({
                   key={val.query}
                   onPress={() => onFilterChange?.(key, val.query)}
                   className={cn(
-                    "px-4 py-2.5 rounded-full border transition-all",
+                    "px-4 py-2.5 rounded-full border",
                     isActive
                       ? "bg-brand-500 border-brand-500 shadow-md"
                       : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"

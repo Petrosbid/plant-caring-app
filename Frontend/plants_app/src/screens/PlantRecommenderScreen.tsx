@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, ScrollView, Image } from 'react-native';
+import { View, Text, Pressable, ScrollView, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenWrapper } from '../components/common/ScreenWrapper';
 import { Button } from '../components/common/Button';
@@ -11,6 +11,7 @@ import { Motion, AnimatePresence } from '@legendapp/motion';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
+import { cn } from '../utils/cn';
 
 const QUIZ_STEPS = [
   {
@@ -198,11 +199,11 @@ const PlantRecommenderScreen = () => {
               {currentStepData.options.map((opt) => {
                 const isSelected = answers[currentStepData.id] === opt.value;
                 return (
-                  <TouchableOpacity
+                  <Pressable
                     key={opt.value}
                     onPress={() => handleOptionSelect(opt.value)}
                     className={cn(
-                      "p-6 rounded-[32px] border-2 transition-all flex-row justify-between items-center",
+                      "p-6 rounded-[32px] border-2 flex-row justify-between items-center",
                       isSelected 
                         ? "bg-brand-500 border-brand-500 shadow-xl shadow-brand-500/30" 
                         : "bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700"
@@ -215,7 +216,7 @@ const PlantRecommenderScreen = () => {
                       {isEn ? opt.labelEn : opt.labelFa}
                     </Text>
                     {isSelected && <CheckCircle2 size={24} color="white" />}
-                  </TouchableOpacity>
+                  </Pressable>
                 );
               })}
             </View>

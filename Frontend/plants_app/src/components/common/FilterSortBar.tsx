@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, TouchableOpacity, TextInput, Text } from 'react-native';
-import { Search, Sliders, ArrowDown, X } from 'lucide-react-native';
+import { Search, SlidersHorizontal, ArrowDownAZ, X } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 
@@ -48,7 +48,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
         onPress={onSortPress}
         className="w-12 h-12 bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-2xl items-center justify-center shadow-sm"
       >
-        <ArrowDown size={20} color="#16a34a" />
+        <ArrowDownAZ size={20} color="#16a34a" />
       </TouchableOpacity>
 
       {/* Filter Button */}
@@ -56,7 +56,7 @@ export const FilterSortBar: React.FC<FilterSortBarProps> = ({
         onPress={onFilterPress}
         className="w-12 h-12 bg-white dark:bg-slate-800/80 border border-slate-100 dark:border-slate-700 rounded-2xl items-center justify-center shadow-sm relative"
       >
-        <Sliders size={20} color="#16a34a" />
+        <SlidersHorizontal size={20} color="#16a34a" />
         {activeFiltersCount > 0 && (
           <View className="absolute -top-1 -right-1 bg-red-500 w-5 h-5 rounded-full items-center justify-center border-2 border-white dark:border-slate-900">
             <Text className="text-[10px] text-white font-bold">

@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image } from 'react-native';
-import { Motion } from '@legendapp/motion';
+import { Motion as _Motion } from '@legendapp/motion';
 import { Heart, Eye, Bookmark } from 'lucide-react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
@@ -9,6 +9,8 @@ import { RootStackParamList } from '../../types/navigation';
 import { Plant } from '../../types';
 import { Badge } from '../common/Badge';
 import { cn } from '../../utils/cn';
+
+const MotionL = _Motion as any;
 
 interface PlantCardProps {
   plant: Plant;
@@ -30,7 +32,7 @@ export const PlantCard: React.FC<PlantCardProps> = ({
 
   return (
     // @ts-ignore
-    <Motion.Pressable
+    <MotionL.Pressable
       onPress={() => navigation.navigate('PlantDetails', { id: plant.id.toString() })}
       className={cn(
         "bg-white dark:bg-slate-800/80 rounded-3xl border border-slate-200/60 dark:border-slate-700/50 shadow-md overflow-hidden mb-4",
@@ -92,6 +94,6 @@ export const PlantCard: React.FC<PlantCardProps> = ({
           </View>
         </View>
       </View>
-    </Motion.Pressable>
+    </MotionL.Pressable>
   );
 };
