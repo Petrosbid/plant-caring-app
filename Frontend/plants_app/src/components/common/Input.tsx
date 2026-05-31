@@ -1,5 +1,7 @@
 import React from 'react';
-import { View, Text, TextInput, TextInputProps } from 'react-native';
+import { View, TextInput, TextInputProps } from 'react-native';
+import { AppText as Text } from './AppText';
+import { useTranslation } from 'react-i18next';
 import { cn } from '../../utils/cn';
 
 interface InputProps extends TextInputProps {
@@ -19,6 +21,10 @@ export const Input: React.FC<InputProps> = ({
   className,
   ...props
 }) => {
+  const { i18n } = useTranslation();
+  const isEn = i18n.language === 'en';
+  const fontClass = isEn ? 'font-inter' : 'font-vazir';
+
   return (
     <View className={cn("w-full mb-4", containerClassName)}>
       {label && (
@@ -33,7 +39,11 @@ export const Input: React.FC<InputProps> = ({
       )}>
         {leftIcon && <View className="mr-2">{leftIcon}</View>}
         <TextInput
-          className="flex-1 h-12 text-slate-900 dark:text-white text-sm"
+          className={cn(
+            "flex-1 h-12 text-slate-900 dark:text-white text-sm",
+            fontClass,
+            !isEn && "text-right"
+          )}
           placeholderTextColor="#94a3b8"
           {...props}
         />

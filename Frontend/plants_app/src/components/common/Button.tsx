@@ -1,5 +1,6 @@
 import React from 'react';
-import { Text, Pressable } from 'react-native';
+import { Pressable } from 'react-native';
+import { AppText as Text } from './AppText';
 import { Motion as _Motion } from '@legendapp/motion';
 import { cn } from '../../utils/cn';
 import { GooeyLoader } from './GooeyLoader';

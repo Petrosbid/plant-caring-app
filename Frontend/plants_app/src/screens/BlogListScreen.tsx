@@ -46,7 +46,6 @@ const BlogListScreen = () => {
       const results = data.results || [];
       setPosts(results);
 
-      // Extract unique categories
       const uniqueCats = new Set<string>();
       results.forEach((p: any) => {
         if (p.category) uniqueCats.add(p.category);

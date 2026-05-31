@@ -42,8 +42,10 @@ module.exports = {
         primary: "#3B82F6", 
       },
       fontFamily: {
-        vazir: ["Vazirmatn-Regular", "sans-serif"],
-        vazirBold: ["Vazirmatn-Bold", "sans-serif"],
+        vazir: ["Vazirmatn_400Regular"],
+        vazirBold: ["Vazirmatn_700Bold"],
+        inter: ["Inter_400Regular"],
+        interBold: ["Inter_700Bold"],
       },
       fontWeight: {
         extrablack: "950",

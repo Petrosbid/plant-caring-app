@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, RefreshControl } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRoute } from '@react-navigation/native';
 import { ScreenWrapper } from '../components/common/ScreenWrapper';
 import { PlantCard } from '../components/plants/PlantCard';
 import { plantService } from '../services/api';
@@ -12,6 +13,9 @@ import { PLANT_FILTERS, PLANT_SORT_OPTIONS } from '../constants/filters';
 
 const LibraryScreen = () => {
   const { t, i18n } = useTranslation();
+  const route = useRoute();
+  const initialFilters = (route.params as any)?.filters || {};
+
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -20,9 +24,16 @@ const LibraryScreen = () => {
   const [hasMore, setHasMore] = useState(true);
 
   // Filter & Sort State
-  const [filters, setFilters] = useState<Record<string, string>>({});
+  const [filters, setFilters] = useState<Record<string, string>>(initialFilters);
   const [ordering, setOrdering] = useState('-created_at');
   const [modalType, setModalType] = useState<'filter' | 'sort' | null>(null);
+
+  // Update filters if route params change
+  useEffect(() => {
+    if ((route.params as any)?.filters) {
+      setFilters((route.params as any).filters);
+    }
+  }, [(route.params as any)?.filters]);
 
   const fetchPlants = async (pageNum = 1, isRefreshing = false) => {
     try {

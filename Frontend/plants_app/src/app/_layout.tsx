@@ -2,17 +2,26 @@ import { GluestackUIProvider } from "@gluestack-ui/nativewind";
 import { Stack } from "expo-router";
 import { StatusBar } from "expo-status-bar";
 import { useColorScheme } from "nativewind";
-import React from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   configureReanimatedLogger,
   ReanimatedLogLevel,
 } from "react-native-reanimated";
+import * as SplashScreen from "expo-splash-screen";
+import { useFonts, Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
+import { Vazirmatn_400Regular } from "@expo-google-fonts/vazirmatn/400Regular";
+import { Vazirmatn_700Bold } from "@expo-google-fonts/vazirmatn/700Bold";
+import { View } from "react-native";
+
 // وارد کردن کامپوننت SafeAreaView در کنار SafeAreaProvider
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 import { AuthProvider } from "../context/AuthContext";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
 import "../i18n"; // Initialize i18n
+
+// Keep the splash screen visible while we fetch resources
+SplashScreen.preventAutoHideAsync();
 
 // Disable strict mode for shared value access during render
 // This is often triggered by CSS Interop / NativeWind v4 internals in React 19
@@ -25,11 +34,28 @@ function AppContent() {
   const { theme } = useTheme();
   const { colorScheme, setColorScheme } = useColorScheme();
 
-  React.useEffect(() => {
+  const [fontsLoaded, fontError] = useFonts({
+    Inter_400Regular,
+    Inter_700Bold,
+    Vazirmatn_400Regular,
+    Vazirmatn_700Bold,
+  });
+
+  const onLayoutRootView = useCallback(async () => {
+    if (fontsLoaded || fontError) {
+      await SplashScreen.hideAsync();
+    }
+  }, [fontsLoaded, fontError]);
+
+  useEffect(() => {
     if (colorScheme !== theme) {
       setColorScheme(theme);
     }
   }, [theme, colorScheme, setColorScheme]);
+
+  if (!fontsLoaded && !fontError) {
+    return null;
+  }
 
   return (
     <GluestackUIProvider>
@@ -41,6 +67,7 @@ function AppContent() {
           flex: 1, 
           backgroundColor: theme === "dark" ? "#121212" : "#ffffff" 
         }}
+        onLayout={onLayoutRootView}
       >
         <Stack>
           <Stack.Screen name="index" options={{ headerShown: false }} />

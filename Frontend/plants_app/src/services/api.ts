@@ -511,7 +511,11 @@ export const blogService = {
       `${BLOG_API_BASE_URL}/posts/?${query.toString()}`,
     );
     if (!response.ok) throw new Error("Failed to fetch posts");
-    return response.json();
+    const data = await response.json();
+    if (Array.isArray(data)) {
+      return { results: data, count: data.length, next: null };
+    }
+    return data;
   },
 
   getPostBySlug: async (slug: string): Promise<any> => {
