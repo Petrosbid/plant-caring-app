@@ -80,12 +80,6 @@ const BlogListScreen = () => {
     },
   };
 
-  const handleFilterChange = (key: string, value: string) => {
-    if (key === "category") {
-      setSelectedCategory(value);
-    }
-  };
-
   return (
     <ScreenWrapper withScroll={false}>
       <View className="px-2 pt-2 mb-6 mt-9">
@@ -185,8 +179,9 @@ const BlogListScreen = () => {
         onSortChange={setOrdering}
         filterCategories={blogFilters as any}
         currentFilters={{ category: selectedCategory }}
-        onFilterChange={handleFilterChange}
-        onClearFilters={() => setSelectedCategory("All")}
+        onFiltersApply={(filters) =>
+          setSelectedCategory(filters.category ?? "All")
+        }
       />
     </ScreenWrapper>
   );

@@ -11,8 +11,8 @@ export function HomeContent() {
       <ThemeTransition
         onToggle={toggleTheme}
         theme={theme}
-        speed={0.6}
-        blur={10}
+        speed={0.55}
+        blur={8}
         style={{ marginBottom: 30 }}
       >
         <View className="px-6 py-3 rounded-full bg-primary-500">

@@ -11,13 +11,14 @@ interface AuthContextType {
   login: (credentials: any) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
+  setUser: (user: User) => void;
   checkAuth: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [user, setUser] = useState<User | null>(null);
+  const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
   const checkAuth = useCallback(async () => {
@@ -28,7 +29,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         try {
           const profile = await authService.getProfile();
           console.log('[Auth] Profile fetched:', profile.username);
-          setUser(profile);
+          setUserState(profile);
           await AsyncStorage.setItem('user', JSON.stringify(profile));
         } catch (profileError) {
           console.error('[Auth] Failed to fetch profile with existing token:', profileError);
@@ -36,14 +37,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           await AsyncStorage.removeItem('access_token');
           await AsyncStorage.removeItem('refresh_token');
           await AsyncStorage.removeItem('user');
-          setUser(null);
+          setUserState(null);
         }
       } else {
-        setUser(null);
+        setUserState(null);
       }
     } catch (error) {
       console.error('[Auth] Auth check internal error:', error);
-      setUser(null);
+      setUserState(null);
     } finally {
       setIsLoading(false);
     }
@@ -58,7 +59,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     try {
       await authService.login(credentials);
       const profile = await authService.getProfile();
-      setUser(profile);
+      setUserState(profile);
       await AsyncStorage.setItem('user', JSON.stringify(profile));
     } catch (error) {
       console.error('Login failed:', error);
@@ -72,7 +73,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setIsLoading(true);
     try {
       await authService.logout();
-      setUser(null);
+      setUserState(null);
     } catch (error) {
       console.error('Logout failed:', error);
     } finally {
@@ -81,11 +82,17 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   };
 
   const updateUser = (userData: Partial<User>) => {
-    if (user) {
-      const updatedUser = { ...user, ...userData };
-      setUser(updatedUser);
+    setUserState((prev) => {
+      if (!prev) return prev;
+      const updatedUser = { ...prev, ...userData };
       AsyncStorage.setItem('user', JSON.stringify(updatedUser));
-    }
+      return updatedUser;
+    });
+  };
+
+  const setUser = (nextUser: User) => {
+    setUserState(nextUser);
+    AsyncStorage.setItem('user', JSON.stringify(nextUser));
   };
 
   return (
@@ -97,6 +104,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         login,
         logout,
         updateUser,
+        setUser,
         checkAuth,
       }}
     >

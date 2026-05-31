@@ -66,9 +66,32 @@ export interface User {
   first_name?: string;
   last_name?: string;
   bio?: string;
+  /** API field name */
+  phone?: string;
+  /** Legacy / client alias — mapped to `phone` on save */
   phone_number?: string;
+  national_code?: string;
+  birth_date?: string;
+  gender?: string;
   profile_picture?: string | null;
   date_joined: string;
+}
+
+export interface ProfileUpdateInput {
+  username?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  bio?: string;
+  phone?: string;
+  phone_number?: string;
+  national_code?: string;
+  birth_date?: string;
+  gender?: string;
+  password?: string;
+  new_password?: string;
+  current_password?: string;
+  confirm_password?: string;
 }
 
 export interface Disease {

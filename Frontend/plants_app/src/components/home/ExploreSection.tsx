@@ -50,12 +50,6 @@ export const ExploreSection = () => {
         <Text className="text-[22px] font-black text-slate-900 dark:text-white">
           {isEn ? "Explore Collections" : "کلکسیون‌های ویژه"}
         </Text>
-        <TouchableOpacity 
-            onPress={() => navigation.navigate("Library")}
-            className="w-8 h-8 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800"
-        >
-          <Text className="text-slate-400 font-black text-lg mb-1">...</Text>
-        </TouchableOpacity>
       </View>
 
       <ScrollView 

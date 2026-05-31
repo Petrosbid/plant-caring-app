@@ -1,9 +1,17 @@
 // src/services/api.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import type { Disease, Plant, Reminder, User, UserPlant } from "../types";
+import type {
+  Disease,
+  Plant,
+  ProfileUpdateInput,
+  Reminder,
+  User,
+  UserPlant,
+} from "../types";
 
 export const API_BASE_URL = 'http://192.168.183.1:8000/api';
 const BLOG_API_BASE_URL = 'http://192.168.183.1:8000/api/blog';
+export const BLOG_SHARE_BASE_URL = API_BASE_URL.replace('/api', '');
 
 const getToken = async () => await AsyncStorage.getItem("access_token");
 const getRefreshToken = async () => await AsyncStorage.getItem("refresh_token");
@@ -19,6 +27,46 @@ const getAuthHeaders = async (): Promise<Record<string, string>> => {
 const getFileUploadHeaders = async (): Promise<Record<string, string>> => {
   const token = await getToken();
   return token ? { Authorization: `Bearer ${token}` } : {};
+};
+
+const formatApiError = (errorData: unknown, fallback: string): string => {
+  if (!errorData || typeof errorData !== "object") return fallback;
+  const data = errorData as Record<string, unknown>;
+  if (typeof data.detail === "string") return data.detail;
+  const parts = Object.entries(data).map(([key, value]) => {
+    if (Array.isArray(value)) return `${key}: ${value.join(", ")}`;
+    if (typeof value === "string") return `${key}: ${value}`;
+    return `${key}: ${JSON.stringify(value)}`;
+  });
+  return parts.length ? parts.join("\n") : fallback;
+};
+
+/** Maps client form fields to the backend UserSerializer shape. */
+export const buildProfilePayload = (
+  data: ProfileUpdateInput,
+): Record<string, string> => {
+  const payload: Record<string, string> = {};
+
+  const assign = (key: string, value: string | undefined) => {
+    if (value !== undefined && value !== null) payload[key] = value;
+  };
+
+  assign("username", data.username);
+  assign("email", data.email);
+  assign("first_name", data.first_name);
+  assign("last_name", data.last_name);
+  assign("bio", data.bio);
+  assign("national_code", data.national_code);
+  assign("birth_date", data.birth_date);
+  assign("gender", data.gender);
+
+  const phone = data.phone ?? data.phone_number;
+  if (phone !== undefined) assign("phone", phone);
+
+  const password = data.password ?? data.new_password;
+  if (password) assign("password", password);
+
+  return payload;
 };
 
 // ==============================
@@ -115,26 +163,63 @@ export const authService = {
     return response.json();
   },
 
-  updateProfile: async (userData: Partial<User>): Promise<User> => {
+  updateProfile: async (userData: ProfileUpdateInput): Promise<User> => {
     const headers = await getAuthHeaders();
+    const body = buildProfilePayload(userData);
     const response = await fetch(`${API_BASE_URL}/auth/profile/`, {
-      method: "PUT",
+      method: "PATCH",
       headers,
-      body: JSON.stringify(userData),
+      body: JSON.stringify(body),
     });
-    
+
     const contentType = response.headers.get("content-type");
     if (!response.ok) {
       if (contentType && contentType.includes("application/json")) {
         const errorData = await response.json();
-        throw new Error(errorData.detail || "Failed to update profile");
-      } else {
-        const text = await response.text();
-        console.error("Profile update failed with non-JSON response:", text.substring(0, 100));
-        throw new Error(`Profile update failed (${response.status}): Server returned HTML or text.`);
+        throw new Error(formatApiError(errorData, "Failed to update profile"));
       }
+      const text = await response.text();
+      console.error(
+        "Profile update failed with non-JSON response:",
+        text.substring(0, 100),
+      );
+      throw new Error(
+        `Profile update failed (${response.status}): Server returned HTML or text.`,
+      );
     }
-    
+
+    return response.json();
+  },
+
+  updateProfilePicture: async (imageUri: string): Promise<User> => {
+    const formData = new FormData();
+    const filename = imageUri.split("/").pop() || "avatar.jpg";
+    const match = /\.(\w+)$/.exec(filename);
+    const type = match ? `image/${match[1]}` : "image/jpeg";
+    // @ts-ignore — React Native FormData file entry
+    formData.append("profile_picture", {
+      uri: imageUri,
+      name: filename,
+      type,
+    });
+
+    const response = await fetch(`${API_BASE_URL}/auth/profile/picture/`, {
+      method: "PUT",
+      headers: await getFileUploadHeaders(),
+      body: formData,
+    });
+
+    const contentType = response.headers.get("content-type");
+    if (!response.ok) {
+      if (contentType && contentType.includes("application/json")) {
+        const errorData = await response.json();
+        throw new Error(
+          formatApiError(errorData, "Failed to update profile picture"),
+        );
+      }
+      throw new Error(`Profile picture update failed (${response.status})`);
+    }
+
     return response.json();
   },
 };
@@ -192,11 +277,19 @@ export const plantService = {
     return response.json();
   },
 
-  recommendPlant: async (answers: any, language: string = "en"): Promise<any> => {
+  recommendPlant: async (
+    answers: Record<string, string | string[] | boolean>,
+    language: string = "en",
+    additionalNotes: string = "",
+  ): Promise<any> => {
     const response = await fetch(`${API_BASE_URL}/plants/recommend-plant/`, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ answers, language }),
+      headers: await getAuthHeaders(),
+      body: JSON.stringify({
+        language,
+        answers,
+        additional_notes: additionalNotes,
+      }),
     });
     
     const contentType = response.headers.get("content-type");
@@ -519,8 +612,28 @@ export const blogService = {
   },
 
   getPostBySlug: async (slug: string): Promise<any> => {
-    const response = await fetch(`${BLOG_API_BASE_URL}/posts/${slug}/`);
+    const response = await fetch(`${BLOG_API_BASE_URL}/posts/${slug}/`, {
+      headers: await getAuthHeaders(),
+    });
     if (!response.ok) throw new Error("Failed to fetch post");
+    return response.json();
+  },
+
+  likePost: async (slug: string): Promise<any> => {
+    const response = await fetch(`${BLOG_API_BASE_URL}/posts/${slug}/like/`, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to like post");
+    return response.json();
+  },
+
+  dislikePost: async (slug: string): Promise<any> => {
+    const response = await fetch(`${BLOG_API_BASE_URL}/posts/${slug}/dislike/`, {
+      method: "POST",
+      headers: await getAuthHeaders(),
+    });
+    if (!response.ok) throw new Error("Failed to dislike post");
     return response.json();
   },
 
@@ -529,6 +642,69 @@ export const blogService = {
       `${BLOG_API_BASE_URL}/posts/${slug}/comments/`,
     );
     if (!response.ok) throw new Error("Failed to fetch comments");
+    const data = await response.json();
+    return Array.isArray(data) ? data : data.results || [];
+  },
+
+  addComment: async (
+    slug: string,
+    commentData: { content: string; parent?: number },
+  ): Promise<any> => {
+    const response = await fetch(
+      `${BLOG_API_BASE_URL}/posts/${slug}/comments/`,
+      {
+        method: "POST",
+        headers: await getAuthHeaders(),
+        body: JSON.stringify(commentData),
+      },
+    );
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => null);
+      throw new Error(formatApiError(errorData, "Failed to add comment"));
+    }
+    return response.json();
+  },
+
+  voteComment: async (
+    commentId: number,
+    voteType: 1 | -1,
+  ): Promise<any> => {
+    const response = await fetch(
+      `${BLOG_API_BASE_URL}/comments/${commentId}/vote/`,
+      {
+        method: "POST",
+        headers: await getAuthHeaders(),
+        body: JSON.stringify({ vote_type: voteType }),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to vote on comment");
+    return response.json();
+  },
+
+  deleteComment: async (commentId: number): Promise<void> => {
+    const response = await fetch(
+      `${BLOG_API_BASE_URL}/comments/${commentId}/`,
+      {
+        method: "DELETE",
+        headers: await getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to delete comment");
+  },
+
+  updateComment: async (
+    commentId: number,
+    content: string,
+  ): Promise<any> => {
+    const response = await fetch(
+      `${BLOG_API_BASE_URL}/comments/${commentId}/`,
+      {
+        method: "PUT",
+        headers: await getAuthHeaders(),
+        body: JSON.stringify({ content }),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to update comment");
     return response.json();
   },
 };

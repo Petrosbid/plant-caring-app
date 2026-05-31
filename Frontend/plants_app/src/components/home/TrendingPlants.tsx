@@ -33,10 +33,16 @@ export const TrendingPlants: React.FC<TrendingPlantsProps> = ({ plants }) => {
           className="w-full h-full"
           resizeMode="cover"
         />
-        <View className="absolute top-3 left-3 bg-white/90 dark:bg-slate-900/90 px-2 py-1 rounded-xl flex-row items-center border border-orange-100 dark:border-orange-900/30">
+        <View className="absolute top-3 left-3 bg-white/90 dark:bg-slate-900/90 px-5 py-1 rounded-xl flex-row items-center border border-orange-100 dark:border-orange-900/30">
           <Flame size={12} color="#f97316" fill="#f97316" />
-          <Text className="text-[10px] font-black ml-1 text-orange-600 dark:text-orange-400 uppercase tracking-tighter">
-            {index === 0 ? "Superhot" : "Hot"}
+          <Text className="text-[10px] font-black ml-1 text-orange-600 dark:text-orange-400 uppercase tracking-tighter ">
+            {index === 0
+              ? isEn
+                ? "SuperHot"
+                : "خیلی‌محبوب"
+              : isEn
+                ? "Hot"
+                : "پرطرفدار"}
           </Text>
         </View>
       </View>
@@ -55,9 +61,6 @@ export const TrendingPlants: React.FC<TrendingPlantsProps> = ({ plants }) => {
         <Text className="text-[22px] font-black text-slate-900 dark:text-white">
           {isEn ? "Trending in Verna" : "داغ‌ترین‌های ورنا"}
         </Text>
-        <TouchableOpacity className="w-8 h-8 items-center justify-center rounded-full bg-slate-50 dark:bg-slate-800">
-          <Text className="text-slate-400 font-black text-lg mb-1">...</Text>
-        </TouchableOpacity>
       </View>
 
       <FlatList

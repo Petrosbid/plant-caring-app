@@ -82,17 +82,6 @@ const LibraryScreen = () => {
     }
   };
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => {
-      if (prev[key] === value) {
-        const newFilters = { ...prev };
-        delete newFilters[key];
-        return newFilters;
-      }
-      return { ...prev, [key]: value };
-    });
-  };
-
   return (
     <ScreenWrapper withScroll={false}>
       <View className="px-2 pt-2">
@@ -148,8 +137,7 @@ const LibraryScreen = () => {
         onSortChange={setOrdering}
         filterCategories={PLANT_FILTERS as any}
         currentFilters={filters}
-        onFilterChange={handleFilterChange}
-        onClearFilters={() => setFilters({})}
+        onFiltersApply={setFilters}
       />
     </ScreenWrapper>
   );

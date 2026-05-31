@@ -8,10 +8,10 @@ import { Badge } from '../components/common/Badge';
 import { useReminders } from '../hooks/useReminders';
 import { useUserPlants } from '../hooks/useUserPlants';
 import { Loader } from '../components/common/Loader';
-import { Bell, Trash2, CheckCircle2, Clock, Plus } from 'lucide-react-native';
+import { Bell, Trash2, CheckCircle2, Clock, Plus, X } from 'lucide-react-native';
 import { FilterSortBar } from '../components/common/FilterSortBar';
 import { FilterSortModal } from '../components/common/FilterSortModal';
-import { AddReminderModal } from '../components/common/AddReminderModal';
+import { AddReminderForm } from '../components/common/AddReminderForm';
 import { REMINDER_FILTERS, REMINDER_SORT_OPTIONS } from '../constants/filters';
 import { Motion } from '@legendapp/motion';
 import { formatDate } from '../utils/date';
@@ -28,7 +28,7 @@ const RemindersScreen = () => {
   const [filters, setFilters] = useState<Record<string, string>>({});
   const [ordering, setOrdering] = useState('scheduled_date');
   const [modalType, setModalType] = useState<'filter' | 'sort' | null>(null);
-  const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddForm, setShowAddForm] = useState(false);
 
   const processedReminders = useMemo(() => {
     let result = [...reminders];
@@ -62,17 +62,6 @@ const RemindersScreen = () => {
     return result;
   }, [reminders, search, filters, ordering]);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => {
-      if (prev[key] === value) {
-        const newFilters = { ...prev };
-        delete newFilters[key];
-        return newFilters;
-      }
-      return { ...prev, [key]: value };
-    });
-  };
-
   return (
     <ScreenWrapper withScroll={false}>
       <View className="px-2 pt-2 mb-6">
@@ -88,9 +77,9 @@ const RemindersScreen = () => {
           <Button 
             variant="success" 
             className="w-12 h-12 p-0 rounded-2xl"
-            onPress={() => setShowAddModal(true)}
+            onPress={() => setShowAddForm((prev) => !prev)}
           >
-            <Plus size={24} color="white" />
+            {showAddForm ? <X size={24} color="white" /> : <Plus size={24} color="white" />}
           </Button>
         </View>
 
@@ -103,7 +92,7 @@ const RemindersScreen = () => {
         />
       </View>
 
-      {loading && reminders.length === 0 ? (
+      {loading && reminders.length === 0 && !showAddForm ? (
         <View className="flex-1 items-center justify-center">
           <Loader size={16} />
         </View>
@@ -112,6 +101,15 @@ const RemindersScreen = () => {
           data={processedReminders}
           keyExtractor={(item) => item.id.toString()}
           contentContainerStyle={{ paddingHorizontal: 8, paddingBottom: 120 }}
+          ListHeaderComponent={
+            showAddForm ? (
+              <AddReminderForm
+                userPlants={userPlants}
+                onSubmit={addReminder}
+                onCancel={() => setShowAddForm(false)}
+              />
+            ) : null
+          }
           refreshControl={
             <RefreshControl refreshing={loading} onRefresh={refreshReminders} tintColor="#16a34a" />
           }
@@ -205,16 +203,9 @@ const RemindersScreen = () => {
         onSortChange={setOrdering}
         filterCategories={REMINDER_FILTERS as any}
         currentFilters={filters}
-        onFilterChange={handleFilterChange}
-        onClearFilters={() => setFilters({})}
+        onFiltersApply={setFilters}
       />
 
-      <AddReminderModal
-        isVisible={showAddModal}
-        onClose={() => setShowAddModal(false)}
-        onSubmit={addReminder}
-        userPlants={userPlants}
-      />
     </ScreenWrapper>
   );
 };

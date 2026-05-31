@@ -66,17 +66,6 @@ const MyGardenScreen = () => {
     return result;
   }, [userPlants, search, ordering, filters]);
 
-  const handleFilterChange = (key: string, value: string) => {
-    setFilters(prev => {
-      if (prev[key] === value) {
-        const newFilters = { ...prev };
-        delete newFilters[key];
-        return newFilters;
-      }
-      return { ...prev, [key]: value };
-    });
-  };
-
   if (loading && userPlants.length === 0) {
     return (
       <View className="flex-1 items-center justify-center bg-surface-light dark:bg-surface-dark">
@@ -216,8 +205,7 @@ const MyGardenScreen = () => {
             }
         }}
         currentFilters={filters}
-        onFilterChange={handleFilterChange}
-        onClearFilters={() => setFilters({})}
+        onFiltersApply={setFilters}
       />
 
       {selectedPlant && (

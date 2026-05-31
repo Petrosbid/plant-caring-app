@@ -1,13 +1,19 @@
-import React from 'react';
-import { View, Text, Modal, TouchableOpacity, ScrollView, Pressable, Platform } from 'react-native';
-import { BlurView } from 'expo-blur';
-import { X, Check, Trash2 } from 'lucide-react-native';
-import { useTranslation } from 'react-i18next';
-import { Motion as _Motion, AnimatePresence } from '@legendapp/motion';
-import { cn } from '../../utils/cn';
-import { Button } from './Button';
-
-const MotionL = _Motion as any;
+import { BlurView } from "expo-blur";
+import { Check, Trash2, X } from "lucide-react-native";
+import React, { useEffect, useState } from "react";
+import { useTranslation } from "react-i18next";
+import {
+  Modal,
+  Platform,
+  Pressable,
+  ScrollView,
+  Text,
+  TouchableOpacity,
+  useWindowDimensions,
+  View,
+} from "react-native";
+import { useSafeAreaInsets } from "react-native-safe-area-context";
+import { cn } from "../../utils/cn";
 
 interface FilterOption {
   en: string;
@@ -30,8 +36,8 @@ interface SortOption {
 interface FilterSortModalProps {
   isVisible: boolean;
   onClose: () => void;
-  type: 'filter' | 'sort';
-  
+  type: "filter" | "sort";
+
   // Sort props
   sortOptions?: SortOption[];
   currentSort?: string;
@@ -40,9 +46,11 @@ interface FilterSortModalProps {
   // Filter props
   filterCategories?: Record<string, FilterCategory>;
   currentFilters?: Record<string, string>;
-  onFilterChange?: (key: string, value: string) => void;
-  onClearFilters?: () => void;
+  /** Called when the user taps Apply or Clear All — not on every chip tap */
+  onFiltersApply?: (filters: Record<string, string>) => void;
 }
+
+const SHEET_HEIGHT_RATIO = 0.65;
 
 export const FilterSortModal: React.FC<FilterSortModalProps> = ({
   isVisible,
@@ -53,18 +61,50 @@ export const FilterSortModal: React.FC<FilterSortModalProps> = ({
   onSortChange,
   filterCategories,
   currentFilters = {},
-  onFilterChange,
-  onClearFilters,
+  onFiltersApply,
 }) => {
   const { i18n } = useTranslation();
-  const isEn = i18n.language === 'en';
+  const isEn = i18n.language === "en";
+  const { height: screenHeight } = useWindowDimensions();
+  const insets = useSafeAreaInsets();
+  const sheetHeight = Math.round(screenHeight * SHEET_HEIGHT_RATIO);
 
-  const renderSortOptions = () => (
+  const [draftFilters, setDraftFilters] = useState<Record<string, string>>({});
+
+  useEffect(() => {
+    if (isVisible && type === "filter") {
+      setDraftFilters({ ...currentFilters });
+    }
+  }, [isVisible, type, currentFilters]);
+
+  const toggleDraftFilter = (key: string, value: string) => {
+    setDraftFilters((prev) => {
+      if (prev[key] === value) {
+        const next = { ...prev };
+        delete next[key];
+        return next;
+      }
+      return { ...prev, [key]: value };
+    });
+  };
+
+  const handleApplyFilters = () => {
+    onFiltersApply?.(draftFilters);
+    onClose();
+  };
+
+  const handleClearFilters = () => {
+    setDraftFilters({});
+    onFiltersApply?.({});
+    onClose();
+  };
+
+  const renderSortOptions = (
     <View className="gap-2">
       {sortOptions?.map((opt) => {
         const isActive = currentSort === opt.key;
         return (
-          <TouchableOpacity
+          <Pressable
             key={opt.key}
             onPress={() => {
               onSortChange?.(opt.key);
@@ -72,25 +112,29 @@ export const FilterSortModal: React.FC<FilterSortModalProps> = ({
             }}
             className={cn(
               "flex-row items-center justify-between p-4 rounded-2xl border",
-              isActive 
-                ? "bg-brand-50 border-brand-200 dark:bg-brand-900/20 dark:border-brand-800" 
-                : "bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-700"
+              isActive
+                ? "bg-brand-50 border-brand-200 dark:bg-brand-900/20 dark:border-brand-800"
+                : "bg-slate-50 border-slate-100 dark:bg-slate-800/50 dark:border-slate-700",
             )}
           >
-            <Text className={cn(
-              "font-bold",
-              isActive ? "text-brand-700 dark:text-brand-400" : "text-slate-600 dark:text-slate-300"
-            )}>
+            <Text
+              className={cn(
+                "font-bold",
+                isActive
+                  ? "text-brand-700 dark:text-brand-400"
+                  : "text-slate-600 dark:text-slate-300",
+              )}
+            >
               {isEn ? opt.labelEn : opt.labelFa}
             </Text>
             {isActive && <Check size={20} color="#16a34a" />}
-          </TouchableOpacity>
+          </Pressable>
         );
       })}
     </View>
   );
 
-  const renderFilterCategories = () => (
+  const renderFilterCategories = (
     <View className="gap-8">
       {Object.entries(filterCategories || {}).map(([key, category]) => (
         <View key={key}>
@@ -99,22 +143,27 @@ export const FilterSortModal: React.FC<FilterSortModalProps> = ({
           </Text>
           <View className="flex-row flex-wrap gap-2">
             {category.values.map((val) => {
-              const isActive = currentFilters[key] === val.query;
+              const isActive = draftFilters[key] === val.query;
               return (
                 <TouchableOpacity
                   key={val.query}
-                  onPress={() => onFilterChange?.(key, val.query)}
+                  activeOpacity={0.7}
+                  onPress={() => toggleDraftFilter(key, val.query)}
                   className={cn(
                     "px-4 py-2.5 rounded-full border",
                     isActive
                       ? "bg-brand-500 border-brand-500 shadow-md"
-                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700"
+                      : "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700",
                   )}
                 >
-                  <Text className={cn(
-                    "text-xs font-bold",
-                    isActive ? "text-white" : "text-slate-600 dark:text-slate-400"
-                  )}>
+                  <Text
+                    className={cn(
+                      "text-xs font-bold",
+                      isActive
+                        ? "text-white"
+                        : "text-slate-600 dark:text-slate-400",
+                    )}
+                  >
                     {isEn ? val.en : val.fa}
                   </Text>
                 </TouchableOpacity>
@@ -130,86 +179,97 @@ export const FilterSortModal: React.FC<FilterSortModalProps> = ({
     <Modal
       visible={isVisible}
       transparent
-      animationType="none"
+      animationType="slide"
       onRequestClose={onClose}
+      statusBarTranslucent
     >
       <View className="flex-1 justify-end">
-        {/* Backdrop */}
-        <Pressable 
-          className="absolute inset-0 bg-black/40" 
+        <Pressable
+          className="absolute inset-0 bg-black/40"
           onPress={onClose}
+          accessibilityRole="button"
+          accessibilityLabel={isEn ? "Close" : "بستن"}
         />
 
-        {/* Modal Content */}
-        <MotionL.View
-          initial={{ y: 500 }}
-          animate={{ y: 0 }}
-          exit={{ y: 500 }}
-          transition={{ type: 'spring', damping: 25, stiffness: 300 }}
+        <View
           className="bg-white dark:bg-slate-900 rounded-t-[40px] shadow-2xl overflow-hidden"
-          style={{ maxHeight: '85%' }}
+          style={{
+            height: sheetHeight,
+            paddingBottom: Math.max(insets.bottom, 16),
+          }}
         >
-          {Platform.OS === 'ios' && (
-            <BlurView intensity={80} tint="default" className="absolute inset-0" />
+          {Platform.OS === "ios" && (
+            <BlurView
+              intensity={80}
+              tint="default"
+              className="absolute inset-0"
+              pointerEvents="none"
+            />
           )}
-          
-          <View className="p-6">
-            {/* Header */}
-            <View className="flex-row justify-between items-center mb-8">
+
+          <View className="flex-1 px-6 pt-6">
+            <View className="flex-row justify-between items-center mb-6">
               <View>
                 <Text className="text-2xl font-black text-slate-900 dark:text-white">
-                  {type === 'filter' 
-                    ? (isEn ? "Filters" : "فیلترها") 
-                    : (isEn ? "Sort By" : "مرتب‌سازی")}
+                  {type === "filter"
+                    ? isEn
+                      ? "Filters"
+                      : "فیلترها"
+                    : isEn
+                      ? "Sort By"
+                      : "مرتب‌سازی"}
                 </Text>
-                {type === 'filter' && Object.keys(currentFilters).length > 0 && (
-                  <Text className="text-brand-600 font-bold text-xs">
-                    {Object.keys(currentFilters).length} {isEn ? "active filters" : "فیلتر فعال"}
-                  </Text>
-                )}
+                {type === "filter" &&
+                  Object.keys(draftFilters).length > 0 && (
+                    <Text className="text-brand-600 font-bold text-xs">
+                      {Object.keys(draftFilters).length}{" "}
+                      {isEn ? "active filters" : "فیلتر فعال"}
+                    </Text>
+                  )}
               </View>
-              
-              <TouchableOpacity 
+
+              <Pressable
                 onPress={onClose}
                 className="w-10 h-10 bg-slate-100 dark:bg-slate-800 rounded-full items-center justify-center"
               >
                 <X size={20} color="#94a3b8" />
-              </TouchableOpacity>
+              </Pressable>
             </View>
 
-            {/* Scrollable Area */}
-            <ScrollView 
+            <ScrollView
+              className="flex-1"
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingBottom: 100 }}
+              contentContainerStyle={{ paddingBottom: 16 }}
+              keyboardShouldPersistTaps="handled"
             >
-              {type === 'sort' ? renderSortOptions() : renderFilterCategories()}
+              {type === "sort" ? renderSortOptions : renderFilterCategories}
             </ScrollView>
 
-            {/* Footer for Filter */}
-            {type === 'filter' && (
-              <View className="absolute bottom-0 left-0 right-0 p-6 bg-white/90 dark:bg-slate-900/90 border-t border-slate-100 dark:border-slate-800 flex-row gap-4">
-                <Button 
-                  variant="secondary" 
-                  className="flex-1"
-                  onPress={() => {
-                    onClearFilters?.();
-                    onClose();
-                  }}
+            {type === "filter" && (
+              <View className="flex-row gap-4 pt-4 border-t border-slate-100 dark:border-slate-800">
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={handleClearFilters}
+                  className="flex-1 flex-row items-center justify-center h-12 rounded-2xl bg-slate-100 dark:bg-slate-800"
                 >
                   <Trash2 size={18} color="#ef4444" />
-                  <Text className="ml-2 text-red-500 font-bold">{isEn ? "Clear All" : "پاک کردن"}</Text>
-                </Button>
-                <Button 
-                  variant="primary" 
-                  className="flex-1"
-                  onPress={onClose}
+                  <Text className="ml-2 text-red-500 font-bold">
+                    {isEn ? "Clear All" : "پاک کردن"}
+                  </Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  activeOpacity={0.7}
+                  onPress={handleApplyFilters}
+                  className="flex-1 h-12 rounded-2xl bg-brand-500 items-center justify-center"
                 >
-                  <Text className="text-white font-bold">{isEn ? "Apply" : "اعمال فیلتر"}</Text>
-                </Button>
+                  <Text className="text-white font-bold">
+                    {isEn ? "Apply" : "اعمال فیلتر"}
+                  </Text>
+                </TouchableOpacity>
               </View>
             )}
           </View>
-        </MotionL.View>
+        </View>
       </View>
     </Modal>
   );

@@ -1,5 +1,9 @@
 // src/navigation/RootNavigator.tsx
 import React from 'react';
+import {
+  NavigationContainer,
+  NavigationIndependentTree,
+} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { MainTabs } from './MainTabs';
@@ -20,8 +24,6 @@ import IdentifyScreen from '../screens/IdentifyScreen';
 import DiseaseCheckScreen from '../screens/DiseaseCheckScreen';
 import LibraryScreen from '../screens/LibraryScreen';
 import DiseaseLibraryScreen from '../screens/DiseaseLibraryScreen';
-
-import { NavigationContainer, NavigationIndependentTree } from '@react-navigation/native';
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 

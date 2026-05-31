@@ -6,6 +6,9 @@ import {
   Dimensions,
   StyleProp,
   ViewStyle,
+  Modal,
+  StyleSheet,
+  GestureResponderEvent,
 } from 'react-native';
 import { BlurView } from 'expo-blur';
 
@@ -18,87 +21,78 @@ export interface ThemeTransitionProps {
   blur?: number;
 }
 
+const { width: SCREEN_W, height: SCREEN_H } = Dimensions.get('window');
+
+function getMaxRadius(x: number, y: number) {
+  const dx = Math.max(x, SCREEN_W - x);
+  const dy = Math.max(y, SCREEN_H - y);
+  return Math.sqrt(dx * dx + dy * dy) + 16;
+}
+
+/**
+ * Circular reveal theme toggle (mirrors plants_site View Transition API on native).
+ * Tap anywhere on the wrapped control to animate from the touch point.
+ */
 export function ThemeTransition({
   children,
   onToggle,
+  theme = 'light',
   style,
-  speed = 0.5,
-  blur = 0,
+  speed = 0.55,
+  blur = 8,
 }: ThemeTransitionProps) {
+  const [overlayVisible, setOverlayVisible] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
-  const [showOverlay, setShowOverlay] = useState(false);
   const scaleAnim = useRef(new Animated.Value(0)).current;
-  const overlayStyleRef = useRef<{
-    width: number;
-    height: number;
-    left: number;
-    top: number;
-    borderRadius: number;
-  }>({
-    width: 0,
-    height: 0,
-    left: 0,
-    top: 0,
-    borderRadius: 0,
-  });
+  const originRef = useRef({ x: SCREEN_W / 2, y: SCREEN_H / 2, radius: SCREEN_W });
+  const toggleCalledRef = useRef(false);
 
-  const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+  const nextTheme = theme === 'dark' ? 'light' : 'dark';
+  const overlayColor = nextTheme === 'dark' ? '#0f172a' : '#f8fafc';
 
-  const getMaxRadius = (x: number, y: number) => {
-    const dx = Math.max(x, screenWidth - x);
-    const dy = Math.max(y, screenHeight - y);
-    return Math.sqrt(dx * dx + dy * dy) + 10;
-  };
-
-  const runAnimation = useCallback(
-    (touchX: number, touchY: number) => {
-      const radius = getMaxRadius(touchX, touchY);
-      const size = radius * 2;
-
-      overlayStyleRef.current = {
-        width: size,
-        height: size,
-        left: touchX - radius,
-        top: touchY - radius,
-        borderRadius: radius,
-      };
-
-      scaleAnim.setValue(0);
-      setShowOverlay(true);
-
-      Animated.timing(scaleAnim, {
-        toValue: 1,
-        duration: speed * 1000,
-        useNativeDriver: true,
-      }).start(({ finished }) => {
-        if (finished) {
-          setTimeout(() => {
-            setShowOverlay(false);
-            setIsTransitioning(false);
-          }, 50);
-        } else {
-          setShowOverlay(false);
-          setIsTransitioning(false);
-        }
-      });
-    },
-    [screenWidth, screenHeight, speed, scaleAnim]
-  );
+  const finishTransition = useCallback(() => {
+    setOverlayVisible(false);
+    setIsTransitioning(false);
+    toggleCalledRef.current = false;
+    scaleAnim.setValue(0);
+  }, [scaleAnim]);
 
   const handlePress = useCallback(
-    (event: any) => {
+    (event: GestureResponderEvent) => {
       if (isTransitioning) return;
 
       const { pageX, pageY } = event.nativeEvent;
+      const radius = getMaxRadius(pageX, pageY);
+      originRef.current = { x: pageX, y: pageY, radius };
+      toggleCalledRef.current = false;
       setIsTransitioning(true);
+      setOverlayVisible(true);
+      scaleAnim.setValue(0);
 
-      // Trigger theme toggle immediately (simulates startViewTransition behavior)
-      onToggle?.();
+      const duration = speed * 1000;
 
-      runAnimation(pageX, pageY);
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration,
+        useNativeDriver: true,
+      }).start(({ finished }) => {
+        if (finished) finishTransition();
+        else finishTransition();
+      });
+
+      // Toggle theme mid-animation (like startViewTransition callback timing)
+      setTimeout(() => {
+        if (!toggleCalledRef.current) {
+          toggleCalledRef.current = true;
+          onToggle?.();
+        }
+      }, duration * 0.35);
     },
-    [isTransitioning, onToggle, runAnimation]
+    [isTransitioning, onToggle, speed, scaleAnim, finishTransition],
   );
+
+  const { x, y, radius } = originRef.current;
+  const size = radius * 2;
 
   return (
     <>
@@ -106,32 +100,54 @@ export function ThemeTransition({
         onPress={handlePress}
         style={style}
         disabled={isTransitioning}
-        pointerEvents={isTransitioning ? 'none' : 'auto'}
+        accessibilityRole="button"
       >
         {children}
       </Pressable>
 
-      {showOverlay && (
-         <Animated.View
-            style={{
-            position: 'absolute',
-            width: overlayStyleRef.current.width,
-            height: overlayStyleRef.current.height,
-            left: overlayStyleRef.current.left,
-            top: overlayStyleRef.current.top,
-            borderRadius: overlayStyleRef.current.borderRadius,
-            overflow: 'hidden',
-            transform: [{ scale: scaleAnim }],
-            }}
-            pointerEvents="none"
-        >
-            <BlurView
-            intensity={blur * 5}   // تبدیل عدد blur به شدت (0 تا 100)
-            style={{ flex: 1 }}
-            tint="dark"
-            />
-        </Animated.View>
-      )}
+      <Modal
+        visible={overlayVisible}
+        transparent
+        animationType="none"
+        statusBarTranslucent
+        onRequestClose={finishTransition}
+      >
+        <View style={styles.modalRoot} pointerEvents="none">
+          <Animated.View
+            style={[
+              styles.circle,
+              {
+                width: size,
+                height: size,
+                left: x - radius,
+                top: y - radius,
+                borderRadius: radius,
+                backgroundColor: overlayColor,
+                transform: [{ scale: scaleAnim }],
+              },
+            ]}
+          >
+            {blur > 0 ? (
+              <BlurView
+                intensity={Math.min(blur * 8, 100)}
+                tint={nextTheme === 'dark' ? 'dark' : 'light'}
+                style={StyleSheet.absoluteFill}
+              />
+            ) : null}
+          </Animated.View>
+        </View>
+      </Modal>
     </>
   );
 }
+
+const styles = StyleSheet.create({
+  modalRoot: {
+    flex: 1,
+    backgroundColor: 'transparent',
+  },
+  circle: {
+    position: 'absolute',
+    overflow: 'hidden',
+  },
+});
