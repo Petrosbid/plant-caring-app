@@ -4,15 +4,28 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/api';
 import type { User } from '../types';
 
+interface RegisterOtpData {
+  phone?: string;
+  email?: string;
+  first_name?: string;
+  last_name?: string;
+  username: string;
+}
+
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (credentials: any) => Promise<void>;
+  login: (credentials: { username: string; password: string }) => Promise<void>;
   logout: () => Promise<void>;
   updateUser: (userData: Partial<User>) => void;
   setUser: (user: User) => void;
   checkAuth: () => Promise<void>;
+  requestOtpCode: (phoneNumber: string) => Promise<void>;
+  loginWithOtp: (phoneNumber: string, code: string) => Promise<void>;
+  registerWithPhoneOtp: (data: RegisterOtpData) => Promise<void>;
+  registerWithEmailOtp: (data: RegisterOtpData) => Promise<void>;
+  verifyRegisterOtp: (identifier: string, code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -54,15 +67,57 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     checkAuth();
   }, [checkAuth]);
 
-  const login = async (credentials: any) => {
+  const finishAuthSession = async () => {
+    const profile = await authService.getProfile();
+    setUserState(profile);
+    await AsyncStorage.setItem('user', JSON.stringify(profile));
+  };
+
+  const login = async (credentials: { username: string; password: string }) => {
     setIsLoading(true);
     try {
       await authService.login(credentials);
-      const profile = await authService.getProfile();
-      setUserState(profile);
-      await AsyncStorage.setItem('user', JSON.stringify(profile));
+      await finishAuthSession();
     } catch (error) {
       console.error('Login failed:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const requestOtpCode = async (phoneNumber: string) => {
+    await authService.requestOtp(phoneNumber);
+  };
+
+  const loginWithOtp = async (phoneNumber: string, code: string) => {
+    setIsLoading(true);
+    try {
+      await authService.verifyOtp(phoneNumber, code);
+      await finishAuthSession();
+    } catch (error) {
+      console.error('OTP login failed:', error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const registerWithPhoneOtp = async (data: RegisterOtpData) => {
+    await authService.registerRequestOtp('phone', data);
+  };
+
+  const registerWithEmailOtp = async (data: RegisterOtpData) => {
+    await authService.registerRequestOtp('email', data);
+  };
+
+  const verifyRegisterOtp = async (identifier: string, code: string) => {
+    setIsLoading(true);
+    try {
+      await authService.registerVerifyOtp(identifier, code);
+      await finishAuthSession();
+    } catch (error) {
+      console.error('Register OTP verify failed:', error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -106,6 +161,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         updateUser,
         setUser,
         checkAuth,
+        requestOtpCode,
+        loginWithOtp,
+        registerWithPhoneOtp,
+        registerWithEmailOtp,
+        verifyRegisterOtp,
       }}
     >
       {children}
