@@ -191,6 +191,84 @@ export const authService = {
     return response.json();
   },
 
+  requestOtp: async (phoneNumber: string): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/auth/api/otp/request/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone_number: phoneNumber }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(formatApiError(errorData, "Failed to send verification code"));
+    }
+  },
+
+  verifyOtp: async (
+    phoneNumber: string,
+    code: string,
+  ): Promise<{ access: string; refresh: string }> => {
+    const response = await fetch(`${API_BASE_URL}/auth/api/otp/verify/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ phone_number: phoneNumber, code }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(formatApiError(errorData, "Invalid verification code"));
+    }
+    const data = await response.json();
+    if (data.access && data.refresh) {
+      await AsyncStorage.setItem("access_token", data.access);
+      await AsyncStorage.setItem("refresh_token", data.refresh);
+    }
+    return data;
+  },
+
+  registerRequestOtp: async (
+    method: "phone" | "email",
+    data: {
+      phone?: string;
+      email?: string;
+      first_name?: string;
+      last_name?: string;
+      username: string;
+    },
+  ): Promise<void> => {
+    const response = await fetch(`${API_BASE_URL}/auth/api/register/otp/request/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ method, ...data }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(formatApiError(errorData, "Failed to send verification code"));
+    }
+  },
+
+  registerVerifyOtp: async (
+    identifier: string,
+    code: string,
+  ): Promise<{ access: string; refresh: string; user?: User }> => {
+    const response = await fetch(`${API_BASE_URL}/auth/api/register/otp/verify/`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ identifier, code }),
+    });
+    if (!response.ok) {
+      const errorData = await response.json().catch(() => ({}));
+      throw new Error(formatApiError(errorData, "Invalid verification code"));
+    }
+    const data = await response.json();
+    if (data.access && data.refresh) {
+      await AsyncStorage.setItem("access_token", data.access);
+      await AsyncStorage.setItem("refresh_token", data.refresh);
+      if (data.user) {
+        await AsyncStorage.setItem("user", JSON.stringify(data.user));
+      }
+    }
+    return data;
+  },
+
   updateProfilePicture: async (imageUri: string): Promise<User> => {
     const formData = new FormData();
     const filename = imageUri.split("/").pop() || "avatar.jpg";
