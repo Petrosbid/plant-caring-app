@@ -83,7 +83,6 @@ const PlantRecommenderScreen = () => {
   const { i18n } = useTranslation();
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
   const isEn = i18n.language === 'en';
-  const isRtl = !isEn || I18nManager.isRTL;
 
   const [currentSection, setCurrentSection] = useState(1);
   const [answers, setAnswers] = useState<Answers>({});
@@ -303,7 +302,7 @@ const PlantRecommenderScreen = () => {
   const renderBooleanOptions = (q: Question, value: unknown, hasError: boolean) => {
     const boolValue = value as boolean | undefined;
     return (
-      <View className={cn('flex-row gap-3', isRtl && 'flex-row-reverse')}>
+      <View className="flex-row gap-3">
         {[
           { val: true, label: isEn ? 'Yes' : 'بله' },
           { val: false, label: isEn ? 'No' : 'خیر' },
@@ -349,8 +348,8 @@ const PlantRecommenderScreen = () => {
         'w-full rounded-2xl border-2 px-4 py-3 text-base text-slate-800 dark:text-white bg-white dark:bg-slate-800',
         hasError ? 'border-red-400' : 'border-slate-200 dark:border-slate-700',
         isEn ? 'font-inter' : 'font-vazir',
+        'text-start'
       )}
-      style={{ textAlign: isRtl ? 'right' : 'left' }}
     />
   );
 
@@ -364,9 +363,9 @@ const PlantRecommenderScreen = () => {
         key={q.id}
         className="rounded-2xl bg-white/90 dark:bg-slate-800/60 p-4 border border-slate-200/80 dark:border-slate-700/60"
       >
-        <View className={cn('flex-row items-start gap-2 mb-3', isRtl && 'flex-row-reverse')}>
+        <View className="flex-row items-start gap-2 mb-3">
           {getQuestionIcon(q.id)}
-          <Text className="flex-1 text-base font-semibold text-slate-800 dark:text-slate-200 leading-6">
+          <Text className="flex-1 text-base font-semibold text-slate-800 dark:text-slate-200 leading-6 text-start">
             {label}
             {q.required && <Text className="text-red-500"> *</Text>}
           </Text>
@@ -379,12 +378,12 @@ const PlantRecommenderScreen = () => {
         {q.type === 'text' && renderTextInput(q, value, hasError)}
 
         {!q.required && (
-          <Text className="text-xs text-slate-400 mt-2">
+          <Text className="text-xs text-slate-400 mt-2 text-start">
             {isEn ? 'Optional' : 'اختیاری'}
           </Text>
         )}
         {hasError && (
-          <Text className="text-xs text-red-500 mt-2">
+          <Text className="text-xs text-red-500 mt-2 text-start">
             {isEn ? 'This question is required.' : 'این سوال اجباری است.'}
           </Text>
         )}
@@ -408,7 +407,7 @@ const PlantRecommenderScreen = () => {
   return (
     <>
       <ScreenWrapper>
-        <View className="pb-4" style={{ direction: isRtl ? 'rtl' : 'ltr' }}>
+        <View className="pb-4">
           {/* Hero */}
           <View className="items-center mb-8">
             <View className="w-14 h-14 rounded-2xl bg-brand-100 dark:bg-brand-900/40 items-center justify-center mb-4">
@@ -426,7 +425,7 @@ const PlantRecommenderScreen = () => {
 
           {/* Progress */}
           <View className="mb-6">
-            <View className={cn('flex-row justify-between mb-2', isRtl && 'flex-row-reverse')}>
+            <View className="flex-row justify-between mb-2">
               <Text className="text-sm font-medium text-slate-500">
                 {isEn ? `Step ${currentSection} of 5` : `مرحله ${currentSection} از ۵`}
               </Text>
@@ -440,7 +439,7 @@ const PlantRecommenderScreen = () => {
                 style={{ width: `${totalProgress}%` }}
               />
             </View>
-            <View className={cn('flex-row justify-between mt-4', isRtl && 'flex-row-reverse')}>
+            <View className="flex-row justify-between mt-4">
               {[1, 2, 3, 4, 5].map((step) => {
                 const done = step < currentSection;
                 const active = step === currentSection;
@@ -478,15 +477,15 @@ const PlantRecommenderScreen = () => {
           {/* Section card */}
           <View className="rounded-3xl overflow-hidden border border-slate-200/80 dark:border-slate-700/60 shadow-lg shadow-black/5 mb-6">
             <View className="bg-brand-600 px-5 py-4">
-              <View className={cn('flex-row items-center gap-3', isRtl && 'flex-row-reverse')}>
+              <View className="flex-row items-center gap-3">
                 <View className="w-10 h-10 rounded-xl bg-white/20 items-center justify-center">
                   <SectionIcon size={22} color="white" />
                 </View>
                 <View className="flex-1">
-                  <Text className="text-lg font-bold text-white">
+                  <Text className="text-lg font-bold text-white text-start">
                     {isEn ? currentSectionData.titleEn : currentSectionData.titleFa}
                   </Text>
-                  <Text className="text-white/85 text-sm mt-0.5">
+                  <Text className="text-white/85 text-sm mt-0.5 text-start">
                     {isEn
                       ? currentSectionData.descriptionEn
                       : currentSectionData.descriptionFa}
@@ -502,7 +501,7 @@ const PlantRecommenderScreen = () => {
           {/* Additional notes on last section */}
           {isLastSection && (
             <View className="rounded-2xl bg-white dark:bg-slate-800/80 border border-slate-200 dark:border-slate-700 p-4 mb-6">
-              <View className={cn('flex-row items-center gap-2 mb-3', isRtl && 'flex-row-reverse')}>
+              <View className="flex-row items-center gap-2 mb-3">
                 <Smile size={18} color="#16a34a" />
                 <Text className="font-semibold text-slate-800 dark:text-slate-200">
                   {isEn ? 'Additional Notes (Optional)' : 'نکات اضافی (اختیاری)'}
@@ -523,20 +522,20 @@ const PlantRecommenderScreen = () => {
                 className={cn(
                   'min-h-[100px] rounded-2xl border-2 border-slate-200 dark:border-slate-700 px-4 py-3 text-slate-800 dark:text-white bg-slate-50 dark:bg-slate-900',
                   isEn ? 'font-inter' : 'font-vazir',
+                  'text-start'
                 )}
-                style={{ textAlign: isRtl ? 'right' : 'left' }}
               />
             </View>
           )}
 
           {/* Navigation */}
-          <View className={cn('flex-row items-center gap-3 mb-4', isRtl && 'flex-row-reverse')}>
+          <View className="flex-row items-center gap-3 mb-4">
             {currentSection > 1 && (
               <Pressable
                 onPress={goToPrevSection}
                 className="flex-row items-center gap-2 px-5 py-3.5 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
               >
-                <ChevronLeft size={20} color="#64748b" style={isRtl ? { transform: [{ scaleX: -1 }] } : undefined} />
+                <ChevronLeft size={20} color="#64748b" style={{ transform: [{ scaleX: isEn ? 1 : -1 }] }} />
                 <Text className="font-bold text-slate-600 dark:text-slate-300">
                   {isEn ? 'Previous' : 'قبلی'}
                 </Text>
@@ -549,7 +548,7 @@ const PlantRecommenderScreen = () => {
                 className="flex-row items-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-500 shadow-lg shadow-brand-500/25"
               >
                 <Text className="font-bold text-white">{isEn ? 'Next' : 'بعدی'}</Text>
-                <ChevronRight size={20} color="white" style={isRtl ? { transform: [{ scaleX: -1 }] } : undefined} />
+                <ChevronRight size={20} color="white" style={{ transform: [{ scaleX: isEn ? 1 : -1 }] }} />
               </Pressable>
             ) : (
               <Pressable
@@ -557,7 +556,7 @@ const PlantRecommenderScreen = () => {
                 disabled={loading}
                 className="flex-row items-center gap-2 px-6 py-3.5 rounded-2xl bg-brand-500 shadow-lg shadow-brand-500/25 opacity-100"
               >
-                <Send size={18} color="white" />
+                <Send size={18} color="white" style={{ transform: [{ scaleX: isEn ? 1 : -1 }] }} />
                 <Text className="font-bold text-white">
                   {isEn ? 'Get Recommendation' : 'دریافت پیشنهاد'}
                 </Text>
@@ -589,7 +588,7 @@ const PlantRecommenderScreen = () => {
             onPress={(e) => e.stopPropagation()}
           >
             <View className="bg-brand-600 px-5 py-4 flex-row items-center justify-between">
-              <View className={cn('flex-row items-center gap-2', isRtl && 'flex-row-reverse')}>
+              <View className="flex-row items-center gap-2">
                 <Text className="text-2xl">🌿</Text>
                 <Text className="text-xl font-bold text-white">
                   {isEn ? 'Your Perfect Match' : 'گیاه مناسب شما'}
@@ -617,27 +616,27 @@ const PlantRecommenderScreen = () => {
                 </View>
               )}
 
-              <Text className="text-2xl font-black text-slate-900 dark:text-white mb-1">
+              <Text className="text-2xl font-black text-slate-900 dark:text-white mb-1 text-start">
                 {result?.plant_name}
               </Text>
-              <Text className="text-brand-600 dark:text-brand-400 italic text-sm mb-4">
+              <Text className="text-brand-600 dark:text-brand-400 italic text-sm mb-4 text-start">
                 {result?.scientific_name}
               </Text>
 
               <View className="bg-brand-50 dark:bg-brand-900/30 p-4 rounded-2xl mb-4 border-l-4 border-brand-500">
-                <View className={cn('flex-row items-center gap-2 mb-2', isRtl && 'flex-row-reverse')}>
+                <View className="flex-row items-center gap-2 mb-2">
                   <Info size={16} color="#16a34a" />
                   <Text className="text-xs font-bold text-brand-700 dark:text-brand-400 uppercase">
                     {isEn ? 'Why this plant?' : 'چرا این گیاه؟'}
                   </Text>
                 </View>
-                <Text className="text-slate-700 dark:text-slate-200 text-sm leading-5">
+                <Text className="text-slate-700 dark:text-slate-200 text-sm leading-5 text-start">
                   {result?.reason}
                 </Text>
               </View>
 
               {result?.description ? (
-                <Text className="text-slate-600 dark:text-slate-400 text-sm leading-5 mb-4">
+                <Text className="text-slate-600 dark:text-slate-400 text-sm leading-5 mb-4 text-start">
                   {result.description}
                 </Text>
               ) : null}

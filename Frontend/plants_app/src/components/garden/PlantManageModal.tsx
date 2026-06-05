@@ -47,26 +47,26 @@ export const PlantManageModal: React.FC<PlantManageModalProps> = ({
           exit={{ y: 800 }}
           transition={{ type: 'spring', damping: 26, stiffness: 260 }}
           className="bg-slate-50 dark:bg-slate-950 rounded-t-[44px] shadow-2xl overflow-hidden"
-          style={{ height: '94%' }}
+          style={{ height: '90%' }}
         >
           {Platform.OS === 'ios' && (
             <BlurView intensity={80} tint="default" className="absolute inset-0" />
           )}
 
-          <View className="flex-row justify-between items-center px-5 pt-5 pb-2">
+          <View className="flex-row justify-between items-center px-5 pt-4 pb-1">
             <View className="flex-1 mr-3">
-              <Text className="text-xl font-black text-slate-900 dark:text-white" numberOfLines={1}>
+              <Text className="text-lg font-black text-slate-900 dark:text-white" numberOfLines={1}>
                 {userPlant.nickname || userPlant.plant_details?.farsi_name}
               </Text>
-              <Text className="text-slate-500 dark:text-slate-400 text-[10px] font-bold uppercase tracking-widest mt-0.5">
+              <Text className="text-slate-500 dark:text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-0.5">
                 {userPlant.plant_details?.scientific_name}
               </Text>
             </View>
             <TouchableOpacity
               onPress={onClose}
-              className="w-11 h-11 bg-white dark:bg-slate-800 rounded-2xl items-center justify-center border border-slate-100 dark:border-slate-700"
+              className="w-10 h-10 bg-white dark:bg-slate-800 rounded-2xl items-center justify-center border border-slate-100 dark:border-slate-700"
             >
-              <X size={20} color="#94a3b8" />
+              <X size={18} color="#94a3b8" />
             </TouchableOpacity>
           </View>
 

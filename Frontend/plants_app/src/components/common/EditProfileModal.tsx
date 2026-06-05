@@ -169,7 +169,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
 
           <View className="flex-1 px-6 pt-6">
             <View className="flex-row justify-between items-center mb-4">
-              <View className="flex-1 pr-3">
+              <View className="flex-1 pe-3">
                 <Text className="text-2xl font-black text-slate-900 dark:text-white">
                   {isEn ? 'Edit Profile' : 'ویرایش پروفایل'}
                 </Text>
@@ -256,7 +256,7 @@ export const EditProfileModal: React.FC<EditProfileModalProps> = ({
                 leftIcon={<Calendar size={18} color="#94a3b8" />}
               />
 
-              <Text className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 ml-1">
+              <Text className="text-xs font-bold text-slate-500 dark:text-slate-400 mb-2 ms-1">
                 {isEn ? 'Gender' : 'جنسیت'}
               </Text>
               <View className="flex-row gap-2 mb-4">

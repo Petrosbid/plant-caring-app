@@ -15,10 +15,13 @@ export const AppText: React.FC<TextProps & { className?: string }> = ({
   // Use Vazirmatn for Persian, Inter for English
   const fontClass = isEn ? 'font-inter' : 'font-vazir';
   
+  // Handle RTL alignment
+  const textAlign = isEn ? 'left' : 'right';
+  
   return (
     <RNText 
       className={cn(fontClass, className)} 
-      style={style} 
+      style={[{ textAlign }, style]} 
       {...props}
     >
       {children}

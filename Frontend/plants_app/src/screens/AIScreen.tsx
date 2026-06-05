@@ -20,7 +20,7 @@ const AIScreen = () => {
         <View className="flex-row items-center gap-3 mb-2">
           <Zap size={32} color="#16a34a" fill="#16a34a" />
           <Text className="text-3xl font-black text-slate-900 dark:text-white">
-            {t('common.AI')}
+            {isEn ? "AI" : "هوش مصنوعی"}
           </Text>
         </View>
         <Text className="text-slate-500 dark:text-slate-400 mb-8">
@@ -43,8 +43,8 @@ const AIScreen = () => {
               variant="primary" 
               onPress={() => navigation.navigate('Identify')}
             >
-              <Camera size={20} color="white" />
-              <Text className="ml-2 text-white font-bold">{isEn ? "Open Identifier" : "باز کردن شناسایی"}</Text>
+              <Camera size={18} color="white" />
+              <Text className="text-white font-bold text-sm">{isEn ? "Open Identifier" : "باز کردن شناسایی"}</Text>
             </Button>
           </Card>
 
@@ -65,15 +65,15 @@ const AIScreen = () => {
                 className="flex-1"
                 onPress={() => navigation.navigate('DiseaseCheck')}
               >
-                <Camera size={20} color="white" />
-                <Text className="ml-2 text-white font-bold">{isEn ? "Check Health" : "بررسی سلامت"}</Text>
+                <Camera size={18} color="white" />
+                <Text className="text-white font-bold text-sm">{isEn ? "Check Health" : "بررسی سلامت"}</Text>
               </Button>
               <Button 
                 variant="outline" 
-                className="px-4"
+                className="px-5 border-red-500"
                 onPress={() => navigation.navigate('DiseaseLibrary')}
               >
-                <Search size={20} color="#ef4444" />
+                <Search size={18} color="#ef4444" />
               </Button>
             </View>
           </Card>
@@ -93,7 +93,8 @@ const AIScreen = () => {
               variant="secondary" 
               onPress={() => navigation.navigate('PlantRecommender')}
             >
-              <Text className="text-slate-800 dark:text-white font-bold">{isEn ? "Start Quiz" : "شروع آزمون"}</Text>
+              <Zap size={18} color={isEn ? "#0f172a" : "#fff"} fill={isEn ? "#0f172a" : "#fff"} />
+              <Text className="text-slate-800 dark:text-white font-bold text-sm">{isEn ? "Start Quiz" : "شروع آزمون"}</Text>
             </Button>
           </Card>
         </View>

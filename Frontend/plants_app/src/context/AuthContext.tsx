@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/api';
+import { getAccessToken, clearTokens } from '../utils/tokenStorage';
 import type { User } from '../types';
 
 interface RegisterOtpData {
@@ -10,6 +11,7 @@ interface RegisterOtpData {
   first_name?: string;
   last_name?: string;
   username: string;
+  password?: string;
 }
 
 interface AuthContextType {
@@ -36,24 +38,37 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
   const checkAuth = useCallback(async () => {
     try {
-      const token = await AsyncStorage.getItem('access_token');
-      console.log('[Auth] Checking token:', token ? 'Found' : 'Not found');
+      const token = await getAccessToken();
       if (token) {
         try {
+          // If token is found, try to get profile. 
+          // Our API service will automatically handle refreshing if this 401s.
           const profile = await authService.getProfile();
-          console.log('[Auth] Profile fetched:', profile.username);
           setUserState(profile);
           await AsyncStorage.setItem('user', JSON.stringify(profile));
         } catch (profileError) {
-          console.error('[Auth] Failed to fetch profile with existing token:', profileError);
-          // If profile fetch fails but token exists, token is likely invalid/expired
-          await AsyncStorage.removeItem('access_token');
-          await AsyncStorage.removeItem('refresh_token');
+          console.error('[Auth] Failed to fetch profile:', profileError);
+          // If even after refresh attempt it fails, clear everything
+          await clearTokens();
           await AsyncStorage.removeItem('user');
           setUserState(null);
         }
       } else {
-        setUserState(null);
+        // No access token, check if we have user in storage as fallback (unlikely without token)
+        const storedUser = await AsyncStorage.getItem('user');
+        if (storedUser) {
+          try {
+            // Check if we can get profile with existing tokens (might trigger refresh)
+            const profile = await authService.getProfile();
+            setUserState(profile);
+          } catch {
+            setUserState(null);
+            await clearTokens();
+            await AsyncStorage.removeItem('user');
+          }
+        } else {
+          setUserState(null);
+        }
       }
     } catch (error) {
       console.error('[Auth] Auth check internal error:', error);
@@ -180,4 +195,3 @@ export const useAuth = () => {
   }
   return context;
 };
-

@@ -3,7 +3,7 @@ import { View, TouchableOpacity, Alert, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LogIn, User, Lock, Phone, ArrowLeft } from 'lucide-react-native';
+import { LogIn, User, Lock, Phone, ArrowLeft, Eye, EyeOff } from 'lucide-react-native';
 import { Motion as _Motion } from '@legendapp/motion';
 
 const MotionL = _Motion as any;
@@ -32,6 +32,7 @@ const LoginScreen = () => {
   const [loginMethod, setLoginMethod] = useState<LoginMethod>('password');
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [phoneNumber, setPhoneNumber] = useState('');
   const [otpCode, setOtpCode] = useState('');
   const [otpSent, setOtpSent] = useState(false);
@@ -138,6 +139,7 @@ const LoginScreen = () => {
 
   return (
     <AuthScreenLayout
+      accent="blue"
       icon={<LogIn size={40} color="white" />}
       title={isEn ? 'Welcome Back' : 'خوش آمدید'}
       subtitle={
@@ -163,7 +165,6 @@ const LoginScreen = () => {
       {loginMethod === 'password' ? (
         <MotionL.View
           key="password-form"
-          initial={{ opacity: 0, x: isEn ? 12 : -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.25 }}
         >
@@ -182,7 +183,16 @@ const LoginScreen = () => {
             value={password}
             onChangeText={setPassword}
             leftIcon={<Lock size={20} color="#94a3b8" />}
-            secureTextEntry
+            rightIcon={
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                {showPassword ? (
+                  <EyeOff size={20} color="#94a3b8" />
+                ) : (
+                  <Eye size={20} color="#94a3b8" />
+                )}
+              </TouchableOpacity>
+            }
+            secureTextEntry={!showPassword}
             autoComplete="password"
           />
           <TouchableOpacity className="self-end mb-5">
@@ -190,14 +200,13 @@ const LoginScreen = () => {
               {isEn ? 'Forgot Password?' : 'فراموشی رمز عبور؟'}
             </Text>
           </TouchableOpacity>
-          <Button variant="primary" size="lg" isLoading={loading} onPress={handlePasswordLogin}>
-            {isEn ? 'Sign In' : 'ورود'}
+          <Button variant="blue" size="lg" isLoading={loading} onPress={handlePasswordLogin}>
+            <Text>{isEn ? 'Sign In' : 'ورود'}</Text>
           </Button>
         </MotionL.View>
       ) : (
         <MotionL.View
           key="otp-form"
-          initial={{ opacity: 0, x: isEn ? 12 : -12 }}
           animate={{ opacity: 1, x: 0 }}
           transition={{ duration: 0.25 }}
         >
@@ -213,8 +222,8 @@ const LoginScreen = () => {
           />
 
           {!otpSent ? (
-            <Button variant="primary" size="lg" isLoading={loading} onPress={handleSendOtp}>
-              {isEn ? 'Send Verification Code' : 'ارسال کد تایید'}
+            <Button variant="blue" size="lg" isLoading={loading} onPress={handleSendOtp}>
+              <Text>{isEn ? 'Send Verification Code' : 'ارسال کد تایید'}</Text>
             </Button>
           ) : (
             <View>
@@ -232,13 +241,13 @@ const LoginScreen = () => {
               <View className="flex-row gap-3 mt-6">
                 <View className="flex-1">
                   <Button
-                    variant="primary"
+                    variant="blue"
                     size="lg"
                     isLoading={loading}
                     onPress={handleVerifyOtp}
                     disabled={otpCode.length < 6}
                   >
-                    {isEn ? 'Verify & Login' : 'تایید و ورود'}
+                    <Text>{isEn ? 'Verify & Login' : 'تایید و ورود'}</Text>
                   </Button>
                 </View>
                 <Pressable

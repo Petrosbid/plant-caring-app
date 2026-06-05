@@ -1,9 +1,5 @@
 // src/navigation/RootNavigator.tsx
 import React from 'react';
-import {
-  NavigationContainer,
-  NavigationIndependentTree,
-} from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { RootStackParamList } from '../types/navigation';
 import { MainTabs } from './MainTabs';
@@ -39,37 +35,32 @@ export const RootNavigator = () => {
   }
 
   return (
-    <NavigationIndependentTree>
-      <NavigationContainer>
-        <Stack.Navigator
-          screenOptions={{
-            headerShown: false,
-            animation: 'slide_from_right',
-          }}
-        >
-          {!isAuthenticated ? (
-            <>
-              <Stack.Screen name="Login" component={LoginScreen} />
-              <Stack.Screen name="Signup" component={SignupScreen} />
-            </>
-          ) : (
-            <>
-              <Stack.Screen name="MainTabs" component={MainTabs} />
-              <Stack.Screen name="Library" component={LibraryScreen} />
-              <Stack.Screen name="DiseaseLibrary" component={DiseaseLibraryScreen} />
-              <Stack.Screen name="PlantDetails" component={PlantDetailsScreen} />
-              <Stack.Screen name="DiseaseDetails" component={DiseaseDetailsScreen} />
-              <Stack.Screen name="BlogList" component={BlogListScreen} />
-              <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
-              <Stack.Screen name="CareGuide" component={CareGuideScreen} />
-              <Stack.Screen name="PlantRecommender" component={PlantRecommenderScreen} />
-              <Stack.Screen name="Identify" component={IdentifyScreen} />
-              <Stack.Screen name="DiseaseCheck" component={DiseaseCheckScreen} />
-            </>
-          )}
-        </Stack.Navigator>
-      </NavigationContainer>
-    </NavigationIndependentTree>
+    <Stack.Navigator
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+      }}
+    >
+      {!isAuthenticated ? (
+        <>
+          <Stack.Screen name="Login" component={LoginScreen} />
+          <Stack.Screen name="Signup" component={SignupScreen} />
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="MainTabs" component={MainTabs} />
+          <Stack.Screen name="Library" component={LibraryScreen} />
+          <Stack.Screen name="DiseaseLibrary" component={DiseaseLibraryScreen} />
+          <Stack.Screen name="PlantDetails" component={PlantDetailsScreen} />
+          <Stack.Screen name="DiseaseDetails" component={DiseaseDetailsScreen} />
+          <Stack.Screen name="BlogList" component={BlogListScreen} />
+          <Stack.Screen name="BlogDetail" component={BlogDetailScreen} />
+          <Stack.Screen name="CareGuide" component={CareGuideScreen} />
+          <Stack.Screen name="PlantRecommender" component={PlantRecommenderScreen} />
+          <Stack.Screen name="Identify" component={IdentifyScreen} />
+          <Stack.Screen name="DiseaseCheck" component={DiseaseCheckScreen} />
+        </>
+      )}
+    </Stack.Navigator>
   );
 };
-

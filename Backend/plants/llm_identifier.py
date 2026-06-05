@@ -52,8 +52,7 @@ that follows the structure below.
 
 **care_difficulty** "easy", "medium", "hard"
 
-**is_toxic** True or False (must be capital T/F)
-
+**is_toxic** true or false (must be lowercase json booleans)
 ---
 
 ### JSON structure (all fields required)
@@ -87,7 +86,7 @@ that follows the structure below.
 Return ONLY the raw JSON object.
 """
 
-    try:
+    try:  # Outer try block starts here
         response = requests.post(
             url="https://openrouter.ai/api/v1/chat/completions",
             headers={
@@ -109,22 +108,48 @@ Return ONLY the raw JSON object.
         if response.status_code == 200:
             content = response.json()["choices"][0]["message"]["content"].strip()
 
+            # 1. Clean markdown code fences if present
             if "```json" in content:
                 content = content.split("```json")[1].split("```")[0].strip()
             elif "```" in content:
                 content = content.split("```")[1].split("```")[0].strip()
 
+            # 2. Extract anything between the first '{' and last '}' to isolate the object
+            start_idx = content.find('{')
+            end_idx = content.rfind('}')
+            if start_idx != -1 and end_idx != -1:
+                content = content[start_idx:end_idx + 1]
+
+            # 3. Quick-fix Python booleans commonly hallucinated by LLMs
+            content = re.sub(r':\s*True\b', ': true', content)
+            content = re.sub(r':\s*False\b', ': false', content)
+
             try:
                 care_data = json.loads(content)
                 return care_data
-            except json.JSONDecodeError:
-                print("Error Parsing JSON:", repr(content))
+            except json.JSONDecodeError as e:
+                # If it's still broken (e.g. truncated), try a primitive fallback regex to capture what we can
+                print("Error Parsing JSON, attempting recovery. Raw:", repr(content))
+
+                # Loose regex recovery to salvage field data if truncated mid-stream
+                salvaged_data = {}
+                matches = re.findall(r'"(\w+)":\s*"(.*?)"', content)
+                for key, val in matches:
+                    salvaged_data[key] = val
+
+                if salvaged_data:
+                    # Explicitly convert boolean keys if caught by regex
+                    if 'is_toxic' in content:
+                        salvaged_data['is_toxic'] = 'false' not in content.lower()
+                    return salvaged_data
+
                 return None
-        else:
-            print("Error:", response.status_code, repr(response.text))
-            return None
-    except Exception as e:
-        print(f"Error calling LLM API: {repr(e)}")
+
+        # If status code is not 200
+        return None
+
+    except Exception as e:  # <--- Added this to close the outer try block safely!
+        print(f"Network request or unexpected error occurred: {repr(e)}")
         return None
 
 

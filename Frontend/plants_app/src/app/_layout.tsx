@@ -18,7 +18,7 @@ import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
 import { AuthProvider } from "../context/AuthContext";
 import { ThemeProvider, useTheme } from "../context/ThemeContext";
-import "../i18n"; // Initialize i18n
+import { initI18n } from "../i18n"; // Async i18n init
 
 // Keep the splash screen visible while we fetch resources
 SplashScreen.preventAutoHideAsync();
@@ -33,6 +33,7 @@ configureReanimatedLogger({
 function AppContent() {
   const { theme } = useTheme();
   const { colorScheme, setColorScheme } = useColorScheme();
+  const [i18nLoaded, setI18nLoaded] = React.useState(false);
 
   const [fontsLoaded, fontError] = useFonts({
     Inter_400Regular,
@@ -41,11 +42,15 @@ function AppContent() {
     Vazirmatn_700Bold,
   });
 
+  useEffect(() => {
+    initI18n().then(() => setI18nLoaded(true));
+  }, []);
+
   const onLayoutRootView = useCallback(async () => {
-    if (fontsLoaded || fontError) {
+    if ((fontsLoaded || fontError) && i18nLoaded) {
       await SplashScreen.hideAsync();
     }
-  }, [fontsLoaded, fontError]);
+  }, [fontsLoaded, fontError, i18nLoaded]);
 
   useEffect(() => {
     if (colorScheme !== theme) {
@@ -53,7 +58,7 @@ function AppContent() {
     }
   }, [theme, colorScheme, setColorScheme]);
 
-  if (!fontsLoaded && !fontError) {
+  if ((!fontsLoaded && !fontError) || !i18nLoaded) {
     return null;
   }
 

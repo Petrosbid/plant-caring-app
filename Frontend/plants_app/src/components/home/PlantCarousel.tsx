@@ -52,7 +52,7 @@ export const PlantCarousel: React.FC<PlantCarouselProps> = ({
       initial={{ opacity: 0, x: 50 }}
       animate={{ opacity: 1, x: 0 }}
       transition={{ delay: index * 100, type: 'spring' }}
-      className="mr-4"
+      className="me-4"
       style={{ width: ITEM_WIDTH }}
     >
       <TouchableOpacity

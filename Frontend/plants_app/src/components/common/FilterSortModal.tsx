@@ -138,7 +138,7 @@ export const FilterSortModal: React.FC<FilterSortModalProps> = ({
     <View className="gap-8">
       {Object.entries(filterCategories || {}).map(([key, category]) => (
         <View key={key}>
-          <Text className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 ml-2">
+          <Text className="text-sm font-bold text-slate-400 uppercase tracking-widest mb-4 ms-2">
             {isEn ? category.labelEn : category.labelFa}
           </Text>
           <View className="flex-row flex-wrap gap-2">
@@ -253,7 +253,7 @@ export const FilterSortModal: React.FC<FilterSortModalProps> = ({
                   className="flex-1 flex-row items-center justify-center h-12 rounded-2xl bg-slate-100 dark:bg-slate-800"
                 >
                   <Trash2 size={18} color="#ef4444" />
-                  <Text className="ml-2 text-red-500 font-bold">
+                  <Text className="ms-2 text-red-500 font-bold">
                     {isEn ? "Clear All" : "پاک کردن"}
                   </Text>
                 </TouchableOpacity>

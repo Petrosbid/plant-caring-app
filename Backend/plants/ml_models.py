@@ -4,11 +4,16 @@ import json
 import tempfile
 import logging
 import base64
+import time
 import requests
 from django.conf import settings
 from django.db.models import Q
+from requests.exceptions import SSLError, ConnectionError, Timeout
 
 logger = logging.getLogger(__name__)
+
+session = requests.Session()
+session.verify = True
 
 OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
 VISION_MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
@@ -138,13 +143,33 @@ def predict_plant(image_data):
             "temperature": 0.2
         }
 
-        # ارسال درخواست به OpenRouter
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers=headers,
-            json=payload,
-            timeout=40
-        )
+        # --- راهکار سوم: پیاده‌سازی حلقه Retry برای مقابله با قطعی‌های ناگهانی SSL/Network ---
+        max_retries = 3
+        retry_delay = 2  # زمان انتظار بین هر تلاش (ثانیه)
+        response = None
+
+        for attempt in range(max_retries):
+            try:
+                logger.info(f"Sending request to OpenRouter (Attempt {attempt + 1}/{max_retries})...")
+                response = requests.post(
+                    url="https://openrouter.ai/api/v1/chat/completions",
+                    headers=headers,
+                    json=payload,
+                    timeout=40
+                )
+                # اگر درخواست موفق بود یا ارور سروری غیر از شبکه داد، از حلقه خارج می‌شویم
+                break
+            except (SSLError, ConnectionError, Timeout) as net_err:
+                logger.warning(f"Network issue encountered on attempt {attempt + 1}: {net_err}")
+                if attempt < max_retries - 1:
+                    logger.info(f"Waiting {retry_delay} seconds before retrying...")
+                    time.sleep(retry_delay)
+                else:
+                    # اگر در آخرین تلاش هم خطا داد، خطا را پرتاب کن تا در بلاکِ نهاییِ Exception هندل شود
+                    raise net_err
+
+        if not response:
+            return {'id': None, 'name': None, 'error': 'Failed to establish connection to API'}
 
         if response.status_code != 200:
             logger.error(f"OpenRouter API Error: {response.status_code} - {response.text}")

@@ -4,6 +4,23 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 export const HAS_LAUNCHED_KEY = '@has_launched';
 export const RECOMMENDER_ANSWERS_KEY = '@plant_recommender_answers';
 export const READING_FONT_SIZE_KEY = '@reading_font_size';
+export const APP_LANGUAGE_KEY = '@app_language';
+
+export const getAppLanguage = async (): Promise<string | null> => {
+  try {
+    return await AsyncStorage.getItem(APP_LANGUAGE_KEY);
+  } catch {
+    return null;
+  }
+};
+
+export const saveAppLanguage = async (lang: string): Promise<void> => {
+  try {
+    await AsyncStorage.setItem(APP_LANGUAGE_KEY, lang);
+  } catch (error) {
+    console.error('Error saving app language:', error);
+  }
+};
 
 export const getReadingFontSize = async (): Promise<number | null> => {
   try {

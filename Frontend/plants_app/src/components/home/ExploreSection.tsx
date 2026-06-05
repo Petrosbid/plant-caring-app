@@ -46,8 +46,8 @@ export const ExploreSection = () => {
 
   return (
     <View className="mt-12 pb-8 ">
-      <View className="flex-row justify-between items-center px-5 mb-5">
-        <Text className="text-[22px] font-black text-slate-900 dark:text-white">
+      <View className=" items-center px-5 mb-6">
+        <Text className=" text-center text-[22px] font-black text-slate-900 dark:text-white">
           {isEn ? "Explore Collections" : "کلکسیون‌های ویژه"}
         </Text>
       </View>
@@ -63,7 +63,7 @@ export const ExploreSection = () => {
             key={i}
             onPress={() => navigation.navigate("Library", { filters: cat.filters } as any)}
             activeOpacity={0.9}
-            className="w-[220px] h-[220px] rounded-[40px] overflow-hidden shadow-lg shadow-slate-200 dark:shadow-none mr-4"
+            className="w-[220px] h-[220px] rounded-[40px] overflow-hidden shadow-lg shadow-slate-200 dark:shadow-none me-4"
           >
             <ImageBackground
               source={{ uri: cat.image }}

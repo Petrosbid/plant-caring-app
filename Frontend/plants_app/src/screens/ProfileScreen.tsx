@@ -9,6 +9,7 @@ import {
   ActivityIndicator,
 } from 'react-native';
 import * as ImagePicker from 'expo-image-picker';
+import * as Updates from 'expo-updates';
 import { useTranslation } from 'react-i18next';
 import { ScreenWrapper } from '../components/common/ScreenWrapper';
 import { Card } from '../components/common/Card';
@@ -38,6 +39,7 @@ import { formatDate } from '../utils/date';
 import { ThemeTransition } from '../components/common/ThemeTransition';
 import { EditProfileModal } from '../components/common/EditProfileModal';
 import { authService } from '../services/api';
+import { saveAppLanguage } from '../utils/storage';
 import type { ProfileUpdateInput } from '../types';
 
 const ProfileScreen = () => {
@@ -115,7 +117,32 @@ const ProfileScreen = () => {
   };
 
   const toggleLanguage = () => {
-    i18n.changeLanguage(i18n.language === 'en' ? 'fa' : 'en');
+    const nextLang = i18n.language === 'en' ? 'fa' : 'en';
+    
+    Alert.alert(
+      isEn ? 'Change Language' : 'تغییر زبان',
+      isEn 
+        ? 'The app will restart to apply the language and layout changes.' 
+        : 'برنامه برای اعمال تغییرات زبان و چیدمان مجدداً راه‌اندازی خواهد شد.',
+      [
+        { text: isEn ? 'Cancel' : 'انصراف', style: 'cancel' },
+        { 
+          text: isEn ? 'Confirm' : 'تایید', 
+          onPress: async () => {
+            try {
+              await saveAppLanguage(nextLang);
+              // Small delay to ensure storage is flushed
+              await new Promise(resolve => setTimeout(resolve, 100));
+              await Updates.reloadAsync();
+            } catch (err) {
+              console.error('Failed to reload app:', err);
+              // Fallback to manual language change if reload fails
+              i18n.changeLanguage(nextLang);
+            }
+          } 
+        },
+      ]
+    );
   };
 
   if (!isAuthenticated || !user) {
@@ -158,8 +185,8 @@ const ProfileScreen = () => {
         <View className="h-36 mx-4 rounded-3xl overflow-hidden bg-brand-600">
           <View className="absolute inset-0 bg-brand-700/80" />
           <View className="absolute inset-0 bg-black/25" />
-          <View className="absolute bottom-4 left-4 right-4 flex-row items-end justify-between">
-            <View className="flex-1 pr-3">
+          <View className="absolute bottom-4 start-4 end-4 flex-row items-end justify-between">
+            <View className="flex-1 pe-3">
               <Text className="text-white/80 text-xs font-semibold uppercase tracking-wider">
                 {isEn ? 'My Account' : 'حساب من'}
               </Text>
@@ -191,7 +218,7 @@ const ProfileScreen = () => {
               source={{ uri: avatarUri }}
               className="w-28 h-28 rounded-full border-4 border-white dark:border-slate-900 bg-slate-200"
             />
-            <View className="absolute bottom-0 right-0 bg-brand-500 w-9 h-9 rounded-full items-center justify-center border-[3px] border-white dark:border-slate-900">
+            <View className="absolute bottom-0 end-0 bg-brand-500 w-9 h-9 rounded-full items-center justify-center border-[3px] border-white dark:border-slate-900">
               {avatarLoading ? (
                 <ActivityIndicator size="small" color="#fff" />
               ) : (
@@ -227,7 +254,7 @@ const ProfileScreen = () => {
             activeOpacity={0.7}
             className="flex-row items-center justify-between p-4 border-b border-slate-100/80 dark:border-slate-700/50 bg-brand-50/50 dark:bg-brand-900/10"
           >
-            <View className="flex-row items-center gap-2">
+            <View className="flex-row items-center gap-2 justify-between">
               <Pencil size={16} color="#16a34a" />
               <Text className="text-brand-700 dark:text-brand-400 font-bold text-sm">
                 {isEn ? 'Edit personal information' : 'ویرایش اطلاعات شخصی'}
@@ -351,11 +378,11 @@ const ProfileScreen = () => {
 
         <Button
           variant="ghost"
-          className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 py-4 mt-2"
+          className="bg-red-50 dark:bg-red-900/10 border border-red-100 dark:border-red-900/20 py-4 mt-2 mb-6 h-auto"
           onPress={handleLogout}
         >
           <LogOut size={20} color="#ef4444" />
-          <Text className="ml-2 text-red-500 font-black">{t('common.logout')}</Text>
+          <Text className="ms-2 text-red-500 font-black">{t('common.logout')}</Text>
         </Button>
       </View>
     </ScreenWrapper>
@@ -371,7 +398,7 @@ const ProfileScreen = () => {
 };
 
 const SectionLabel = ({ text }: { text: string }) => (
-  <Text className="text-xs font-bold text-slate-400 uppercase tracking-widest ml-1">
+  <Text className="text-xs font-bold text-slate-400 uppercase tracking-widest ms-1">
     {text}
   </Text>
 );
@@ -424,22 +451,29 @@ const SettingsRow = ({
 }) => (
   <View
     className={cn(
-      'flex-row items-start justify-between p-4 gap-3',
+      'flex-row justify-between p-4 gap-3',
+      multiline ? 'items-start' : 'items-center',
       !isLast && 'border-b border-slate-100/80 dark:border-slate-700/50',
     )}
   >
     <View className="flex-row items-center gap-3 flex-shrink">
       <IconBox>{icon}</IconBox>
-      <Text className="text-slate-800 dark:text-slate-200 font-bold">{label}</Text>
+      <Text 
+        className="text-slate-800 dark:text-slate-200 font-bold"
+        style={{ includeFontPadding: false, textAlignVertical: 'center' }}
+      >
+        {label}
+      </Text>
     </View>
     <Text
       className={cn(
-        'text-slate-500 dark:text-slate-400 text-sm flex-1 text-right',
+        'text-slate-500 dark:text-slate-400 text-sm flex-1 text-end',
         multiline && 'max-w-[55%]',
       )}
       numberOfLines={multiline ? 3 : 1}
+      style={{ includeFontPadding: false, textAlignVertical: 'center' }}
     >
-      {value}
+      {value || '—'} 
     </Text>
   </View>
 );

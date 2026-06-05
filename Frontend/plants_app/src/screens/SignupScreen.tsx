@@ -9,6 +9,9 @@ import {
   Mail,
   Phone,
   ArrowLeft,
+  Lock,
+  Eye,
+  EyeOff,
 } from 'lucide-react-native';
 import { Motion as _Motion } from '@legendapp/motion';
 
@@ -44,7 +47,9 @@ const SignupScreen = () => {
     last_name: '',
     phone: '',
     email: '',
+    password: '',
   });
+  const [showPassword, setShowPassword] = useState(false);
   const [code, setCode] = useState('');
   const [identifier, setIdentifier] = useState('');
   const [loading, setLoading] = useState(false);
@@ -80,6 +85,10 @@ const SignupScreen = () => {
       setError(isEn ? 'Email is required' : 'ایمیل لازم است');
       return;
     }
+    if (!formData.password) {
+      setError(isEn ? 'Password is required' : 'رمز عبور لازم است');
+      return;
+    }
 
     setError(null);
     setLoading(true);
@@ -88,6 +97,7 @@ const SignupScreen = () => {
         username: formData.username.trim(),
         first_name: formData.first_name.trim() || undefined,
         last_name: formData.last_name.trim() || undefined,
+        password: formData.password,
       };
       if (method === 'phone') {
         await registerWithPhoneOtp({
@@ -150,7 +160,7 @@ const SignupScreen = () => {
 
   return (
     <AuthScreenLayout
-      accent="green"
+      accent="blue"
       icon={<UserPlus size={40} color="white" />}
       title={isEn ? 'Create Account' : 'ایجاد حساب کاربری'}
       subtitle={
@@ -165,7 +175,6 @@ const SignupScreen = () => {
       {step === 'form' ? (
         <MotionL.View
           key="signup-form"
-          initial={{ opacity: 0, y: 16 }}
           animate={{ opacity: 1, y: 0 }}
         >
           <AuthMethodTabs
@@ -209,6 +218,25 @@ const SignupScreen = () => {
             autoCapitalize="none"
           />
 
+          <Input
+            label={isEn ? 'Password' : 'رمز عبور'}
+            placeholder="••••••••"
+            value={formData.password}
+            onChangeText={(v) => updateField('password', v)}
+            leftIcon={<Lock size={20} color="#94a3b8" />}
+            rightIcon={
+              <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+                {showPassword ? (
+                  <EyeOff size={20} color="#94a3b8" />
+                ) : (
+                  <Eye size={20} color="#94a3b8" />
+                )}
+              </TouchableOpacity>
+            }
+            secureTextEntry={!showPassword}
+            autoComplete="password-new"
+          />
+
           {method === 'phone' ? (
             <Input
               label={isEn ? 'Phone Number' : 'شماره تلفن'}
@@ -233,13 +261,13 @@ const SignupScreen = () => {
           )}
 
           <Button
-            variant="success"
+            variant="blue"
             size="lg"
             isLoading={loading}
             onPress={handleSendCode}
             className="mt-2"
           >
-            {isEn ? 'Send Verification Code' : 'ارسال کد تایید'}
+            <Text>{isEn ? 'Send Verification Code' : 'ارسال کد تایید'}</Text>
           </Button>
 
           <AuthDivider isEn={isEn} />
@@ -248,7 +276,6 @@ const SignupScreen = () => {
       ) : (
         <MotionL.View
           key="signup-verify"
-          initial={{ opacity: 0, scale: 0.96 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.3 }}
         >
@@ -260,13 +287,13 @@ const SignupScreen = () => {
 
           <View className="mt-6">
             <Button
-              variant="success"
+              variant="blue"
               size="lg"
               isLoading={loading}
               onPress={handleVerifyCode}
               disabled={code.length < 6}
             >
-              {isEn ? 'Complete Registration' : 'تکمیل ثبت‌نام'}
+              <Text>{isEn ? 'Complete Registration' : 'تکمیل ثبت‌نام'}</Text>
             </Button>
           </View>
 

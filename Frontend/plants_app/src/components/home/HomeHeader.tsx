@@ -47,14 +47,13 @@ export const HomeHeader = () => {
   ];
 
   return (
-    <View className="px-5 pt-4 pb-10 bg-white dark:bg-slate-900 rounded-b-[40px] shadow-sm shadow-slate-200">
+    <View className="px-5 pt-4 pb-10 dark:bg-emerald-950 rounded-b-[40px] shadow-sm shadow-slate-200">
       <View className="flex-row items-center border-[2px] border-[#4FD1C5] rounded-full px-5 h-[60px] bg-white dark:bg-slate-800 mb-10 shadow-sm shadow-teal-50 dark:shadow-none">
         <Search size={24} color="#94a3b8" strokeWidth={2.5} />
         <TextInput
           placeholder={isEn ? "Search plants" : "جستجوی گیاهان"}
-          className="flex-1 ml-3 text-slate-800 dark:text-white text-[17px] font-medium"
+          className="flex-1 ms-3 text-slate-800 dark:text-white text-[17px] font-medium text-start"
           placeholderTextColor="#94a3b8"
-          style={{ textAlign: isEn ? "left" : "right" }}
         />
       </View>
 

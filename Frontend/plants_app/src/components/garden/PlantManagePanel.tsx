@@ -99,14 +99,6 @@ export const PlantManagePanel: React.FC<PlantManagePanelProps> = ({
     setActiveTab(initialTab);
   }, [userPlant.id, initialTab]);
 
-  const tabs: { key: PlantManageTab; icon: typeof Info; label: string }[] = [
-    { key: 'info', icon: Info, label: isEn ? 'Overview' : 'نما' },
-    { key: 'edit', icon: Edit3, label: isEn ? 'Edit' : 'ویرایش' },
-    { key: 'growth', icon: TrendingUp, label: isEn ? 'Growth' : 'رشد' },
-    { key: 'reminders', icon: Bell, label: isEn ? 'Tasks' : 'کارها' },
-    { key: 'chat', icon: MessageCircle, label: isEn ? 'AI' : 'چت' },
-  ];
-
   const plant = userPlant.plant_details;
   const displayName =
     userPlant.nickname ||
@@ -122,94 +114,196 @@ export const PlantManagePanel: React.FC<PlantManagePanelProps> = ({
       keyboardVerticalOffset={Platform.OS === 'ios' ? 8 : 0}
     >
       {showHero && plant && (
-        <View className="mx-4 mb-4 rounded-[32px] overflow-hidden h-44">
+        <View className="mx-4 mb-3 rounded-[28px] overflow-hidden h-32">
           <Image
             source={{ uri: plant.primary_image || 'https://via.placeholder.com/400' }}
             className="absolute inset-0 w-full h-full"
             resizeMode="cover"
           />
           <LinearGradient
-            colors={['transparent', 'rgba(0,0,0,0.75)']}
+            colors={['transparent', 'rgba(0,0,0,0.7)']}
             className="absolute inset-0"
           />
-          <View className="absolute bottom-0 left-0 right-0 p-5">
-            <View className={cn('self-start px-3 py-1 rounded-full mb-2', health.pill)}>
-              <Text className={cn('text-[10px] font-black uppercase', health.text)}>
+          <View className="absolute bottom-0 left-0 right-0 p-4">
+            <View className={cn('self-start px-2.5 py-0.5 rounded-full mb-1.5', health.pill)}>
+              <Text className={cn('text-[9px] font-black uppercase', health.text)}>
                 {health.label}
               </Text>
             </View>
-            <Text className="text-2xl font-black text-white" numberOfLines={1}>
+            <Text className="text-lg font-black text-white" numberOfLines={1}>
               {displayName}
             </Text>
-            <Text className="text-white/70 text-xs font-medium mt-0.5" numberOfLines={1}>
+            <Text className="text-white/70 text-[10px] font-medium" numberOfLines={1}>
               {plant.scientific_name || plant.farsi_name}
             </Text>
           </View>
         </View>
       )}
 
-      <ScrollView
-        horizontal
-        showsHorizontalScrollIndicator={false}
-        className="px-4 mb-4"
-        contentContainerStyle={{ gap: 8, paddingRight: 16 }}
-      >
-        {tabs.map((tab) => {
-          const isActive = activeTab === tab.key;
-          const Icon = tab.icon;
-          return (
-            <TouchableOpacity
-              key={tab.key}
-              onPress={() => setActiveTab(tab.key)}
-              className={cn(
-                'flex-row items-center gap-2 px-4 py-2.5 rounded-2xl border',
-                isActive
-                  ? 'bg-brand-500 border-brand-500 shadow-lg shadow-brand-500/25'
-                  : 'bg-white dark:bg-slate-800 border-slate-100 dark:border-slate-700'
-              )}
-            >
-              <Icon size={16} color={isActive ? '#fff' : '#94a3b8'} />
-              <Text
-                className={cn(
-                  'text-xs font-black',
-                  isActive ? 'text-white' : 'text-slate-500 dark:text-slate-400'
-                )}
-              >
-                {tab.label}
-              </Text>
-            </TouchableOpacity>
-          );
-        })}
-      </ScrollView>
+      <View className="px-4 mb-4">
+        <ScrollView
+          horizontal
+          showsHorizontalScrollIndicator={false}
+          className="bg-slate-100 dark:bg-slate-800/50 rounded-2xl p-1"
+          contentContainerStyle={{ gap: 4 }}
+        >
+          <TouchableOpacity
+            onPress={() => setActiveTab('info')}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              borderRadius: 12,
+              backgroundColor: activeTab === 'info' ? (Platform.OS === 'ios' ? '#fff' : '#16a34a') : 'transparent',
+              shadowColor: activeTab === 'info' ? '#000' : 'transparent',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.1,
+              shadowRadius: 2,
+              elevation: activeTab === 'info' ? 2 : 0,
+            }}
+          >
+            <Info size={14} color={activeTab === 'info' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#94a3b8'} />
+            <Text style={{ 
+              fontSize: 11, 
+              fontWeight: '900', 
+              color: activeTab === 'info' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#64748b' 
+            }}>
+              {isEn ? 'Overview' : 'نما'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setActiveTab('edit')}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              borderRadius: 12,
+              backgroundColor: activeTab === 'edit' ? (Platform.OS === 'ios' ? '#fff' : '#16a34a') : 'transparent',
+              shadowColor: activeTab === 'edit' ? '#000' : 'transparent',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.1,
+              shadowRadius: 2,
+              elevation: activeTab === 'edit' ? 2 : 0,
+            }}
+          >
+            <Edit3 size={14} color={activeTab === 'edit' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#94a3b8'} />
+            <Text style={{ 
+              fontSize: 11, 
+              fontWeight: '900', 
+              color: activeTab === 'edit' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#64748b' 
+            }}>
+              {isEn ? 'Edit' : 'ویرایش'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setActiveTab('growth')}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              borderRadius: 12,
+              backgroundColor: activeTab === 'growth' ? (Platform.OS === 'ios' ? '#fff' : '#16a34a') : 'transparent',
+              shadowColor: activeTab === 'growth' ? '#000' : 'transparent',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.1,
+              shadowRadius: 2,
+              elevation: activeTab === 'growth' ? 2 : 0,
+            }}
+          >
+            <TrendingUp size={14} color={activeTab === 'growth' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#94a3b8'} />
+            <Text style={{ 
+              fontSize: 11, 
+              fontWeight: '900', 
+              color: activeTab === 'growth' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#64748b' 
+            }}>
+              {isEn ? 'Growth' : 'رشد'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setActiveTab('reminders')}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              borderRadius: 12,
+              backgroundColor: activeTab === 'reminders' ? (Platform.OS === 'ios' ? '#fff' : '#16a34a') : 'transparent',
+              shadowColor: activeTab === 'reminders' ? '#000' : 'transparent',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.1,
+              shadowRadius: 2,
+              elevation: activeTab === 'reminders' ? 2 : 0,
+            }}
+          >
+            <Bell size={14} color={activeTab === 'reminders' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#94a3b8'} />
+            <Text style={{ 
+              fontSize: 11, 
+              fontWeight: '900', 
+              color: activeTab === 'reminders' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#64748b' 
+            }}>
+              {isEn ? 'Tasks' : 'کارها'}
+            </Text>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            onPress={() => setActiveTab('chat')}
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 6,
+              paddingHorizontal: 14,
+              paddingVertical: 8,
+              borderRadius: 12,
+              backgroundColor: activeTab === 'chat' ? (Platform.OS === 'ios' ? '#fff' : '#16a34a') : 'transparent',
+              shadowColor: activeTab === 'chat' ? '#000' : 'transparent',
+              shadowOffset: { width: 0, height: 1 },
+              shadowOpacity: 0.1,
+              shadowRadius: 2,
+              elevation: activeTab === 'chat' ? 2 : 0,
+            }}
+          >
+            <MessageCircle size={14} color={activeTab === 'chat' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#94a3b8'} />
+            <Text style={{ 
+              fontSize: 11, 
+              fontWeight: '900', 
+              color: activeTab === 'chat' ? (Platform.OS === 'ios' ? '#16a34a' : '#fff') : '#64748b' 
+            }}>
+              {isEn ? 'AI' : 'چت'}
+            </Text>
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
 
       <View className={cn('flex-1 px-4', activeTab === 'chat' ? 'pb-2' : 'pb-6')}>
-        <AnimatePresence>
-          <MotionL.View
-            key={`${userPlant.id}-${activeTab}`}
-            initial={{ opacity: 0, y: 12 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            className="flex-1"
-          >
-            {activeTab === 'info' && <InfoTab userPlant={userPlant} isEn={isEn} />}
-            {activeTab === 'edit' && (
-              <EditTab
-                userPlant={userPlant}
-                isEn={isEn}
-                onUpdate={onUpdate}
-                onRefresh={onRefresh}
-                onDelete={onDelete}
-              />
-            )}
-            {activeTab === 'growth' && (
-              <GrowthTab userPlant={userPlant} isEn={isEn} onRefresh={onRefresh} />
-            )}
-            {activeTab === 'reminders' && <RemindersTab userPlant={userPlant} isEn={isEn} />}
-            {activeTab === 'chat' && (
-              <PlantChat plantId={chatPlantId} language={isEn ? 'en' : 'fa'} className="min-h-[420px]" />
-            )}
-          </MotionL.View>
-        </AnimatePresence>
+        <View className="flex-1">
+          {activeTab === 'info' && <InfoTab userPlant={userPlant} isEn={isEn} />}
+          {activeTab === 'edit' && (
+            <EditTab
+              userPlant={userPlant}
+              isEn={isEn}
+              onUpdate={onUpdate}
+              onRefresh={onRefresh}
+              onDelete={onDelete}
+            />
+          )}
+          {activeTab === 'growth' && (
+            <GrowthTab userPlant={userPlant} isEn={isEn} onRefresh={onRefresh} />
+          )}
+          {activeTab === 'reminders' && <RemindersTab userPlant={userPlant} isEn={isEn} />}
+          {activeTab === 'chat' && (
+            <PlantChat plantId={chatPlantId} language={isEn ? 'en' : 'fa'} className="min-h-[420px]" />
+          )}
+        </View>
       </View>
     </KeyboardAvoidingView>
   );
@@ -221,68 +315,69 @@ const InfoTab = ({ userPlant, isEn }: { userPlant: UserPlant; isEn: boolean }) =
   const health = healthConfig(userPlant.health_status, isEn);
   const pendingTasks = userPlant.reminders?.filter((r) => !r.is_completed).length ?? 0;
 
-  const cards = [
-    {
-      icon: <Droplet size={18} color="#3b82f6" />,
-      label: isEn ? 'Next Watering' : 'آبیاری بعدی',
-      value: formatDate(userPlant.next_watering_date, lang),
-    },
-    {
-      icon: <Sun size={18} color="#f59e0b" />,
-      label: isEn ? 'Next Fertilizing' : 'کوددهی بعدی',
-      value: formatDate(userPlant.next_fertilizing_date, lang),
-    },
-    {
-      icon: <Scissors size={18} color="#8b5cf6" />,
-      label: isEn ? 'Next Pruning' : 'هرس بعدی',
-      value: formatDate(userPlant.next_pruning_date, lang),
-    },
-    {
-      icon: <Shield size={18} color="#16a34a" />,
-      label: isEn ? 'Health' : 'سلامت',
-      value: health.label,
-    },
-    {
-      icon: <Droplet size={18} color="#06b6d4" />,
-      label: isEn ? 'Water Interval' : 'فاصله آبیاری',
-      value: `${userPlant.watering_interval_days} ${isEn ? 'days' : 'روز'}`,
-    },
-    {
-      icon: <Leaf size={18} color="#22c55e" />,
-      label: isEn ? 'Fertilizer Interval' : 'فاصله کوددهی',
-      value: `${userPlant.fertilizing_interval_days} ${isEn ? 'days' : 'روز'}`,
-    },
-    {
-      icon: <Thermometer size={18} color="#ef4444" />,
-      label: isEn ? 'Pot Size' : 'گلدان',
-      value: (userPlant.pot_size || 'medium').replace('_', ' '),
-    },
-    {
-      icon: <Bell size={18} color="#6366f1" />,
-      label: isEn ? 'Pending Tasks' : 'کارهای باز',
-      value: String(pendingTasks),
-    },
-  ];
+  const cardStyle = {
+    width: '48%',
+    backgroundColor: 'white',
+    padding: 16,
+    borderRadius: 24,
+    borderWidth: 1,
+    borderColor: '#f1f5f9',
+    marginBottom: 12,
+  };
+
+  const labelStyle = { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase' as const, letterSpacing: 1 };
+  const valueStyle = { fontSize: 13, fontWeight: '900', color: '#0f172a', marginTop: 4 };
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
-      <View className="flex-row flex-wrap justify-between gap-y-3">
-        {cards.map((card, i) => (
-          <View
-            key={i}
-            className="w-[48%] bg-white dark:bg-slate-800/80 p-4 rounded-[28px] border border-slate-100 dark:border-slate-700/80 shadow-sm"
-          >
-            <View className="flex-row items-center gap-2 mb-2">
-              {card.icon}
-              <Text className="text-[9px] font-black text-slate-400 uppercase tracking-widest flex-1">
-                {card.label}
-              </Text>
-            </View>
-            <Text className="text-sm font-black text-slate-900 dark:text-white capitalize">
-              {card.value}
-            </Text>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'space-between' }}>
+        <View style={cardStyle}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Droplet size={16} color="#3b82f6" />
+            <Text style={labelStyle}>{isEn ? 'Next Watering' : 'آبیاری بعدی'}</Text>
           </View>
-        ))}
+          <Text style={valueStyle}>{formatDate(userPlant.next_watering_date, lang)}</Text>
+        </View>
+
+        <View style={cardStyle}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Sun size={16} color="#f59e0b" />
+            <Text style={labelStyle}>{isEn ? 'Next Fertilizing' : 'کوددهی بعدی'}</Text>
+          </View>
+          <Text style={valueStyle}>{formatDate(userPlant.next_fertilizing_date, lang)}</Text>
+        </View>
+
+        <View style={cardStyle}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Scissors size={16} color="#8b5cf6" />
+            <Text style={labelStyle}>{isEn ? 'Next Pruning' : 'هرس بعدی'}</Text>
+          </View>
+          <Text style={valueStyle}>{formatDate(userPlant.next_pruning_date, lang)}</Text>
+        </View>
+
+        <View style={cardStyle}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Shield size={16} color="#16a34a" />
+            <Text style={labelStyle}>{isEn ? 'Health' : 'سلامت'}</Text>
+          </View>
+          <Text style={valueStyle}>{health.label}</Text>
+        </View>
+
+        <View style={cardStyle}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Droplet size={16} color="#06b6d4" />
+            <Text style={labelStyle}>{isEn ? 'Water Interval' : 'فاصله آبیاری'}</Text>
+          </View>
+          <Text style={valueStyle}>{userPlant.watering_interval_days} {isEn ? 'days' : 'روز'}</Text>
+        </View>
+
+        <View style={cardStyle}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+            <Bell size={16} color="#6366f1" />
+            <Text style={labelStyle}>{isEn ? 'Pending Tasks' : 'کارهای باز'}</Text>
+          </View>
+          <Text style={valueStyle}>{pendingTasks}</Text>
+        </View>
       </View>
 
       {latestGrowth && (
@@ -474,56 +569,86 @@ const EditTab = ({
       />
 
       <SectionTitle>{isEn ? 'Health Status' : 'وضعیت سلامت'}</SectionTitle>
-      <View className="flex-row flex-wrap gap-2 mb-4">
-        {healthOptions.map((opt) => (
-          <TouchableOpacity
-            key={opt.value}
-            onPress={() => setForm({ ...form, health_status: opt.value })}
-            className={cn(
-              'px-4 py-2.5 rounded-2xl border',
-              form.health_status === opt.value
-                ? 'bg-brand-500 border-brand-500'
-                : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
-            )}
-          >
-            <Text
-              className={cn(
-                'text-xs font-black',
-                form.health_status === opt.value ? 'text-white' : 'text-slate-600 dark:text-slate-300'
-              )}
-            >
-              {opt.label}
-            </Text>
-          </TouchableOpacity>
-        ))}
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 16 }}>
+        <TouchableOpacity
+          onPress={() => setForm({ ...form, health_status: 'healthy' })}
+          style={{
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 16,
+            borderWidth: 1,
+            backgroundColor: form.health_status === 'healthy' ? '#16a34a' : '#f8fafc',
+            borderColor: form.health_status === 'healthy' ? '#16a34a' : '#e2e8f0',
+          }}
+        >
+          <Text style={{ fontSize: 12, fontWeight: '900', color: form.health_status === 'healthy' ? '#fff' : '#475569' }}>
+            {isEn ? 'Healthy' : 'سالم'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setForm({ ...form, health_status: 'needs_attention' })}
+          style={{
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 16,
+            borderWidth: 1,
+            backgroundColor: form.health_status === 'needs_attention' ? '#16a34a' : '#f8fafc',
+            borderColor: form.health_status === 'needs_attention' ? '#16a34a' : '#e2e8f0',
+          }}
+        >
+          <Text style={{ fontSize: 12, fontWeight: '900', color: form.health_status === 'needs_attention' ? '#fff' : '#475569' }}>
+            {isEn ? 'Attention' : 'توجه'}
+          </Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity
+          onPress={() => setForm({ ...form, health_status: 'unhealthy' })}
+          style={{
+            paddingHorizontal: 16,
+            paddingVertical: 10,
+            borderRadius: 16,
+            borderWidth: 1,
+            backgroundColor: form.health_status === 'unhealthy' ? '#16a34a' : '#f8fafc',
+            borderColor: form.health_status === 'unhealthy' ? '#16a34a' : '#e2e8f0',
+          }}
+        >
+          <Text style={{ fontSize: 12, fontWeight: '900', color: form.health_status === 'unhealthy' ? '#fff' : '#475569' }}>
+            {isEn ? 'Unhealthy' : 'ناسالم'}
+          </Text>
+        </TouchableOpacity>
       </View>
 
       <SectionTitle>{isEn ? 'Pot Size' : 'سایز گلدان'}</SectionTitle>
-      <ScrollView horizontal showsHorizontalScrollIndicator={false} className="mb-4">
-        <View className="flex-row gap-2">
-          {potOptions.map((opt) => (
-            <TouchableOpacity
-              key={opt.value}
-              onPress={() => setForm({ ...form, pot_size: opt.value })}
-              className={cn(
-                'px-4 py-2.5 rounded-2xl border',
-                form.pot_size === opt.value
-                  ? 'bg-slate-800 dark:bg-white border-slate-800 dark:border-white'
-                  : 'bg-slate-50 dark:bg-slate-800 border-slate-200 dark:border-slate-700'
-              )}
-            >
-              <Text
-                className={cn(
-                  'text-xs font-bold',
-                  form.pot_size === opt.value
-                    ? 'text-white dark:text-slate-900'
-                    : 'text-slate-600 dark:text-slate-300'
-                )}
+      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={{ marginBottom: 16 }}>
+        <View style={{ flexDirection: 'row', gap: 8 }}>
+          {(['no_pot', 'small', 'medium', 'large', 'extra_large'] as const).map((size) => {
+            const labels = {
+              no_pot: isEn ? 'No Pot' : 'بدون گلدان',
+              small: isEn ? 'Small' : 'کوچک',
+              medium: isEn ? 'Medium' : 'متوسط',
+              large: isEn ? 'Large' : 'بزرگ',
+              extra_large: isEn ? 'XL' : 'خیلی بزرگ',
+            };
+            return (
+              <TouchableOpacity
+                key={size}
+                onPress={() => setForm({ ...form, pot_size: size })}
+                style={{
+                  paddingHorizontal: 16,
+                  paddingVertical: 10,
+                  borderRadius: 16,
+                  borderWidth: 1,
+                  backgroundColor: form.pot_size === size ? '#1e293b' : '#f8fafc',
+                  borderColor: form.pot_size === size ? '#1e293b' : '#e2e8f0',
+                }}
               >
-                {opt.label}
-              </Text>
-            </TouchableOpacity>
-          ))}
+                <Text style={{ fontSize: 12, fontWeight: '700', color: form.pot_size === size ? '#fff' : '#475569' }}>
+                  {labels[size]}
+                </Text>
+              </TouchableOpacity>
+            );
+          })}
         </View>
       </ScrollView>
 
@@ -645,14 +770,22 @@ const GrowthTab = ({
   const records = userPlant.growth_records ?? [];
 
   return (
-    <View className="flex-1">
-      <View className="flex-row gap-2 mb-3">
+    <View style={{ flex: 1 }}>
+      <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
         <TextInput
           value={height}
           onChangeText={setHeight}
           placeholder={isEn ? 'Height (cm)' : 'ارتفاع'}
           keyboardType="decimal-pad"
-          className="flex-1 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white"
+          style={{
+            flex: 1,
+            padding: 16,
+            borderRadius: 16,
+            backgroundColor: '#f8fafc',
+            borderWidth: 1,
+            borderColor: '#f1f5f9',
+            color: '#0f172a',
+          }}
           placeholderTextColor="#94a3b8"
         />
         <TextInput
@@ -660,13 +793,28 @@ const GrowthTab = ({
           onChangeText={setWidth}
           placeholder={isEn ? 'Width' : 'عرض'}
           keyboardType="decimal-pad"
-          className="w-20 p-4 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white"
+          style={{
+            width: 80,
+            padding: 16,
+            borderRadius: 16,
+            backgroundColor: '#f8fafc',
+            borderWidth: 1,
+            borderColor: '#f1f5f9',
+            color: '#0f172a',
+          }}
           placeholderTextColor="#94a3b8"
         />
         <TouchableOpacity
           onPress={handleAdd}
           disabled={adding}
-          className="w-14 h-14 bg-brand-500 rounded-2xl items-center justify-center shadow-lg shadow-brand-500/30"
+          style={{
+            width: 56,
+            height: 56,
+            backgroundColor: '#16a34a',
+            borderRadius: 16,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
         >
           <Plus size={24} color="white" />
         </TouchableOpacity>
@@ -675,33 +823,55 @@ const GrowthTab = ({
         value={notes}
         onChangeText={setNotes}
         placeholder={isEn ? 'Optional note...' : 'یادداشت...'}
-        className="p-3 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700 text-slate-900 dark:text-white mb-4"
+        style={{
+          padding: 12,
+          borderRadius: 16,
+          backgroundColor: '#f8fafc',
+          borderWidth: 1,
+          borderColor: '#f1f5f9',
+          color: '#0f172a',
+          marginBottom: 16,
+        }}
         placeholderTextColor="#94a3b8"
       />
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>
         {records.map((rec, i) => (
-          <MotionL.View
+          <View
             key={rec.id ?? i}
-            initial={{ opacity: 0, x: -12 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ delay: i * 0.04 }}
-            className="flex-row items-center gap-4 mb-3 p-4 bg-white dark:bg-slate-800/60 rounded-[28px] border border-slate-100 dark:border-slate-700/80"
+            style={{
+              flexDirection: 'row',
+              alignItems: 'center',
+              gap: 16,
+              marginBottom: 12,
+              padding: 16,
+              backgroundColor: 'white',
+              borderRadius: 24,
+              borderWidth: 1,
+              borderColor: '#f1f5f9',
+            }}
           >
-            <View className="w-12 h-12 bg-brand-50 dark:bg-brand-900/30 rounded-2xl items-center justify-center">
+            <View style={{
+              width: 48,
+              height: 48,
+              backgroundColor: '#f0fdf4',
+              borderRadius: 16,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}>
               <TrendingUp size={20} color="#16a34a" />
             </View>
-            <View className="flex-1">
-              <Text className="text-slate-900 dark:text-white font-black">
+            <View style={{ flex: 1 }}>
+              <Text style={{ fontSize: 14, fontWeight: '900', color: '#0f172a' }}>
                 {rec.height} {rec.unit}
                 {rec.width ? ` · ${rec.width} ${rec.unit}` : ''}
               </Text>
-              <Text className="text-slate-400 text-xs mt-0.5">{formatDate(rec.date, lang)}</Text>
+              <Text style={{ fontSize: 12, color: '#94a3b8', marginTop: 2 }}>{formatDate(rec.date, lang)}</Text>
               {rec.notes ? (
-                <Text className="text-slate-500 dark:text-slate-400 text-xs mt-1">{rec.notes}</Text>
+                <Text style={{ fontSize: 12, color: '#64748b', marginTop: 4 }}>{rec.notes}</Text>
               ) : null}
             </View>
-          </MotionL.View>
+          </View>
         ))}
         {records.length === 0 && (
           <EmptyState
@@ -723,20 +893,30 @@ const RemindersTab = ({ userPlant, isEn }: { userPlant: UserPlant; isEn: boolean
       {reminders.map((rem: Reminder) => (
         <View
           key={rem.id}
-          className="mb-3 p-5 bg-white dark:bg-slate-800/60 rounded-[28px] border border-slate-100 dark:border-slate-700/80 flex-row items-center gap-4"
+          style={{
+            marginBottom: 12,
+            padding: 20,
+            backgroundColor: 'white',
+            borderRadius: 24,
+            borderWidth: 1,
+            borderColor: '#f1f5f9',
+            flexDirection: 'row',
+            alignItems: 'center',
+            gap: 16,
+          }}
         >
-          <Text className="text-2xl">{CARE_ICONS[rem.care_type] || '📌'}</Text>
-          <View className="flex-1">
-            <Text className="text-slate-900 dark:text-white font-black">{rem.title}</Text>
-            <View className="flex-row items-center gap-1.5 mt-1">
+          <Text style={{ fontSize: 24 }}>{CARE_ICONS[rem.care_type] || '📌'}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={{ fontSize: 14, fontWeight: '900', color: '#0f172a' }}>{rem.title}</Text>
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginTop: 4 }}>
               <Calendar size={12} color="#94a3b8" />
-              <Text className="text-xs text-slate-400 font-bold">
+              <Text style={{ fontSize: 12, color: '#94a3b8', fontWeight: '700' }}>
                 {formatDate(rem.scheduled_date, lang)}
                 {rem.is_recurring ? ` · ${isEn ? 'Recurring' : 'دوره‌ای'}` : ''}
               </Text>
             </View>
             {rem.description ? (
-              <Text className="text-xs text-slate-500 mt-1" numberOfLines={2}>
+              <Text style={{ fontSize: 12, color: '#64748b', marginTop: 4 }} numberOfLines={2}>
                 {rem.description}
               </Text>
             ) : null}
@@ -756,16 +936,19 @@ const RemindersTab = ({ userPlant, isEn }: { userPlant: UserPlant; isEn: boolean
 
 const StatusBadge = ({ completed, isEn }: { completed: boolean; isEn: boolean }) => (
   <View
-    className={cn(
-      'px-2.5 py-1 rounded-full',
-      completed ? 'bg-green-100 dark:bg-green-900/40' : 'bg-blue-100 dark:bg-blue-900/40'
-    )}
+    style={{
+      paddingHorizontal: 10,
+      paddingVertical: 4,
+      borderRadius: 99,
+      backgroundColor: completed ? '#f0fdf4' : '#eff6ff',
+    }}
   >
     <Text
-      className={cn(
-        'text-[8px] font-black',
-        completed ? 'text-green-600 dark:text-green-400' : 'text-blue-600 dark:text-blue-400'
-      )}
+      style={{
+        fontSize: 8,
+        fontWeight: '900',
+        color: completed ? '#16a34a' : '#3b82f6',
+      }}
     >
       {completed ? (isEn ? 'DONE' : 'انجام') : (isEn ? 'OPEN' : 'باز')}
     </Text>

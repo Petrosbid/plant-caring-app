@@ -87,23 +87,42 @@ export const PlantChat: React.FC<PlantChatProps> = ({ plantId, language, classNa
 
   return (
     <View
-      className={cn(
-        'flex-1 bg-white dark:bg-slate-900 rounded-[28px] overflow-hidden border border-slate-100 dark:border-slate-800 shadow-sm',
-        className
-      )}
+      style={{
+        flex: 1,
+        borderRadius: 28,
+        overflow: 'hidden',
+        borderWidth: 1,
+        borderColor: '#f1f5f9',
+      }}
     >
-      <View className="px-5 py-4 border-b border-slate-100 dark:border-slate-800 flex-row items-center gap-3">
-        <View className="w-11 h-11 rounded-2xl bg-brand-500 items-center justify-center shadow-lg shadow-brand-500/30">
-          <Bot size={22} color="white" />
+      <View style={{
+        paddingHorizontal: 20,
+        paddingVertical: 16,
+        borderBottomWidth: 1,
+        backgroundColor: '#a1f0bd',
+        borderBottomColor: '#f1f5f9',
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 12,
+      }}>
+        <View style={{
+          width: 44,
+          height: 44,
+          borderRadius: 16,
+          backgroundColor: '#16a34a',
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          <Bot size={22}/>
         </View>
-        <View className="flex-1">
-          <View className="flex-row items-center gap-1.5">
-            <Text className="font-black text-slate-900 dark:text-white">
+        <View style={{ flex: 1 }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text style={{ fontWeight: '900', color: '#0f172a' }}>
               {isEn ? 'Plant Assistant' : 'دستیار گیاه'}
             </Text>
             <Sparkles size={14} color="#16a34a" />
           </View>
-          <Text className="text-[10px] text-slate-500 dark:text-slate-400 font-medium">
+          <Text style={{ fontSize: 10, color: '#64748b', fontWeight: '500' }}>
             {isEn ? 'Personalized care for this plant' : 'مراقبت اختصاصی برای این گیاه'}
           </Text>
         </View>
@@ -111,29 +130,49 @@ export const PlantChat: React.FC<PlantChatProps> = ({ plantId, language, classNa
 
       <ScrollView
         ref={scrollViewRef}
-        className="flex-1 px-4 py-3"
-        contentContainerStyle={{ paddingBottom: 16, flexGrow: 1 }}
+        style={{ flex: 1 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 12, paddingBottom: 16, flexGrow: 1 }}
         showsVerticalScrollIndicator={false}
         keyboardShouldPersistTaps="handled"
       >
         {messages.length === 0 && (
-          <View className="items-center py-8">
-            <View className="w-16 h-16 rounded-full bg-brand-50 dark:bg-brand-900/30 items-center justify-center mb-4">
+          <View style={{ alignItems: 'center', paddingVertical: 32 }}>
+            <View style={{
+              width: 64,
+              height: 64,
+              borderRadius: 32,
+              alignItems: 'center',
+              justifyContent: 'center',
+              marginBottom: 16,
+            }}>
               <Bot size={32} color="#16a34a" />
             </View>
-            <Text className="text-slate-600 dark:text-slate-300 text-center px-6 text-sm font-medium leading-5">
+            <Text style={{
+              color: '#475569',
+              textAlign: 'center',
+              paddingHorizontal: 24,
+              fontSize: 14,
+              fontWeight: '500',
+              lineHeight: 20,
+            }}>
               {isEn
                 ? 'Ask about watering, health issues, fertilizing, or seasonal care tips.'
                 : 'در مورد آبیاری، سلامت، کوددهی یا نکات فصلی سوال بپرسید.'}
             </Text>
-            <View className="flex-row flex-wrap justify-center gap-2 mt-5 px-2">
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', gap: 8, marginTop: 20 }}>
               {suggestions.map((s) => (
                 <TouchableOpacity
                   key={s}
                   onPress={() => sendMessage(s)}
-                  className="px-3 py-2 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700"
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 8,
+                    borderRadius: 20,
+                    borderWidth: 1,
+                    borderColor: '#e2e8f0',
+                  }}
                 >
-                  <Text className="text-[11px] font-bold text-slate-600 dark:text-slate-300">{s}</Text>
+                  <Text style={{ fontSize: 11, fontWeight: '700', color: '#475569' }}>{s}</Text>
                 </TouchableOpacity>
               ))}
             </View>
@@ -141,58 +180,91 @@ export const PlantChat: React.FC<PlantChatProps> = ({ plantId, language, classNa
         )}
 
         {messages.map((msg) => (
-          <MotionL.View
+          <View
             key={msg.id}
-            initial={{ opacity: 0, y: 10, scale: 0.96 }}
-            animate={{ opacity: 1, y: 0, scale: 1 }}
-            className={cn('mb-3 max-w-[88%]', msg.sender === 'user' ? 'self-end' : 'self-start')}
+            style={{
+              marginBottom: 12,
+              maxWidth: '88%',
+              alignSelf: msg.sender === 'user' ? 'flex-end' : 'flex-start',
+            }}
           >
             <View
-              className={cn(
-                'px-4 py-3 rounded-[20px]',
-                msg.sender === 'user'
-                  ? 'bg-brand-500 rounded-br-sm'
-                  : 'bg-slate-50 dark:bg-slate-800 rounded-bl-sm border border-slate-100 dark:border-slate-700'
-              )}
+              style={{
+                paddingHorizontal: 16,
+                paddingVertical: 12,
+                borderRadius: 20,
+                borderBottomRightRadius: msg.sender === 'user' ? 4 : 20,
+                borderBottomLeftRadius: msg.sender === 'ai' ? 4 : 20,
+                backgroundColor: msg.sender === 'user' ? '#16a34a' : '#f8fafc',
+                borderWidth: msg.sender === 'ai' ? 1 : 0,
+                borderColor: '#f1f5f9',
+              }}
             >
               <Text
-                className={cn(
-                  'text-sm leading-5',
-                  msg.sender === 'user' ? 'text-white font-medium' : 'text-slate-800 dark:text-slate-200'
-                )}
+                style={{
+                  fontSize: 14,
+                  lineHeight: 20,
+                  color: msg.sender === 'user' ? 'white' : '#1e293b',
+                  fontWeight: msg.sender === 'user' ? '500' : '400',
+                }}
               >
                 {msg.text}
               </Text>
             </View>
-          </MotionL.View>
+          </View>
         ))}
         {loading && (
-          <View className="self-start bg-slate-50 dark:bg-slate-800 px-4 py-3 rounded-2xl rounded-bl-sm border border-slate-100 dark:border-slate-700">
+          <View style={{
+            alignSelf: 'flex-start',
+            paddingHorizontal: 16,
+            paddingVertical: 12,
+            borderRadius: 16,
+            borderBottomLeftRadius: 4,
+            borderWidth: 1,
+            borderColor: '#f1f5f9',
+          }}>
             <ActivityIndicator size="small" color="#16a34a" />
           </View>
         )}
       </ScrollView>
 
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-        <View className="p-3 border-t border-slate-100 dark:border-slate-800">
-          <View className="flex-row gap-2 items-center bg-slate-50 dark:bg-slate-800 rounded-2xl px-2 py-2 border border-slate-100 dark:border-slate-700">
+        <View style={{ padding: 12, borderTopWidth: 1, borderTopColor: '#f1f5f9' }}>
+          <View style={{
+            flexDirection: 'row',
+            gap: 8,
+            alignItems: 'center',
+            borderRadius: 16,
+            padding: 8,
+            borderWidth: 1,
+            borderColor: '#f1f5f9',
+          }}>
             <TextInput
               value={input}
               onChangeText={setInput}
               placeholder={isEn ? 'Ask about this plant...' : 'سوال خود را بپرسید...'}
-              className="flex-1 px-3 py-2.5 text-slate-900 dark:text-white text-sm"
+              style={{
+                flex: 1,
+                paddingHorizontal: 12,
+                paddingVertical: 10,
+                color: '#0f172a',
+                fontSize: 14,
+              }}
               placeholderTextColor="#94a3b8"
               multiline
               maxLength={500}
-              onSubmitEditing={() => sendMessage()}
             />
             <TouchableOpacity
               onPress={() => sendMessage()}
               disabled={loading || !input.trim()}
-              className={cn(
-                'w-11 h-11 rounded-xl items-center justify-center',
-                input.trim() ? 'bg-brand-500 shadow-md shadow-brand-500/25' : 'bg-slate-200 dark:bg-slate-700'
-              )}
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: 12,
+                alignItems: 'center',
+                justifyContent: 'center',
+                backgroundColor: input.trim() ? '#16a34a' : '#e2e8f0',
+              }}
             >
               <Send size={18} color="white" />
             </TouchableOpacity>

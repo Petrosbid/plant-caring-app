@@ -28,7 +28,7 @@ export const Input: React.FC<InputProps> = ({
   return (
     <View className={cn("w-full mb-4", containerClassName)}>
       {label && (
-        <Text className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 ml-1">
+        <Text className="text-sm font-semibold text-slate-700 dark:text-slate-300 mb-1.5 ms-1">
           {label}
         </Text>
       )}
@@ -37,20 +37,20 @@ export const Input: React.FC<InputProps> = ({
         error ? "border-red-400" : "border-slate-100 dark:border-slate-700 focus:border-brand-500",
         className
       )}>
-        {leftIcon && <View className="mr-2">{leftIcon}</View>}
+        {leftIcon && <View className="me-2">{leftIcon}</View>}
         <TextInput
           className={cn(
             "flex-1 h-12 text-slate-900 dark:text-white text-sm",
             fontClass,
-            !isEn && "text-right"
+            "text-start"
           )}
           placeholderTextColor="#94a3b8"
           {...props}
         />
-        {rightIcon && <View className="ml-2">{rightIcon}</View>}
+        {rightIcon && <View className="ms-2">{rightIcon}</View>}
       </View>
       {error && (
-        <Text className="text-xs text-red-500 mt-1 ml-1 font-medium">
+        <Text className="text-xs text-red-500 mt-1 ms-1 font-medium">
           {error}
         </Text>
       )}

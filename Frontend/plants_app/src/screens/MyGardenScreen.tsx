@@ -247,10 +247,10 @@ const MyGardenScreen = () => {
                 <TouchableOpacity
                   key={action.tab}
                   onPress={() => openPlant(item, action.tab)}
-                  className="flex-1 flex-row items-center justify-center gap-1.5 py-2.5 rounded-2xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700"
+                  className="flex-1 flex-row items-center justify-center gap-1 py-1.5 rounded-xl bg-slate-50 dark:bg-slate-800 border border-slate-100 dark:border-slate-700"
                 >
-                  <Icon size={14} color="#64748b" />
-                  <Text className="text-[10px] font-black text-slate-600 dark:text-slate-300">
+                  <Icon size={12} color="#64748b" />
+                  <Text className="text-[9px] font-black text-slate-600 dark:text-slate-300">
                     {action.label}
                   </Text>
                 </TouchableOpacity>

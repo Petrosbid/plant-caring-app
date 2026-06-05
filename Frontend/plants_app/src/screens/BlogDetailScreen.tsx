@@ -390,7 +390,7 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
             style={{ minHeight: 400 }}
           >
             {/* Meta chips */}
-            <View className={`flex-row flex-wrap items-center gap-2 mb-5 ${isEn ? '' : 'flex-row-reverse'}`}>
+            <View className="flex-row flex-wrap items-center gap-2 mb-5">
               {post.category ? (
                 <View className="bg-brand-100 dark:bg-brand-900/40 px-3 py-1.5 rounded-full">
                   <Text className="text-[11px] font-bold text-brand-700 dark:text-brand-300 uppercase tracking-wide">
@@ -403,7 +403,7 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
                   {formatDate(post.publish, i18n.language)}
                 </Text>
               </View>
-              <View className={`flex-row items-center gap-1 bg-white dark:bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-100 dark:border-slate-700 ${isEn ? '' : 'flex-row-reverse'}`}>
+              <View className="flex-row items-center gap-1 bg-white dark:bg-slate-800/80 px-3 py-1.5 rounded-full border border-slate-100 dark:border-slate-700">
                 <Clock size={12} color="#16a34a" />
                 <Text className="text-[11px] font-bold text-slate-500 dark:text-slate-400">
                   {readTime} {isEn ? 'min read' : 'دقیقه مطالعه'}
@@ -413,18 +413,18 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
 
             {/* Title */}
             <Text
-              className={`text-[28px] font-black text-slate-900 dark:text-white leading-[38px] mb-6 ${isEn ? 'text-left' : 'text-right'}`}
+              className="text-[28px] font-black text-slate-900 dark:text-white leading-[38px] mb-6 text-start"
             >
               {title}
             </Text>
 
             {/* Stats + author */}
-            <View className={`flex-row items-center justify-between mb-8 ${isEn ? '' : 'flex-row-reverse'}`}>
-              <View className={`flex-row items-center gap-3 ${isEn ? '' : 'flex-row-reverse'}`}>
+            <View className="flex-row items-center justify-between mb-8">
+              <View className="flex-row items-center gap-3">
                 <View className="w-11 h-11 rounded-2xl bg-brand-500 items-center justify-center shadow-lg shadow-brand-500/25">
                   <Text className="text-sm font-black text-white">{authorInitials}</Text>
                 </View>
-                <View className={isEn ? '' : 'items-end'}>
+                <View>
                   <Text className="text-sm font-bold text-slate-800 dark:text-white">
                     {post.author.first_name} {post.author.last_name}
                   </Text>
@@ -434,12 +434,12 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
                 </View>
               </View>
 
-              <View className={`flex-row items-center gap-4 ${isEn ? '' : 'flex-row-reverse'}`}>
-                <View className={`flex-row items-center gap-1 ${isEn ? '' : 'flex-row-reverse'}`}>
+              <View className="flex-row items-center gap-4">
+                <View className="flex-row items-center gap-1">
                   <Eye size={15} color="#94a3b8" />
                   <Text className="text-xs font-bold text-slate-400">{post.view_count}</Text>
                 </View>
-                <View className={`flex-row items-center gap-1 ${isEn ? '' : 'flex-row-reverse'}`}>
+                <View className="flex-row items-center gap-1">
                   <MessageCircle size={15} color="#94a3b8" />
                   <Text className="text-xs font-bold text-slate-400">{post.comments_count}</Text>
                 </View>
@@ -454,7 +454,7 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
             </View>
 
             {/* Tab Bar */}
-            <View className={`flex-row items-center bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-1 mb-6 ${isEn ? '' : 'flex-row-reverse'}`}>
+            <View className="flex-row items-center bg-slate-100 dark:bg-slate-900/50 rounded-2xl p-1 mb-6">
               <Pressable
                 onPress={() => {
                   setActiveTab('article');
@@ -579,7 +579,7 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
                         placeholderTextColor={isDark ? '#64748b' : '#94a3b8'}
                         value={newComment}
                         onChangeText={setNewComment}
-                        className={`text-sm text-slate-800 dark:text-white py-2 min-h-[80px] ${isEn ? 'text-left' : 'text-right'}`}
+                        className="text-sm text-slate-800 dark:text-white py-2 min-h-[80px] text-start"
                         textAlignVertical="top"
                       />
                       <View className={`flex-row justify-end mt-2 ${isEn ? '' : 'flex-row-reverse'}`}>
@@ -610,7 +610,7 @@ const BlogDetailScreen = ({ route, navigation }: any) => {
 
                 {/* Comments List */}
                 <View className="gap-4">
-                  <Text className={`text-lg font-black text-slate-900 dark:text-white mb-2 ${isEn ? '' : 'text-right'}`}>
+                  <Text className="text-lg font-black text-slate-900 dark:text-white mb-2 text-start">
                     {isEn ? `Comments (${comments.length})` : `نظرات (${comments.length})`}
                   </Text>
                   {comments.length === 0 ? (
