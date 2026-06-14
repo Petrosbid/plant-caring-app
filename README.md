@@ -320,18 +320,3 @@ git push origin feature/new-feature
 
 Then create a Pull Request.
 
----
-
-## 📜 License
-
-This project is licensed under the MIT License.
-
-See the `LICENSE` file for details.
-
----
-
-## 🌍 Vision
-
-Our goal is to make plant care smarter, simpler, and more accessible through the power of Artificial Intelligence and connected technologies.
-
-**Helping people grow healthier plants, one leaf at a time. 🌱**
