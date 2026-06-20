@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import type { Disease } from '../types';
 import { diseaseService } from '../services/api';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 
@@ -10,7 +9,7 @@ const DiseaseDetection: React.FC = () => {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [result, setResult] = useState<Disease | null>(null);
+  const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {

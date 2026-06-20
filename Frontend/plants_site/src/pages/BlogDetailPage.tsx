@@ -185,8 +185,6 @@ const BlogDetailPage: React.FC = () => {
   const publishDate = formatDate(post.publish, language);
 
   const title = isEn && post.title_en ? post.title_en : post.title;
-  const content = isEn && post.content_en ? post.content_en : post.content;
-  const metaDescription = isEn && post.meta_description_en ? post.meta_description_en : post.meta_description;
 
   const shareUrl = encodeURIComponent(window.location.href);
   const shareTitle = encodeURIComponent(title);

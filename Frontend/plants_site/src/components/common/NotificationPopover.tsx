@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { FiBell, FiX, FiDroplet, FiSun, FiScissors, FiAlertCircle } from 'react-icons/fi';
+import React, { useState, useEffect } from 'react';
+import { FiX, FiDroplet, FiSun, FiScissors, FiAlertCircle } from 'react-icons/fi';
 import { fetchNotifications, type NotificationsResponse, type Notification } from '../../services/notificationService';
 import { useLanguageTheme } from '../../contexts/LanguageThemeContext';
 import { Link } from 'react-router-dom';

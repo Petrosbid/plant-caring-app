@@ -9,7 +9,7 @@ import FadeContent from '../components/animation/Fadein';
 import type { Disease } from '../types';
 import {
   FiAlertCircle, FiActivity, FiShield, FiEye, FiMessageCircle,
-  FiSearch, FiX, FiChevronDown
+  FiSearch, FiX
 } from 'react-icons/fi';
 
 const SEVERITY_OPTIONS = [

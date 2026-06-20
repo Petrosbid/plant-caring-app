@@ -5,18 +5,16 @@ import tempfile
 import logging
 import base64
 import time
-import requests
 from django.conf import settings
 from django.db.models import Q
-from requests.exceptions import SSLError, ConnectionError, Timeout
+from openai import OpenAI, APIConnectionError, APITimeoutError
 
 logger = logging.getLogger(__name__)
 
-session = requests.Session()
-session.verify = True
-
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
-VISION_MODEL = "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free"
+# دریافت کلید از تنظیمات جنگو
+AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
+# استفاده از یک مدل بینایی استاندارد و قدرتمند سازگار با مستندات AvalAI
+VISION_MODEL = "gemini-3.1-pro-preview"
 
 SYSTEM_PROMPT = """You are an expert botanist and plant identification specialist. Your task is to analyze the provided image and determine whether it contains a plant.
 
@@ -63,19 +61,19 @@ def predict_plant(image_data):
     from .models import Plant
 
     # بررسی وجود روت کلید API
-    if not OPENROUTER_API_KEY:
-        logger.error("OpenRouter API key is missing in settings.")
+    if not AVALAI_API_KEY:
+        logger.error("AvalAI API key is missing in settings.")
         return {'id': None, 'name': None, 'error': 'API key configuration error'}
 
-    # تشخیص پسوند فایل
+    # تشخیص پسوند فایل و استانداردسازی به حروف کوچک برای جلوگیری از مشکلات mime-type
     if hasattr(image_data, 'name') and image_data.name:
-        ext = os.path.splitext(image_data.name)[1]
+        ext = os.path.splitext(image_data.name)[1].lower()
     elif isinstance(image_data, str) and image_data.strip():
         if image_data.startswith('data:'):
             match = re.match(r'data:image/(\w+)', image_data)
-            ext = '.' + match.group(1) if match else '.jpg'
+            ext = '.' + match.group(1).lower() if match else '.jpg'
         else:
-            ext = os.path.splitext(image_data)[1]
+            ext = os.path.splitext(image_data)[1].lower()
     else:
         ext = '.jpg'
 
@@ -108,75 +106,70 @@ def predict_plant(image_data):
         if not base64_image:
             return {'id': None, 'name': None, 'error': 'Failed to process image bytes'}
 
-        # تعیین Content-Type تصویر بر اساس پسوند
+        # تعیین Content-Type تصویر بر اساس پسوند اصلاح شده
         mime_type = f"image/{ext.replace('.', '')}"
-        if mime_type == "image/jpg":
+        if mime_type in ["image/jpg", "image/jpeg"]:
+            mime_type = "image/jpeg"
+        elif mime_type not in ["image/png", "image/webp", "image/gif"]:
+            # فرمت پیش‌فرض در صورت نامعتبر بودن فرمت‌های ورودی
             mime_type = "image/jpeg"
 
-        # آماده‌سازی بدنه درخواست مالتی‌مدیال بر اساس مستندات OpenRouter
-        headers = {
-            "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-            "Content-Type": "application/json",
-            "HTTP-Referer": "https://your-plant-app.com",
-            "X-Title": "Plant Care App",
-        }
+        # مقداردهی کلاینت AvalAI با ساختار OpenAI SDK
+        client = OpenAI(
+            base_url="https://api.avalai.ir/v1",
+            api_key=AVALAI_API_KEY,
+            timeout=100.0,
+        )
 
-        payload = {
-            "model": VISION_MODEL,
-            "messages": [
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": f"{SYSTEM_PROMPT}\n\nAnalyze this image and return JSON as instructed."
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:{mime_type};base64,{base64_image}"
-                            }
-                        }
-                    ]
-                }
-            ],
-            "temperature": 0.2
-        }
-
-        # --- راهکار سوم: پیاده‌سازی حلقه Retry برای مقابله با قطعی‌های ناگهانی SSL/Network ---
+        # پیاده‌سازی حلقه Retry برای مقابله با خطاهای شبکه با خطایابی پکیج رسمی
         max_retries = 3
-        retry_delay = 2  # زمان انتظار بین هر تلاش (ثانیه)
+        retry_delay = 2
         response = None
-
+        print(f"data:{mime_type};base64,{base64_image}")
         for attempt in range(max_retries):
             try:
-                logger.info(f"Sending request to OpenRouter (Attempt {attempt + 1}/{max_retries})...")
-                response = requests.post(
-                    url="https://openrouter.ai/api/v1/chat/completions",
-                    headers=headers,
-                    json=payload,
-                    timeout=40
+                logger.info(f"Sending request to AvalAI (Attempt {attempt + 1}/{max_retries})...")
+
+                # ارسال درخواست مالتی‌مدیال ویژن به مدل معتبر با فرمت استاندارد Base64
+                response = client.chat.completions.create(
+                    model=VISION_MODEL,
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": [
+                                {
+                                    "type": "text",
+                                    "text": f"{SYSTEM_PROMPT}\n\nAnalyze this image and return JSON as instructed."
+                                },
+                                {
+                                    "type": "image_url",
+                                    "image_url": {
+                                        "url": f"data:{mime_type};base64,{base64_image}"
+                                    }
+                                }
+                            ]
+                        }
+                    ],
+                    temperature=0.2,
+                    timeout=100
                 )
-                # اگر درخواست موفق بود یا ارور سروری غیر از شبکه داد، از حلقه خارج می‌شویم
+
                 break
-            except (SSLError, ConnectionError, Timeout) as net_err:
+            except (APIConnectionError, APITimeoutError) as net_err:
                 logger.warning(f"Network issue encountered on attempt {attempt + 1}: {net_err}")
                 if attempt < max_retries - 1:
                     logger.info(f"Waiting {retry_delay} seconds before retrying...")
                     time.sleep(retry_delay)
                 else:
-                    # اگر در آخرین تلاش هم خطا داد، خطا را پرتاب کن تا در بلاکِ نهاییِ Exception هندل شود
                     raise net_err
 
         if not response:
             return {'id': None, 'name': None, 'error': 'Failed to establish connection to API'}
 
-        if response.status_code != 200:
-            logger.error(f"OpenRouter API Error: {response.status_code} - {response.text}")
-            return {'id': None, 'name': None, 'error': f'API Error {response.status_code}'}
+        # دریافت متن مستقیم از ساختار پاسخ کلاینت رسمی
+        content = response.choices[0].message.content.strip()
 
-        content = response.json()["choices"][0]["message"]["content"].strip()
-
+        # پاک‌سازی تگ‌های مارک‌داون احتمالی در پاسخ متنی
         # پاک‌سازی تگ‌های مارک‌داون احتمالی در پاسخ متنی
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
@@ -200,7 +193,9 @@ def predict_plant(image_data):
             detected_plant = Plant.objects.filter(
                 Q(scientific_name__icontains=scientific_name) |
                 Q(farsi_name__icontains=common_name) |
-                Q(english_name__icontains=common_name)
+                Q(english_name__icontains=common_name) |
+                Q(other_names__icontains=common_name) |
+                Q(other_names_en__icontains=common_name)
             ).first()
 
             if detected_plant:

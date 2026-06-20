@@ -10,7 +10,7 @@ import {
   FiHome, FiHeart, FiShield, FiAward, FiCpu,
   FiChevronRight, FiChevronLeft, FiSend, FiX,
   FiCheckCircle, FiDroplet, FiSun, FiThermometer,
-  FiWind, FiMapPin, FiUsers, FiAlertCircle, FiSmile
+  FiWind, FiUsers, FiAlertCircle, FiSmile
 } from 'react-icons/fi';
 import { storageKeys, getStorageItem, setStorageItem } from '../utils/storage';
 

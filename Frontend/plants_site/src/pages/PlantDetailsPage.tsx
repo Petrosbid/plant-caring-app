@@ -29,7 +29,7 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
   const [plant, setPlant] = useState<Plant | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  const { userPlants, loading: userPlantsLoading } = useUserPlants();
+  const { userPlants } = useUserPlants();
 
   // Garden state
   const [isInGarden, setIsInGarden] = useState(false);
@@ -215,7 +215,7 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
   const handleReply = async (parentId: number) => {
     if (!replyContent.trim()) return;
     try {
-      const res = await commentService.addComment(plant!.id, replyContent, parentId);
+      await commentService.addComment(plant!.id, replyContent, parentId);
       setReplyTo(null);
       setReplyContent('');
       const refreshed = await commentService.getComments(plant!.id);
@@ -272,6 +272,12 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
           </button>
           <h1 className={styles.heroTitle}>{displayName}</h1>
           <p className={styles.scientificName}><em>{plant.scientific_name}</em></p>
+          {(isEn ? (plant.other_names_en || plant.other_names) : (plant.other_names || plant.other_names_en)) && (
+            <p className={styles.otherNames}>
+              {isEn ? 'Also known as: ' : 'نام‌های دیگر: '}
+              <span>{isEn ? (plant.other_names_en || plant.other_names) : (plant.other_names || plant.other_names_en)}</span>
+            </p>
+          )}
           <div className={styles.statsRow}>
             <span className={styles.stat}><FiEye /> {plant.view_count.toLocaleString()}</span>
             <span className={styles.stat}><FiHeart /> {favoriteCount.toLocaleString()}</span>

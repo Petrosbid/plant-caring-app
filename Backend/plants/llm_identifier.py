@@ -1,10 +1,11 @@
-import requests
 import json
 import re
 from django.conf import settings
+from openai import OpenAI
 from .models import Plant
 
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
+# دریافت کلید از تنظیمات جنگو
+AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 
 
 def get_plant_info_from_llm(plant_name):
@@ -53,6 +54,8 @@ that follows the structure below.
 **care_difficulty** "easy", "medium", "hard"
 
 **is_toxic** true or false (must be lowercase json booleans)
+
+
 ---
 
 ### JSON structure (all fields required)
@@ -80,75 +83,67 @@ that follows the structure below.
     "propagation_methods": "مقدار مجاز به فارسی",
     "propagation_methods_en": "allowed value in English",
     "care_difficulty": "easy/medium/hard",
-    "is_toxic": True/False
+    "is_toxic": True/False,
+    "other_names" : اسامی معروف و عامه دیگر گیاه
+    "other_names_en" : اسامی معروف و عامه دیگر گیاه به انگلیسی
 }
 
 Return ONLY the raw JSON object.
 """
 
-    try:  # Outer try block starts here
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://your-plant-app.com",
-                "X-Title": "Plant Care App",
-            },
-            json={
-                "model": "openrouter/owl-alpha",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": f"Plant name: {plant_name}"}
-                ],
-                "timeout": 50
-            }
+    try:
+        client = OpenAI(
+            base_url="[https://api.avalai.ir/v1](https://api.avalai.ir/v1)",
+            api_key=AVALAI_API_KEY
         )
 
-        if response.status_code == 200:
-            content = response.json()["choices"][0]["message"]["content"].strip()
+        # فراخوانی متد کامپلیشن
+        response = client.chat.completions.create(
+            model="gemma-4-31b-it",
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": f"Plant name: {plant_name}"}
+            ],
+            timeout=50
+        )
 
-            # 1. Clean markdown code fences if present
-            if "```json" in content:
-                content = content.split("```json")[1].split("```")[0].strip()
-            elif "```" in content:
-                content = content.split("```")[1].split("```")[0].strip()
+        content = response.choices[0].message.content.strip()
 
-            # 2. Extract anything between the first '{' and last '}' to isolate the object
-            start_idx = content.find('{')
-            end_idx = content.rfind('}')
-            if start_idx != -1 and end_idx != -1:
-                content = content[start_idx:end_idx + 1]
+        # 1. Clean markdown code fences if present
+        if "```json" in content:
+            content = content.split("```json")[1].split("```")[0].strip()
+        elif "```" in content:
+            content = content.split("```")[1].split("```")[0].strip()
 
-            # 3. Quick-fix Python booleans commonly hallucinated by LLMs
-            content = re.sub(r':\s*True\b', ': true', content)
-            content = re.sub(r':\s*False\b', ': false', content)
+        # 2. Extract anything between the first '{' and last '}' to isolate the object
+        start_idx = content.find('{')
+        end_idx = content.rfind('}')
+        if start_idx != -1 and end_idx != -1:
+            content = content[start_idx:end_idx + 1]
 
-            try:
-                care_data = json.loads(content)
-                return care_data
-            except json.JSONDecodeError as e:
-                # If it's still broken (e.g. truncated), try a primitive fallback regex to capture what we can
-                print("Error Parsing JSON, attempting recovery. Raw:", repr(content))
+        # 3. Quick-fix Python booleans commonly hallucinated by LLMs
+        content = re.sub(r':\s*True\b', ': true', content)
+        content = re.sub(r':\s*False\b', ': false', content)
 
-                # Loose regex recovery to salvage field data if truncated mid-stream
-                salvaged_data = {}
-                matches = re.findall(r'"(\w+)":\s*"(.*?)"', content)
-                for key, val in matches:
-                    salvaged_data[key] = val
+        try:
+            care_data = json.loads(content)
+            return care_data
+        except json.JSONDecodeError as e:
+            print("Error Parsing JSON, attempting recovery. Raw:", repr(content))
 
-                if salvaged_data:
-                    # Explicitly convert boolean keys if caught by regex
-                    if 'is_toxic' in content:
-                        salvaged_data['is_toxic'] = 'false' not in content.lower()
-                    return salvaged_data
+            salvaged_data = {}
+            matches = re.findall(r'"(\w+)":\s*"(.*?)"', content)
+            for key, val in matches:
+                salvaged_data[key] = val
 
-                return None
+            if salvaged_data:
+                if 'is_toxic' in content:
+                    salvaged_data['is_toxic'] = 'false' not in content.lower()
+                return salvaged_data
 
-        # If status code is not 200
-        return None
+            return None
 
-    except Exception as e:  # <--- Added this to close the outer try block safely!
+    except Exception as e:
         print(f"Network request or unexpected error occurred: {repr(e)}")
         return None
 
@@ -211,6 +206,8 @@ def create_or_update_plant_from_llm(plant_name):
                 'propagation_methods_en': plant_info.get('propagation_methods_en', ''),
                 'care_difficulty': care_diff,
                 'is_toxic': is_toxic,
+                'other_names': plant_info.get('other_names', ''),
+                'other_names_en': plant_info.get('other_names_en', '')
             }
         )
 
@@ -237,6 +234,8 @@ def create_or_update_plant_from_llm(plant_name):
             plant.propagation_methods_en = plant_info.get('propagation_methods_en', plant.propagation_methods_en)
             plant.care_difficulty = validate_care_difficulty(plant_info.get('care_difficulty', plant.care_difficulty))
             plant.is_toxic = text_to_bool(plant_info.get('is_toxic', plant.is_toxic))
+            plant.other_names = plant_info.get('other_names', plant.other_names)
+            plant.other_names_en = plant_info.get('other_names_en', plant.other_names_en)
             plant.save()
 
         return plant

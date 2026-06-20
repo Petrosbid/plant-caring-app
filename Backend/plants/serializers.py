@@ -29,7 +29,7 @@ class PlantSerializer(serializers.ModelSerializer):
     class Meta:
         model = Plant
         fields = (
-            'id', 'farsi_name', 'english_name', 'scientific_name',
+            'id', 'farsi_name', 'english_name', 'other_names', 'other_names_en', 'scientific_name',
             'description', 'description_en',
             'primary_image', 'is_toxic',
             'watering_frequency', 'watering_frequency_en',

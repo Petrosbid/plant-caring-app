@@ -33,14 +33,14 @@ class PlantCommentInline(admin.TabularInline):
 class PlantAdmin(admin.ModelAdmin):
     list_display = ('farsi_name', 'english_name', 'scientific_name', 'is_toxic',
                     'care_difficulty', 'favourite_count', 'comment_count', 'view_count')
-    search_fields = ('farsi_name', 'english_name', 'scientific_name', 'description', 'description_en')
+    search_fields = ('farsi_name', 'english_name', 'other_names', 'other_names_en', 'scientific_name', 'description', 'description_en')
     list_filter = ('is_toxic', 'care_difficulty', 'created_at')
     prepopulated_fields = {}  # در صورت نیاز می‌توانید slug اضافه کنید
     readonly_fields = ('view_count', 'garden_count', 'favourite_count', 'comment_count',
                        'created_at', 'updated_at')
     fieldsets = (
         ('اطلاعات اصلی', {
-            'fields': ('farsi_name', 'english_name', 'scientific_name', 'description', 'description_en', 'is_toxic')
+            'fields': ('farsi_name', 'english_name', 'other_names', 'other_names_en', 'scientific_name', 'description', 'description_en', 'is_toxic')
         }),
         ('راهنمای نگهداری (فارسی)', {
             'fields': ('watering_frequency', 'light_requirements', 'fertilizer_schedule',

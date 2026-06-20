@@ -12,6 +12,8 @@ export interface Plant {
   id: number;
   farsi_name: string;
   english_name: string | null;
+  other_names: string | null;
+  other_names_en: string | null;
   scientific_name: string | null;
   description: string;                
   description_en: string | null;

@@ -1,12 +1,12 @@
 // src/pages/DiseaseDetailsPage.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import {
   FiAlertCircle, FiClipboard, FiShield, FiActivity, FiSend,
-  FiShare2, FiArrowLeft, FiHeart, FiBookmark, FiEye, FiMessageCircle,
-  FiCheckCircle, FiX, FiChevronDown, FiChevronUp, FiGrid
+  FiShare2, FiArrowLeft, FiEye, FiMessageCircle,
+  FiChevronDown, FiChevronUp, FiGrid
 } from 'react-icons/fi';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import { LoaderGooeyBlobs } from '../components/animation/gooey-loader';
@@ -17,7 +17,7 @@ import { formatDate } from '../utils/date';
 const DiseaseDetailsPage: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const { language, theme } = useLanguageTheme();
+  const { language } = useLanguageTheme();
   const isEn = language === 'en';
 
   const [disease, setDisease] = useState<Disease | null>(null);
@@ -31,7 +31,7 @@ const DiseaseDetailsPage: React.FC = () => {
   const [showPrevention, setShowPrevention] = useState(false);
 
   const isLoggedIn = !!localStorage.getItem('access_token');
-  const contentRef = useRef<HTMLDivElement>(null);
+
 
   useEffect(() => {
     const fetchDisease = async () => {
@@ -82,7 +82,7 @@ const DiseaseDetailsPage: React.FC = () => {
   const handleReply = async (parentId: number) => {
     if (!replyContent.trim() || !disease) return;
     try {
-      const res = await diseaseCommentService.addComment(disease.id, replyContent, parentId);
+      await diseaseCommentService.addComment(disease.id, replyContent, parentId);
       setReplyTo(null);
       setReplyContent('');
       // به‌روزرسانی کل کامنت‌ها

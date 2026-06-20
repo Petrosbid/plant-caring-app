@@ -1,8 +1,10 @@
-import requests
 import json
 from django.conf import settings
+from openai import OpenAI, APIConnectionError, APITimeoutError
 
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
+# دریافت کلید از تنظیمات جنگو
+AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
+RECOMMENDATION_MODEL = "gemma-4-31b-it"
 
 
 def get_plant_recommendation_from_llm(answers: dict, language: str, additional_notes: str = ""):
@@ -12,6 +14,11 @@ def get_plant_recommendation_from_llm(answers: dict, language: str, additional_n
     language: 'en' یا 'fa'
     additional_notes: توضیحات اضافی کاربر
     """
+    # بررسی وجود روت کلید API
+    if not AVALAI_API_KEY:
+        print("AvalAI API key is missing in settings.")
+        return None
+
     # ساخت پرامپت بر اساس زبان
     if language == 'fa':
         system_prompt = """تو یک متخصص گیاهان آپارتمانی حرفه‌ای هستی با دانش عمیق از شرایط نگهداری، سازگاری با محیط‌های مختلف، نیازهای نوری، آبیاری، رطوبت، دما، خاک، سمیت برای حیوانات و کودکان، و همچنین سلیقه بصری کاربران.
@@ -51,37 +58,42 @@ Additional notes: {additional_notes}
 """
 
     try:
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://your-plant-app.com",
-                "X-Title": "Plant Care App",
-            },
-            json={
-                "model": "nvidia/nemotron-3-nano-omni-30b-a3b-reasoning:free",
-                "messages": [
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt}
-                ],
-                "response_format": {"type": "json_object"}
-            },
+        # مقداردهی کلاینت AvalAI با ساختار OpenAI SDK
+        client = OpenAI(
+            base_url="https://api.avalai.ir/v1",
+            api_key=AVALAI_API_KEY
+        )
+
+        # فراخوانی متد کامپلیشن
+        response = client.chat.completions.create(
+            model=RECOMMENDATION_MODEL,
+            messages=[
+                {"role": "system", "content": system_prompt},
+                {"role": "user", "content": user_prompt}
+            ],
+            # در صورت پشتیبانی مدل از ساختار خروجی JSON، می‌توانید این فلگ را نگه دارید
+            response_format={"type": "json_object"},
             timeout=50
         )
 
-        if response.status_code == 200:
-            content = response.json()["choices"][0]["message"]["content"]
-            # پاکسازی احتمالی
-            if content.startswith("```json"):
-                content = content.replace("```json", "").replace("```", "")
-            elif content.startswith("```"):
-                content = content.replace("```", "")
-            recommendation = json.loads(content)
-            return recommendation
-        else:
-            print(f"LLM recommendation error: {response.status_code} - {response.text}")
-            return None
+        # دریافت متن خروجی مستقیم از کلاینت
+        content = response.choices[0].message.content.strip()
+
+        # پاکسازی تگ‌های مارک‌داون احتمالی
+        if content.startswith("```json"):
+            content = content.replace("```json", "").replace("```", "").strip()
+        elif content.startswith("```"):
+            content = content.replace("```", "").strip()
+
+        recommendation = json.loads(content)
+        return recommendation
+
+    except (APIConnectionError, APITimeoutError) as net_err:
+        print(f"Network error calling AvalAI: {repr(net_err)}")
+        return None
+    except json.JSONDecodeError as json_err:
+        print(f"JSON decode error from model response: {repr(json_err)}")
+        return None
     except Exception as e:
         print(f"Error calling LLM for recommendation: {repr(e)}")
         return None

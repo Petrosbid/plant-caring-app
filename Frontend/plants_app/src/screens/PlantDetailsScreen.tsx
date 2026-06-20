@@ -156,6 +156,11 @@ const PlantDetailsScreen = () => {
             <Text className="text-white/90 italic text-base">
               {plant.scientific_name}
             </Text>
+            {((isEn ? (plant.other_names_en || plant.other_names) : (plant.other_names || plant.other_names_en))) ? (
+              <Text className="text-white/80 text-sm mt-1">
+                {isEn ? 'Also known as: ' : 'نام‌های دیگر: '}{isEn ? (plant.other_names_en || plant.other_names) : (plant.other_names || plant.other_names_en)}
+              </Text>
+            ) : null}
           </View>
         </View>
 

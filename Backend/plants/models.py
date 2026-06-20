@@ -23,6 +23,8 @@ class Plant(models.Model):
     """Represents a plant in the main database. Each plant has a list of images via plant.images (PlantImage)."""
     farsi_name = models.CharField(max_length=255, unique=False, help_text="Farsi Name")
     english_name = models.CharField(max_length=255, unique=False, help_text="English Name", blank=True, null=True)
+    other_names = models.CharField(max_length=255, blank=True, null=True, help_text="Other Persian names")
+    other_names_en = models.CharField(max_length=255, blank=True, null=True, help_text="Other English names")
     scientific_name = models.CharField(max_length=255, unique=True, blank=True, null=True)
     description = models.TextField(help_text="Description in Persian")
     description_en = models.TextField(help_text="Description in English")

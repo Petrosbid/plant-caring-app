@@ -12,7 +12,6 @@ blur?: number;
 export function ThemeTransition({
 children,
 onToggle,
-theme,
 className,
 speed = 0.5,
 blur = 0,

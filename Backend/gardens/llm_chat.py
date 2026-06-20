@@ -1,15 +1,15 @@
-import requests
 import json
 from django.conf import settings
-from django.utils import timezone
-from datetime import timedelta
+from openai import OpenAI, APIConnectionError, APITimeoutError
 
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
+# دریافت کلید از تنظیمات جنگو
+AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
+CHAT_MODEL = "gemma-4-31b-it"
 
 
 def get_plant_chat_response(user_plant, user_question, chat_history=None):
 
-    if not OPENROUTER_API_KEY:
+    if not AVALAI_API_KEY:
         return "متاسفانه سرویس هوش مصنوعی در دسترس نیست. لطفاً بعداً تلاش کنید."
 
     plant = user_plant.plant
@@ -34,7 +34,7 @@ def get_plant_chat_response(user_plant, user_question, chat_history=None):
 نور: {plant.light_requirements or 'نامشخص'} (انگلیسی: {plant.light_requirements_en or '-'})
 رطوبت: {plant.humidity_level or 'نامشخص'} (انگلیسی: {plant.humidity_level_en or '-'})
 دمای مناسب: {plant.temperature_range or 'نامشخص'} (انگلیسی: {plant.temperature_range_en or '-'})
-خاک مناسب: {plant.soil_type or 'نامشخص'} (انگلیسی: {plant.soil_type_en or '-'})
+خک مناسب: {plant.soil_type or 'نامشخص'} (انگلیسی: {plant.soil_type_en or '-'})
 هرس: {plant.pruning_info or 'نامشخص'} (انگلیسی: {plant.pruning_info_en or '-'})
 تکثیر: {plant.propagation_methods or 'نامشخص'} (انگلیسی: {plant.propagation_methods_en or '-'})
 
@@ -89,30 +89,28 @@ Now the conversation history (last 10 messages at most) will be provided, follow
     messages.append({"role": "user", "content": user_question})
 
     try:
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://your-plant-app.com",
-                "X-Title": "Plant Care Chat",
-            },
-            json={
-                "model": "tngtech/deepseek-r1t2-chimera:free",
-                "messages": messages,
-                "temperature": 0.7,
-                "max_tokens": 600,
-            },
+        # مقداردهی کلاینت با ساختار استاندارد OpenAI SDK
+        client = OpenAI(
+            base_url="https://api.avalai.ir/v1",
+            api_key=AVALAI_API_KEY
+        )
+
+        # فراخوانی متد چت کامپلیشن
+        response = client.chat.completions.create(
+            model=CHAT_MODEL,
+            messages=messages,
+            temperature=0.7,
+            max_tokens=600,
             timeout=45
         )
 
-        if response.status_code == 200:
-            reply = response.json()["choices"][0]["message"]["content"]
-            return reply.strip()
-        else:
-            print(f"LLM Chat Error: {response.status_code} - {response.text}")
-            return "متاسفانه در حال حاضر سرویس هوش مصنوعی دچار مشکل شده است. لطفاً چند دقیقه دیگر تلاش کنید."
+        # استخراج مستقیم پاسخ متنی
+        reply = response.choices[0].message.content
+        return reply.strip()
 
+    except (APIConnectionError, APITimeoutError) as net_err:
+        print(f"Network error with AvalAI client: {repr(net_err)}")
+        return "خطایی در ارتباط با سرور هوش مصنوعی رخ داد. لطفاً بعداً تلاش کنید."
     except Exception as e:
         print(f"Exception in get_plant_chat_response: {repr(e)}")
-        return "خطایی در ارتباط با سرور هوش مصنوعی رخ داد. لطفاً بعداً تلاش کنید."
+        return "متاسفانه در حال حاضر سرویس هوش مصنوعی دچار مشکل شده است. لطفاً چند دقیقه دیگر تلاش کنید."

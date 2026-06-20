@@ -1,0 +1,16 @@
+Django
+django-ckeditor
+django-cors-headers
+django-filter
+django-material-admin
+django-taggit
+djangorestframework
+djangorestframework_simplejwt
+drf-nested-routers
+drf-spectacular
+numpy
+openai
+pillow
+python-dotenv
+requests
+smsir-python

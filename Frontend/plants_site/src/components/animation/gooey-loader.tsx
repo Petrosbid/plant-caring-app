@@ -13,7 +13,7 @@ className,
 size = 20,
 color = "currentColor",
 duration = 1.5,
-...props
+
 }: LoaderGooeyBlobsProps) {
 return (
 <div className={cn("flex items-center gap-2", className)}>

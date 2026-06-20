@@ -1,4 +1,3 @@
-// src/services/api.ts
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from "../utils/tokenStorage";
 import type {
@@ -10,8 +9,8 @@ import type {
   UserPlant,
 } from "../types";
 
-export const API_BASE_URL = 'http://192.168.183.1:8000/api';
-const BLOG_API_BASE_URL = 'http://192.168.183.1:8000/api/blog';
+export const API_BASE_URL = 'https://django-3b13q0.chbkn.run/api';
+const BLOG_API_BASE_URL = 'https://django-3b13q0.chbkn.run/api/blog';
 export const BLOG_SHARE_BASE_URL = API_BASE_URL.replace('/api', '');
 
 let isRefreshing = false;
@@ -417,7 +416,7 @@ export const gardenService = {
   },
 
   addGrowthRecord: async (data: any): Promise<any> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/growth-records/`, {
+    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/growth/`, {
       method: "POST",
       body: JSON.stringify(data),
     });

@@ -141,7 +141,6 @@ const PlantDetailModal: React.FC<Props> = ({ userPlant, language, onClose, onUpd
 
 const InfoTab: React.FC<{ userPlant: UserPlant; language: 'en' | 'fa' }> = ({ userPlant, language }) => {
   const isEn = language === 'en';
-  const plant = userPlant.plant_details;
   const latestGrowth = userPlant.growth_records?.[0];
 
   const healthLabel = userPlant.health_status === 'healthy'

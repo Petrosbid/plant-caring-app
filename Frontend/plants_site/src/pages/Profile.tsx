@@ -1,5 +1,5 @@
 // UserDashboard.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useUserPlants } from '../hooks/useUserPlants';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
@@ -170,7 +170,7 @@ const ProfileForm: React.FC<{ user: any; genderChoices: [string, string][] }> = 
   const { t } = useLanguageTheme();
   const { updateUser } = useAuth();
   const [loading, setLoading] = useState(false);
-  const { register, handleSubmit, formState: { errors }, watch } = useForm<ProfileFormData>({
+  const { register, handleSubmit } = useForm<ProfileFormData>({
     defaultValues: {
       username: user.username || '',
       first_name: user.first_name || '',

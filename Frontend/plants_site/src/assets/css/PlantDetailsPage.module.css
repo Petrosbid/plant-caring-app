@@ -166,6 +166,13 @@
     font-style: italic;
 }
 
+.otherNames {
+    font-size: 1rem;
+    opacity: 0.8;
+    margin-bottom: 1.5rem;
+    margin-top: -1rem;
+}
+
 .statsRow {
     display: flex;
     gap: 2rem;

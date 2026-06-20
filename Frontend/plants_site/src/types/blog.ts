@@ -38,7 +38,7 @@ export interface PostListItem {
 }
 
 // Interface for the blog post detail view (extends list item)
-export interface PostDetail extends Omit<PostListItem, 'excerpt'> {
+export interface PostDetail extends Omit<PostListItem, 'excerpt' | 'meta_description_en'> {
   content: string;
   content_en?: string | null;
   updated: string; 

@@ -298,3 +298,4 @@ SPECTACULAR_SETTINGS = {
         'drf_spectacular.hooks.preprocess_exclude_path_format'
     ],
 }
+AVALAI_API_KEY="aa-Abmgq6GVYUyjc2R8hF2wSURD5ByhdzHlAcYbUbEqSifyjk1H"

@@ -1,5 +1,5 @@
 // context/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
+import React, { createContext,  useState, useEffect, type ReactNode } from 'react';
 import type { User } from '../types';
 import { authService } from '../services/api';
 import { use } from 'react';
@@ -126,22 +126,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       throw error;
     }
   };
-  const registerWithPhoneOtp = async (data: { phone?: string; email?: string; first_name?: string; last_name?: string; username: string; }) => {
-  await Promise.all([
-    authService.registerRequestOtp('phone', data),
-  ]);
-};
-const registerWithEmailOtp = async (data: { phone?: string; email?: string; first_name?: string; last_name?: string; username: string; }) => {
-  await authService.registerRequestOtp('email', data);
-};
-const verifyRegisterOtp = async (identifier: string, code: string) => {
-  const response = await authService.registerVerifyOtp(identifier, code);
-  const userData = await authService.getProfile(); 
-  setUser(userData);
-  setIsAuthenticated(true);
-};
+
+  const registerWithPhoneOtp = async (data: { phone: string; username: string; first_name?: string; last_name?: string }) => {
+    try {
+      await authService.registerRequestOtp('phone', data);
+    } catch (error) {
+      console.error('Phone OTP registration request failed:', error);
+      throw error;
+    }
+  };
+
+  const registerWithEmailOtp = async (data: { email: string; username: string; first_name?: string; last_name?: string }) => {
+    try {
+      await authService.registerRequestOtp('email', data);
+    } catch (error) {
+      console.error('Email OTP registration request failed:', error);
+      throw error;
+    }
+  };
+
+  const verifyRegisterOtp = async (identifier: string, code: string) => {
+    try {
+      const response = await authService.registerVerifyOtp(identifier, code);
+      const userData = response.user || await authService.getProfile();
+      localStorage.setItem('user', JSON.stringify(userData));
+      setUser(userData);
+      setIsAuthenticated(true);
+    } catch (error) {
+      console.error('Verify registration OTP failed:', error);
+      throw error;
+    }
+  };
+
   return (
-    <AuthContext.Provider value={{ user, login, logout, register, updateUser, isAuthenticated, requestOtpCode, loginWithOtp }}>
+    <AuthContext.Provider value={{
+      user,
+      login,
+      logout,
+      register,
+      updateUser,
+      isAuthenticated,
+      requestOtpCode,
+      loginWithOtp,
+      registerWithPhoneOtp,
+      registerWithEmailOtp,
+      verifyRegisterOtp
+    }}>
       {children}
     </AuthContext.Provider>
   );

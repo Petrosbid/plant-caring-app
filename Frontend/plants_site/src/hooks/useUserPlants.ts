@@ -15,7 +15,7 @@ export const useUserPlants = () => {
     }
     setLoading(true);
     try {
-      const data = await gardenService.getUserPlants();
+      const data = await gardenService.getUserPlants() as any;
       const plants = Array.isArray(data) ? data : data.results || [];
       setUserPlants(plants);
     } catch (err) {

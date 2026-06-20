@@ -1,16 +1,22 @@
 # diseases/llm_disease.py
-import requests
 import json
 from django.conf import settings
+from openai import OpenAI, APIConnectionError, APITimeoutError
 from .models import Disease
 
-OPENROUTER_API_KEY = getattr(settings, 'OPENROUTER_API_KEY', None)
+# دریافت کلید از تنظیمات جنگو
+AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
+DISEASE_MODEL = "gemma-4-31b-it"
 
 
 def get_disease_details_from_llm(disease_name, plant_name=None):
     """
     دریافت اطلاعات دقیق و جامع بیماری از LLM (دوزبانه)
     """
+    if not AVALAI_API_KEY:
+        print("AvalAI API key is missing in settings.")
+        return None
+
     context_plant = f" on the plant '{plant_name}'" if plant_name else " on plants"
 
     system_prompt = f"""
@@ -48,11 +54,10 @@ Return ONLY a valid JSON object (no markdown, no extra text). The JSON must stri
         "Step 3: Improve air circulation and reduce humidity",
         "At least 3, up to 6 actionable steps"
     ],
-    "prevention_fa": "روش‌های پیشگیری به فارسی: فاصله کاشت مناسب، آبیاری قطرهای، استفاده از ارقام مقاوم، ضدعفونی ابزار، کنترل علف‌های هرز و ...",
+    "prevention_fa": "روش‌های پیشگیری به فارسی: فاصله کاشت مناسب، آبیاری قطره‌ای، استفاده از ارقام مقاوم، ضدعفونی ابزار، کنترل علف‌های هرز و ...",
     "prevention_en": "Prevention methods in English: proper spacing, drip irrigation, resistant varieties, tool disinfection, weed control, etc.",
     "organic_treatment_fa": "درمان ارگانیک/طبیعی به فارسی (مثلاً مخلوط جوش شیرین و روغن، عصاره سیر، یا معرفی دشمنان طبیعی). اگر وجود ندارد بنویسید 'درمان ارگانیک شناخته شده‌ای نیست'.",
     "organic_treatment_en": "Organic/natural treatment in English (e.g., baking soda and oil spray, garlic extract, beneficial insects). If none, write 'No known organic treatment'."
-    "is_infectious_en": "yes or no"
 }}
 
 ---
@@ -70,50 +75,53 @@ Now, generate the JSON for disease: **{disease_name}**
 """
 
     try:
-        response = requests.post(
-            url="https://openrouter.ai/api/v1/chat/completions",
-            headers={
-                "Authorization": f"Bearer {OPENROUTER_API_KEY}",
-                "Content-Type": "application/json",
-                "HTTP-Referer": "https://your-plant-doctor-app.com",
-                "X-Title": "Plant Disease Expert",
-            },
-            json={
-                "model": "openai/gpt-4o-mini",  # or "tngtech/deepseek-r1t2-chimera:free"
-                "messages": [
-                    {"role": "system",
-                     "content": "You are a professional plant pathologist. Respond only with valid JSON as instructed."},
-                    {"role": "user", "content": system_prompt}
-                ],
-                "response_format": {"type": "json_object"},
-                "temperature": 0.2,
-                "max_tokens": 2000
-            },
+        # مقداردهی کلاینت AvalAI با ساختار OpenAI SDK
+        client = OpenAI(
+            base_url="https://api.avalai.ir/v1",
+            api_key=AVALAI_API_KEY
+        )
+
+        # فراخوانی متد کامپلیشن با اعمال فرمت ساختاریافته JSON
+        response = client.chat.completions.create(
+            model=DISEASE_MODEL,
+            messages=[
+                {"role": "system",
+                 "content": "You are a professional plant pathologist. Respond only with valid JSON as instructed."},
+                {"role": "user", "content": system_prompt}
+            ],
+            response_format={"type": "json_object"},
+            temperature=0.2,
+            max_tokens=2000,
             timeout=90
         )
 
-        if response.status_code == 200:
-            content = response.json()["choices"][0]["message"]["content"]
-            # Clean markdown if present
-            if content.startswith("```json"):
-                content = content.replace("```json", "").replace("```", "")
-            elif content.startswith("```"):
-                content = content.replace("```", "")
+        # دریافت مستقیم محتوای متنی پاسخ
+        content = response.choices[0].message.content.strip()
 
-            disease_data = json.loads(content)
+        # پاکسازی تگ‌های مارک‌داون احتمالی
+        if content.startswith("```json"):
+            content = content.replace("```json", "").replace("```", "").strip()
+        elif content.startswith("```"):
+            content = content.replace("```", "").strip()
 
-            # Ensure treatment steps are lists
-            for lang in ['fa', 'en']:
-                key = f'treatment_steps_{lang}'
-                if not isinstance(disease_data.get(key), list):
-                    disease_data[key] = [str(disease_data.get(key, ''))]
-                else:
-                    disease_data[key] = [str(step) for step in disease_data[key]]
+        disease_data = json.loads(content)
 
-            return disease_data
-        else:
-            print(f"Disease LLM error {response.status_code}: {response.text}")
-            return None
+        # اطمینان از اینکه گام‌های درمانی به صورت لیست هندل می‌شوند
+        for lang in ['fa', 'en']:
+            key = f'treatment_steps_{lang}'
+            if not isinstance(disease_data.get(key), list):
+                disease_data[key] = [str(disease_data.get(key, ''))]
+            else:
+                disease_data[key] = [str(step) for step in disease_data[key]]
+
+        return disease_data
+
+    except (APIConnectionError, APITimeoutError) as net_err:
+        print(f"Network error calling AvalAI for disease information: {repr(net_err)}")
+        return None
+    except json.JSONDecodeError as json_err:
+        print(f"JSON decode error from disease model response: {repr(json_err)}")
+        return None
     except Exception as e:
         print(f"Exception in get_disease_details_from_llm: {repr(e)}")
         return None
@@ -138,11 +146,12 @@ def create_or_update_disease_from_llm(disease_name):
         prevention_en = info.get('prevention_en', '')
         prevention_fa = info.get('prevention_fa', '')
         severity = info.get('severity', 'medium')
+
         # Convert severity to valid choice
         if severity not in ['low', 'medium', 'high', 'critical']:
             severity = 'medium'
 
-        # Combine treatment steps into solution fields (optional)
+        # Combine treatment steps into solution fields
         treatment_steps_en = '\n'.join(info.get('treatment_steps_en', []))
         treatment_steps_fa = '\n'.join(info.get('treatment_steps_fa', []))
         organic_en = info.get('organic_treatment_en', '')

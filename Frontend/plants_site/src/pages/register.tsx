@@ -9,7 +9,7 @@ interface RegisterProps {
   switchToLogin: () => void;
 }
 
-const Register: React.FC<RegisterProps> = ({ onSuccess, switchToLogin }) => {
+const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
   const { t } = useLanguageTheme();
   const { registerWithPhoneOtp, registerWithEmailOtp, verifyRegisterOtp } = useAuth();
   const isEn = t('home') === 'Home';
