@@ -1,171 +1,322 @@
-# PLANT-CARING-APP
+# 🌿 Verna
 
-*Cultivate Growth, Empower Nature, Transform Plant Care*
+### AI-Powered Plant Care Ecosystem
 
-![last-commit](https://img.shields.io/github/last-commit/Petrosbid/plant-caring-app?style=flat&logo=git&logoColor=white&color=0080ff)
-![repo-top-language](https://img.shields.io/github/languages/top/Petrosbid/plant-caring-app?style=flat&color=0080ff)
-![repo-language-count](https://img.shields.io/github/languages/count/Petrosbid/plant-caring-app?style=flat&color=0080ff)
+Verna is an intelligent plant care platform that combines Artificial Intelligence, Computer Vision, and Smart Gardening technologies to help users identify plants, diagnose diseases, track growth, and receive personalized care recommendations.
 
-*Built with the tools and technologies:*
+The project consists of:
 
-![JSON](https://img.shields.io/badge/JSON-000000.svg?style=flat&logo=JSON&logoColor=white)
-![Markdown](https://img.shields.io/badge/Markdown-000000.svg?style=flat&logo=Markdown&logoColor=white)
-![npm](https://img.shields.io/badge/npm-CB3837.svg?style=flat&logo=npm&logoColor=white)
-![Autoprefixer](https://img.shields.io/badge/Autoprefixer-DD3735.svg?style=flat&logo=Autoprefixer&logoColor=white)
-![Swift](https://img.shields.io/badge/Swift-F05138.svg?style=flat&logo=Swift&logoColor=white)
-![PostCSS](https://img.shields.io/badge/PostCSS-DD3A0A.svg?style=flat&logo=PostCSS&logoColor=white)
-![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E.svg?style=flat&logo=JavaScript&logoColor=black)
-![Vitest](https://img.shields.io/badge/Vitest-6E9F18.svg?style=flat&logo=Vitest&logoColor=white)
-![Django](https://img.shields.io/badge/Django-092E20.svg?style=flat&logo=Django&logoColor=white)
-![Gradle](https://img.shields.io/badge/Gradle-02303A.svg?style=flat&logo=Gradle&logoColor=white)
-![React](https://img.shields.io/badge/React-61DAFB.svg?style=flat&logo=React&logoColor=black)
-![NumPy](https://img.shields.io/badge/NumPy-013243.svg?style=flat&logo=NumPy&logoColor=white)
-![Dart](https://img.shields.io/badge/Dart-0175C2.svg?style=flat&logo=Dart&logoColor=white)
-![C++](https://img.shields.io/badge/C++-00599C.svg?style=flat&logo=C%2B%2B&logoColor=white)
-![XML](https://img.shields.io/badge/XML-005FAD.svg?style=flat&logo=XML&logoColor=white)
-![Flutter](https://img.shields.io/badge/Flutter-02569B.svg?style=flat&logo=Flutter&logoColor=white)
-![CMake](https://img.shields.io/badge/CMake-064F8C.svg?style=flat&logo=CMake&logoColor=white)
-![Python](https://img.shields.io/badge/Python-3776AB.svg?style=flat&logo=Python&logoColor=white)
-![TypeScript](https://img.shields.io/badge/TypeScript-3178C6.svg?style=flat&logo=TypeScript&logoColor=white)
-![Vite](https://img.shields.io/badge/Vite-646CFF.svg?style=flat&logo=Vite&logoColor=white)
-![ESLint](https://img.shields.io/badge/ESLint-4B32C3.svg?style=flat&logo=ESLint&logoColor=white)
-![Kotlin](https://img.shields.io/badge/Kotlin-7F52FF.svg?style=flat&logo=Kotlin&logoColor=white)
-![YAML](https://img.shields.io/badge/YAML-CB171E.svg?style=flat&logo=YAML&logoColor=white)
-
-## Table of Contents
-- [Overview](#overview)
-- [Getting Started](#getting-started)
-  - [Prerequisites](#prerequisites)
-  - [Installation](#installation)
-  - [Usage](#usage)
-  - [Testing](#testing)
+* **Django REST Framework Backend**
+* **React Web Application**
+* **React Native (Expo) Mobile Application**
+* **Future IoT Smart Gardening Integration**
 
 ---
 
-## Overview
+## ✨ Features
 
-plant-caring-app is an integrated full-stack solution for plant health management, combining AI-powered diagnosis with user-friendly interfaces across web and mobile platforms. Built with a scalable architecture, it supports plant identification, disease detection, and personalized care reminders to foster healthier plants and engaged users.
+### 📸 AI Plant Identification
 
-**Why plant-caring-app?**
+Identify plants instantly using a photo.
 
-This project streamlines the development of intelligent plant care applications. The core features include:
-
-- 🧩 **🟢 Cross-platform Compatibility:** Supports Android, iOS, Web, Windows, Linux, and macOS, enabling broad reach.
-- 🚀 **🟡 AI Model Validation:** Ensures reliable plant and disease inference with local model loading and testing.
-- 🌱 **🔵 Automated Garden Management:** Facilitates personalized plant tracking, reminders, and care schedules.
-- 🛠️ **🟣 Modular Backend:** Built with Django REST framework, supporting secure user authentication and data management.
-- 🎯 **✨ Developer-Centric Setup:** Includes setup guides, testing scripts, and environment configurations for smooth development and deployment.
+* Species recognition
+* Scientific names
+* Care instructions
+* Watering schedules
+* Soil recommendations
+* Toxicity information
 
 ---
 
-## Getting Started
+### 🏥 Plant Disease Diagnosis
+
+Detect plant diseases through image analysis.
+
+* Disease recognition
+* Nutrient deficiency detection
+* Pest identification
+* Treatment recommendations
+* Prevention strategies
+
+---
+
+### 🎯 Personalized Plant Recommendation
+
+Find the perfect plant based on your lifestyle.
+
+Factors include:
+
+* Available sunlight
+* Climate conditions
+* Living space
+* Pet safety requirements
+* Maintenance preferences
+* Budget constraints
+
+---
+
+### 🪴 Virtual Garden Management
+
+Manage all your plants in one place.
+
+Features:
+
+* Personal plant collection
+* Custom plant names
+* Growth history
+* Health tracking
+* Care reminders
+
+---
+
+### 📈 Growth Analytics
+
+Monitor plant development over time.
+
+Track:
+
+* Height
+* Pot size
+* Canopy width
+* Health score
+* Growth trends
+
+---
+
+### 🤖 Context-Aware AI Assistant
+
+Each plant has its own intelligent assistant.
+
+The AI can access:
+
+* Plant profile
+* Growth history
+* Previous measurements
+* Care records
+
+to provide personalized recommendations.
+
+---
+
+## 🚀 Future Roadmap
+
+### 🌱 Smart IoT Ecosystem
+
+Planned hardware integrations include:
+
+* Soil moisture sensors
+* Light sensors
+* Humidity sensors
+* Smart irrigation systems
+* Automated watering modules
+
+### 💧 Automated Plant Care
+
+AI-driven automation based on real-time sensor data.
+
+---
+
+## 🏗️ Architecture
+
+```text
+┌─────────────────────┐
+│     Mobile App      │
+│ React Native Expo   │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│      REST API       │
+│ Django + DRF        │
+└──────────┬──────────┘
+           │
+           ▼
+┌─────────────────────┐
+│     PostgreSQL      │
+└─────────────────────┘
+
+           ▲
+           │
+┌─────────────────────┐
+│      Web App        │
+│ React + TypeScript  │
+└─────────────────────┘
+```
+
+---
+
+## 🛠 Tech Stack
+
+### Backend
+
+* Python
+* Django
+* Django REST Framework
+* PostgreSQL
+* SQLite (Development)
+
+### Web Frontend
+
+* React
+* TypeScript
+* Vite
+* Tailwind CSS
+
+### Mobile App
+
+* React Native
+* Expo
+* TypeScript
+* NativeWind
+* Gluestack UI
+
+### AI & Machine Learning
+
+* Computer Vision Models
+* Large Language Models (LLMs)
+* Plant Disease Classification
+* Recommendation Systems
+
+---
+
+## 📂 Project Structure
+
+```text
+Backend/
+├── blog/
+├── diseases/
+├── gardens/
+├── plants/
+└── users/
+
+Frontend/
+├── plants_site/
+└── plants_app/
+
+README.md
+```
+
+---
+
+## ⚙️ Installation
 
 ### Prerequisites
 
-This project requires the following dependencies:
+* Python 3.10+
+* Node.js 18+
+* PostgreSQL (optional)
+* Expo Go (for mobile testing)
 
-- **Programming Language:** Python
-- **Package Manager:** Pip, Pub, Npm, Gradle, Cmake
+---
 
-### Installation
+### 1. Backend Setup
 
-Build plant-caring-app from the source and install dependencies:
+```bash
+cd Backend
 
-1. **Clone the repository:**
-   ```sh
-   ❯ git clone https://github.com/Petrosbid/plant-caring-app
-   ```
+python -m venv venv
 
-2. **Navigate to the project directory:**
-   ```sh
-   ❯ cd plant-caring-app
-   ```
+# Linux / macOS
+source venv/bin/activate
 
-3. **Install the dependencies:**
+# Windows
+venv\Scripts\activate
 
-   **Using [pip](https://pypi.org/project/pip/):**
-   ```sh
-   ❯ pip install -r Backend/requirements.txt
-   ```
-
-   **Using [pub](https://dart.dev/):**
-   ```sh
-   ❯ pub get
-   ```
-
-   **Using [npm](https://www.npmjs.com/):**
-   ```sh
-   ❯ npm install
-   ```
-
-   **Using [gradle](https://gradle.org/):**
-   ```sh
-   ❯ gradle build
-   ```
-
-   **Using [cmake](https://isocpp.org/):**
-   ```sh
-   ❯ cmake . && make
-   ```
-
-### Usage
-
-Run the project with:
-
-**Using [pip](https://pypi.org/project/pip/):**
-```sh
-python {entrypoint}
+pip install -r requirements.txt
 ```
 
-**Using [pub](https://dart.dev/):**
-```sh
-dart {entrypoint}
+Create environment variables:
+
+```bash
+cp .env.example .env
 ```
 
-**Using [npm](https://www.npmjs.com/):**
-```sh
-npm start
+Apply migrations:
+
+```bash
+python manage.py migrate
 ```
 
-**Using [gradle](https://gradle.org/):**
-```sh
-gradle run
+Populate initial data:
+
+```bash
+python manage.py populate_plants
+python manage.py populate_diseases
 ```
 
-**Using [cmake](https://isocpp.org/):**
-```sh
-./plant-caring-app
-```
+Run server:
 
-### Testing
-
-Plant-caring-app uses the {**test_framework**} test framework. Run the test suite with:
-
-**Using [pip](https://pypi.org/project/pip/):**
-```sh
-pytest
-```
-
-**Using [pub](https://dart.dev/):**
-```sh
-pub run test
-```
-
-**Using [npm](https://www.npmjs.com/):**
-```sh
-npm test
-```
-
-**Using [gradle](https://gradle.org/):**
-```sh
-gradle test
-```
-
-**Using [cmake](https://isocpp.org/):**
-```sh
-ctest
+```bash
+python manage.py runserver
 ```
 
 ---
 
-[⬆ Return](#top)
+### 2. Web Application
+
+```bash
+cd Frontend/plants_site
+
+npm install
+npm run dev
+```
+
+---
+
+### 3. Mobile Application
+
+```bash
+cd Frontend/plants_app
+
+npm install
+npx expo start
+```
+
+Scan the generated QR code using Expo Go.
+
+---
+
+## 💰 Monetization Strategy
+
+### Freemium Subscription
+
+Premium features:
+
+* Unlimited disease diagnosis
+* Advanced analytics
+* Unlimited AI consultations
+
+### IoT Hardware
+
+Future products:
+
+* Smart pots
+* Moisture sensors
+* Automated irrigation systems
+
+### Partner Marketplace
+
+Connecting users with:
+
+* Local nurseries
+* Plant stores
+* Florists
+
+---
+
+## 🤝 Contributing
+
+Contributions are welcome.
+
+```bash
+# Fork repository
+
+git checkout -b feature/new-feature
+
+git commit -m "Add new feature"
+
+git push origin feature/new-feature
+```
+
+Then create a Pull Request.
+
