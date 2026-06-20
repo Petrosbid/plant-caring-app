@@ -117,6 +117,7 @@ class Reminder(models.Model):
     is_completed = models.BooleanField(default=False)
     is_recurring = models.BooleanField(default=False)
     recurrence_interval = models.IntegerField(null=True, blank=True, help_text="Interval in days for recurring reminders")
+    notified = models.BooleanField(default=False)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 

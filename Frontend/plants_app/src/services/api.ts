@@ -114,9 +114,9 @@ const formatApiError = (errorData: unknown, fallback: string): string => {
 
 export const buildProfilePayload = (
   data: ProfileUpdateInput,
-): Record<string, string> => {
-  const payload: Record<string, string> = {};
-  const assign = (key: string, value: string | undefined) => {
+): Record<string, any> => {
+  const payload: Record<string, any> = {};
+  const assign = (key: string, value: any) => {
     if (value !== undefined && value !== null) payload[key] = value;
   };
   assign("username", data.username);
@@ -127,6 +127,14 @@ export const buildProfilePayload = (
   assign("national_code", data.national_code);
   assign("birth_date", data.birth_date);
   assign("gender", data.gender);
+  
+  // Push Notification Settings
+  assign("push_token", data.push_token);
+  assign("timezone", data.timezone);
+  assign("notify_reminders_exact", data.notify_reminders_exact);
+  assign("notify_reminders_daily", data.notify_reminders_daily);
+  assign("notify_reminders_tomorrow", data.notify_reminders_tomorrow);
+
   const phone = data.phone ?? data.phone_number;
   if (phone !== undefined) assign("phone", phone);
   const password = data.password ?? data.new_password;

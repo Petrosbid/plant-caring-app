@@ -33,6 +33,8 @@ import {
   Camera,
   Fingerprint,
   AtSign,
+  Bell,
+  Clock,
 } from 'lucide-react-native';
 import { cn } from '../utils/cn';
 import { formatDate } from '../utils/date';
@@ -61,6 +63,19 @@ const ProfileScreen = () => {
   const handleUpdateProfile = async (data: ProfileUpdateInput) => {
     const updated = await authService.updateProfile(data);
     setUser(updated);
+  };
+
+  const toggleNotificationSetting = async (key: 'notify_reminders_exact' | 'notify_reminders_daily' | 'notify_reminders_tomorrow') => {
+    if (!user) return;
+    try {
+      const nextValue = !user[key];
+      const updated = await authService.updateProfile({
+        [key]: nextValue,
+      });
+      setUser(updated);
+    } catch (err: any) {
+      Alert.alert(isEn ? 'Error' : 'خطا', err.message || 'Failed to update setting');
+    }
   };
 
   const handleAvatarPress = async () => {
@@ -375,6 +390,85 @@ const ProfileScreen = () => {
             </View>
           </TouchableOpacity>
         </Card>
+
+        <SectionLabel text={isEn ? 'Notification Settings' : 'تنظیمات اعلان‌ها'} />
+
+        <Card className="p-0 overflow-hidden">
+          {/* Exact Reminders */}
+          <View className="flex-row items-center justify-between p-4 border-b border-slate-100/80 dark:border-slate-700/50">
+            <View className="flex-row items-center gap-3 flex-1">
+              <IconBox>
+                <Bell size={20} color="#16a34a" />
+              </IconBox>
+              <View className="flex-1 pe-2">
+                <Text className="text-slate-800 dark:text-slate-200 font-bold" style={{ includeFontPadding: false }}>
+                  {isEn ? 'When Time Arrives' : 'زمان انجام یادآور'}
+                </Text>
+                <Text className="text-slate-400 text-xs mt-0.5" numberOfLines={1}>
+                  {isEn ? 'Notify exact scheduled time' : 'اعلان در زمان دقیق یادآور'}
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={!!user.notify_reminders_exact}
+              onValueChange={() => toggleNotificationSetting('notify_reminders_exact')}
+              trackColor={{ false: '#cbd5e1', true: '#16a34a' }}
+              thumbColor="#fff"
+            />
+          </View>
+
+          {/* Daily Summaries */}
+          <View className="flex-row items-center justify-between p-4 border-b border-slate-100/80 dark:border-slate-700/50">
+            <View className="flex-row items-center gap-3 flex-1">
+              <IconBox>
+                <Calendar size={20} color="#16a34a" />
+              </IconBox>
+              <View className="flex-1 pe-2">
+                <Text className="text-slate-800 dark:text-slate-200 font-bold" style={{ includeFontPadding: false }}>
+                  {isEn ? 'Daily Summary' : 'خلاصه روزانه'}
+                </Text>
+                <Text className="text-slate-400 text-xs mt-0.5" numberOfLines={1}>
+                  {isEn ? 'Morning tasks check (8:00 AM)' : 'بررسی کارهای امروز در ساعت ۸ صبح'}
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={!!user.notify_reminders_daily}
+              onValueChange={() => toggleNotificationSetting('notify_reminders_daily')}
+              trackColor={{ false: '#cbd5e1', true: '#16a34a' }}
+              thumbColor="#fff"
+            />
+          </View>
+
+          {/* Tomorrow Summaries */}
+          <View className="flex-row items-center justify-between p-4">
+            <View className="flex-row items-center gap-3 flex-1">
+              <IconBox>
+                <Clock size={20} color="#16a34a" />
+              </IconBox>
+              <View className="flex-1 pe-2">
+                <Text className="text-slate-800 dark:text-slate-200 font-bold" style={{ includeFontPadding: false }}>
+                  {isEn ? 'Tomorrow’s Tasks' : 'برنامه‌های فردا'}
+                </Text>
+                <Text className="text-slate-400 text-xs mt-0.5" numberOfLines={1}>
+                  {isEn ? 'Evening schedule check (8:00 PM)' : 'بررسی برنامه‌های فردا در ساعت ۸ شب'}
+                </Text>
+              </View>
+            </View>
+            <Switch
+              value={!!user.notify_reminders_tomorrow}
+              onValueChange={() => toggleNotificationSetting('notify_reminders_tomorrow')}
+              trackColor={{ false: '#cbd5e1', true: '#16a34a' }}
+              thumbColor="#fff"
+            />
+          </View>
+        </Card>
+        
+        <View className="-mt-3 mb-1 px-1 flex-row justify-between">
+          <Text className="text-[10px] text-slate-400 font-medium">
+            {isEn ? `Timezone: ${user.timezone || 'UTC'}` : `منطقه زمانی: ${user.timezone || 'UTC'}`}
+          </Text>
+        </View>
 
         <Button
           variant="ghost"

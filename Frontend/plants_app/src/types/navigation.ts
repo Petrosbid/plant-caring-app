@@ -6,7 +6,7 @@ export type RootStackParamList = {
   MainTabs: NavigatorScreenParams<RootTabParamList>;
   Login: undefined;
   Signup: undefined;
-  Library: undefined;
+  Library: { filters?: Record<string, string>; search?: string } | undefined;
   DiseaseLibrary: undefined;
   PlantDetails: { id: string };
   DiseaseDetails: { id: string };

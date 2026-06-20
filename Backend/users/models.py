@@ -18,6 +18,15 @@ class CustomUser(AbstractUser):
     first_name = models.CharField(max_length=30, blank=True, null=True)
     last_name = models.CharField(max_length=30, blank=True, null=True)
 
+    # Push Notification Settings
+    push_token = models.CharField(max_length=255, blank=True, null=True)
+    timezone = models.CharField(max_length=50, default='Asia/Tehran')
+    notify_reminders_exact = models.BooleanField(default=True)
+    notify_reminders_daily = models.BooleanField(default=True)
+    notify_reminders_tomorrow = models.BooleanField(default=True)
+    last_daily_notification_date = models.DateField(blank=True, null=True)
+    last_tomorrow_notification_date = models.DateField(blank=True, null=True)
+
     def __str__(self):
         return self.username
 

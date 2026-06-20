@@ -3,8 +3,8 @@ import type { Plant, Disease, Reminder, User, PlantComment } from '../types';
 import axios from 'axios';
 
 // Base API URL - points to your backend
-export const API_BASE_URL = 'http://django-3b13q0.chbkn.run/api';
-const BLOG_API_BASE_URL = 'http://django-3b13q0.chbkn.run/api/blog';
+export const API_BASE_URL = 'https://django-3b13q0.chbkn.run/api';
+const BLOG_API_BASE_URL = 'https://django-3b13q0.chbkn.run/api/blog';
 
 // Create axios instance for blog API with error handling
 const blogApi = axios.create({

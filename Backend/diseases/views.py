@@ -53,27 +53,6 @@ class DiseaseViewSet(viewsets.ReadOnlyModelViewSet):
 
         return Response(data)
 
-    def retrieve(self, request, *args, **kwargs):
-        instance = self.get_object()
-        # افزایش تعداد بازدید
-        Disease.objects.filter(pk=instance.pk).update(view_count=F('view_count') + 1)
-        instance.refresh_from_db()
-        serializer = self.get_serializer(instance)
-
-        # دریافت اطلاعات اضافی از LLM (اختیاری)
-        llm_data = None
-
-        try:
-            llm_data = get_disease_details_from_llm(instance.name, plant_name=None)
-        except Exception as e:
-            print(f"LLM error: {e}")
-
-        response_data = serializer.data
-        if llm_data:
-            response_data['llm_analysis'] = llm_data
-
-        return Response(response_data)
-
     @action(detail=True, methods=['get'], url_path='comments')
     def get_comments(self, request, pk=None):
         disease = self.get_object()

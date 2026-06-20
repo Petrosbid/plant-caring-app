@@ -77,6 +77,11 @@ export interface User {
   gender?: string;
   profile_picture?: string | null;
   date_joined: string;
+  push_token?: string;
+  timezone?: string;
+  notify_reminders_exact?: boolean;
+  notify_reminders_daily?: boolean;
+  notify_reminders_tomorrow?: boolean;
 }
 
 export interface ProfileUpdateInput {
@@ -94,6 +99,11 @@ export interface ProfileUpdateInput {
   new_password?: string;
   current_password?: string;
   confirm_password?: string;
+  push_token?: string;
+  timezone?: string;
+  notify_reminders_exact?: boolean;
+  notify_reminders_daily?: boolean;
+  notify_reminders_tomorrow?: boolean;
 }
 
 export interface Disease {

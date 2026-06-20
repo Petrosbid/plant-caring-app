@@ -16,7 +16,9 @@ class UserSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'username', 'password', 'email',
             'first_name', 'last_name', 'bio', 'phone',
-            'national_code', 'birth_date', 'gender', 'profile_picture'
+            'national_code', 'birth_date', 'gender', 'profile_picture',
+            'push_token', 'timezone', 'notify_reminders_exact',
+            'notify_reminders_daily', 'notify_reminders_tomorrow'
         )
         extra_kwargs = {
             'password': {'write_only': True},

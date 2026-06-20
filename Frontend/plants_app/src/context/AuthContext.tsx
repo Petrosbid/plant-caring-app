@@ -3,6 +3,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { authService } from '../services/api';
 import { getAccessToken, clearTokens } from '../utils/tokenStorage';
+import { registerPushNotifications } from '../services/notifications';
 import type { User } from '../types';
 
 interface RegisterOtpData {
@@ -81,6 +82,12 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   useEffect(() => {
     checkAuth();
   }, [checkAuth]);
+
+  useEffect(() => {
+    if (user) {
+      registerPushNotifications(user, setUser);
+    }
+  }, [user]);
 
   const finishAuthSession = async () => {
     const profile = await authService.getProfile();

@@ -12,14 +12,16 @@ import { FilterSortModal } from '../components/common/FilterSortModal';
 import { PLANT_FILTERS, PLANT_SORT_OPTIONS } from '../constants/filters';
 
 const LibraryScreen = () => {
-  const { t, i18n } = useTranslation();
+  const t = useTranslation().t;
+  const i18n = useTranslation().i18n;
   const route = useRoute();
   const initialFilters = (route.params as any)?.filters || {};
+  const initialSearch = (route.params as any)?.search || '';
 
   const [plants, setPlants] = useState<Plant[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
-  const [search, setSearch] = useState('');
+  const [search, setSearch] = useState(initialSearch);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
 
@@ -34,6 +36,13 @@ const LibraryScreen = () => {
       setFilters((route.params as any).filters);
     }
   }, [(route.params as any)?.filters]);
+
+  // Update search query if route params change
+  useEffect(() => {
+    if ((route.params as any)?.search !== undefined) {
+      setSearch((route.params as any).search);
+    }
+  }, [(route.params as any)?.search]);
 
   const fetchPlants = async (pageNum = 1, isRefreshing = false) => {
     try {
