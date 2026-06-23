@@ -124,7 +124,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  // ورود با کد یکبارمصرف
   const loginWithOtp = async (phoneNumber: string, code: string) => {
     try {
       const { access, refresh } = await authService.verifyOtp(phoneNumber, code);

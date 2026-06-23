@@ -5,7 +5,8 @@ import axios from 'axios';
 
 // Base API URL - points to your backend
 export const API_BASE_URL = 'http://127.0.0.1:8000/api';
-const BLOG_API_BASE_URL = 'http://127.0.0.1:8000/api/blog';
+export const BLOG_API_BASE_URL = `${API_BASE_URL}/blog`;
+
 
 // Create axios instance for blog API with error handling
 const blogApi = axios.create({

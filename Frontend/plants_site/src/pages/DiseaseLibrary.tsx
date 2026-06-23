@@ -60,7 +60,6 @@ const DiseaseCard: React.FC<{ disease: Disease; language: 'en' | 'fa'; delay?: n
       <motion.div className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 overflow-hidden hover:shadow-card-hover transition-all duration-300 h-full">
         <Link to={`/disease/${disease.id}`} className="block h-full">
           <div className="p-5">
-            {/* Header with severity badge */}
             <div className="flex justify-between items-start gap-2 mb-2">
               <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white line-clamp-2 flex-1">
                 {name}
@@ -70,12 +69,10 @@ const DiseaseCard: React.FC<{ disease: Disease; language: 'en' | 'fa'; delay?: n
               </span>
             </div>
 
-            {/* Scientific name placeholder */}
             <p className="text-xs italic text-slate-500 dark:text-slate-400 mb-3">
               {disease.name_fa && !isEn && disease.name}
             </p>
 
-            {/* Quick info chips */}
             <div className="flex flex-wrap gap-1.5 mb-3">
               <div className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700">
                 <FiActivity className="w-3 h-3" />
@@ -87,12 +84,10 @@ const DiseaseCard: React.FC<{ disease: Disease; language: 'en' | 'fa'; delay?: n
               </div>
             </div>
 
-            {/* Description preview */}
             <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2 mb-3">
               {description?.substring(0, 120)}...
             </p>
 
-            {/* Stats */}
             <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
               <span className="flex items-center gap-1"><FiEye className="w-3 h-3" /> {disease.view_count}</span>
               <span className="flex items-center gap-1"><FiMessageCircle className="w-3 h-3" /> {disease.comment_count || 0}</span>
@@ -162,7 +157,6 @@ const DiseaseLibrary: React.FC = () => {
   const handleFilterChange = (key: 'severity_level' | 'spread_rate', value: string) => {
     setFilters((prev) => {
       if (prev[key] === value) {
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [key]: _, ...rest } = prev;
         return rest;
       }

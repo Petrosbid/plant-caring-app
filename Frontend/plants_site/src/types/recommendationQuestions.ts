@@ -65,7 +65,6 @@ export const SECTIONS: Section[] = [
 ];
 
 export const QUESTIONS: Question[] = [
-  // ========== بخش 1: شرایط محیطی ==========
   {
     id: 'natural_light',
     section: 1,
@@ -155,7 +154,6 @@ export const QUESTIONS: Question[] = [
     required: false,
   },
 
-  // ========== بخش 2: سبک زندگی ==========
   {
     id: 'watering_habits',
     section: 2,
@@ -259,7 +257,6 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
-  // ========== بخش 3: ایمنی و حساسیت ==========
   {
     id: 'pets',
     section: 3,
@@ -334,7 +331,6 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
-  // ========== بخش 4: سلیقه بصری ==========
   {
     id: 'leaf_shape',
     section: 4,
@@ -418,7 +414,6 @@ export const QUESTIONS: Question[] = [
     ],
   },
 
-  // ========== بخش 5: تجربه و یادگیری ==========
   {
     id: 'experience_level',
     section: 5,

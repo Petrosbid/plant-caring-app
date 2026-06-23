@@ -15,11 +15,9 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
 
   const isEn = t('home') === 'Home';
 
-  // ----- State ها -----
   const [isSignUp, setIsSignUp] = useState(false);
   const [loginMethod, setLoginMethod] = useState<'password' | 'otp'>('password'); // نوع ورود
 
-  // فرم ثبت‌نام / ورود با رمز
   const [formData, setFormData] = useState({
     username: '',
     email: '',
@@ -37,13 +35,11 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
-  // ----- هندلرهای عمومی -----
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
-  // ----- ثبت‌نام و ورود با رمز عبور -----
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -63,7 +59,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
           last_name: formData.lastName,
         });
       } else {
-        // ورود با رمز عبور
         await login(formData.username, formData.password);
       }
       navigateTo('profile');
@@ -74,7 +69,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
     }
   };
 
-  // ----- درخواست کد یکبارمصرف -----
   const handleSendOtp = async () => {
     if (!phoneNumber) {
       setError(isEn ? 'Please enter your phone number' : 'لطفاً شماره تلفن خود را وارد کنید');
@@ -92,7 +86,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
     }
   };
 
-  // ----- تأیید کد و ورود با OTP -----
   const handleVerifyOtp = async () => {
     if (!otpCode) {
       setError(isEn ? 'Please enter the verification code' : 'لطفاً کد تایید را وارد کنید');
@@ -110,10 +103,8 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
     }
   };
 
-  // ----- رندر فرم بر اساس نوع ورود (رمز یا OTP) -----
   const renderLoginForm = () => {
     if (loginMethod === 'password') {
-      // فرم ورود با نام کاربری و رمز عبور (مشابه قبل)
       return (
         <form className="space-y-5" onSubmit={handleSubmit}>
           <div>
@@ -173,7 +164,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
         </form>
       );
     } else {
-      // فرم ورود با کد یکبارمصرف
       return (
         <div className="space-y-5">
           <div>
@@ -249,7 +239,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
 
 
 
-  // ----- نمایش خطا -----
   const ErrorDisplay = () => (
     error && (
       <motion.div
@@ -263,7 +252,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
     )
   );
 
-  // ----- صفحه اصلی -----
   return (
     <div className="min-h-screen flex items-center justify-center gradient-mesh bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
       <motion.div
@@ -273,7 +261,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
         className="max-w-md w-full"
       >
         <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-8 lg:p-10">
-          {/* هدر */}
           <div className="text-center mb-8">
             <motion.div
               initial={{ scale: 0.9 }}

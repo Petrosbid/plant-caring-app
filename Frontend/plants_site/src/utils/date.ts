@@ -1,4 +1,3 @@
-// src/utils/date.ts
 
 /**
  * Convert a Gregorian date to Jalali (Persian) date
@@ -6,8 +5,6 @@
  */
 export function toJalaliDate(dateString: string): string {
   const date = new Date(dateString);
-  
-  // Use Intl.DateTimeFormat with Persian locale and calendar
   return new Intl.DateTimeFormat('fa-IR-u-ca-persian', {
     year: 'numeric',
     month: 'long',
@@ -15,12 +12,7 @@ export function toJalaliDate(dateString: string): string {
   }).format(date);
 }
 
-/**
- * Format date based on current language
- * @param dateString - ISO 8601 date string
- * @param language - 'en' or 'fa'
- * @returns Formatted date string
- */
+
 export function formatDate(dateString: string, language: 'en' | 'fa'): string {
   if (language === 'fa') {
     return toJalaliDate(dateString);

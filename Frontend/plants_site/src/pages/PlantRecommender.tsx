@@ -16,7 +16,6 @@ import { storageKeys, getStorageItem, setStorageItem } from '../utils/storage';
 
 type Answers = Record<string, string | string[] | boolean>;
 
-// آیکون‌های شاد برای هر بخش
 const sectionIcons = [
   <FiHome className="w-6 h-6" />,
   <FiHeart className="w-6 h-6" />,
@@ -37,7 +36,6 @@ const PlantRecommender: React.FC = () => {
   const [additionalNotes, setAdditionalNotes] = useState('');
   const [errors, setErrors] = useState<Record<string, boolean>>({});
 
-  // ذخیره و بازیابی از localStorage
   useEffect(() => {
     const saved = localStorage.getItem('plantRecommenderAnswers');
     if (saved) {
@@ -170,12 +168,10 @@ const PlantRecommender: React.FC = () => {
     const hasError = errors[q.id];
     const label = isEn ? q.labelEn : q.labelFa;
 
-    // کلاس‌های پایه برای ورودی‌ها با استایل مدرن
-    const inputBaseClass = `w-full rounded-xl border-2 transition-all duration-200 bg-white dark:bg-slate-800/90 
+    const inputBaseClass = `w-full rounded-xl border-2 transition-all duration-200 bg-white dark:bg-slate-800/90
       ${hasError ? 'border-red-400 dark:border-red-500 ring-2 ring-red-200 dark:ring-red-500/30' : 'border-slate-200 dark:border-slate-700 focus:border-green-400 dark:focus:border-green-500'} 
       focus:outline-none focus:ring-2 focus:ring-green-200 dark:focus:ring-green-500/30 text-slate-800 dark:text-white p-3`;
 
-    // آیکون‌های کمکی برای برخی سوالات خاص (می‌توان گسترش داد)
     const getQuestionIcon = () => {
       if (q.id.includes('light')) return <FiSun className="text-yellow-500" />;
       if (q.id.includes('water')) return <FiDroplet className="text-blue-500" />;

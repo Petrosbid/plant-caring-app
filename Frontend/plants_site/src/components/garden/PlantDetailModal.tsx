@@ -13,7 +13,7 @@ interface Props {
   language: 'en' | 'fa';
   onClose: () => void;
   onUpdate: (data: Partial<UserPlant>) => void;
-  onRefresh?: () => void;                // ← تعریف شد
+  onRefresh?: () => void;
 }
 
 type Tab = 'info' | 'edit' | 'growth' | 'reminders' | 'chat';
@@ -42,7 +42,7 @@ const PlantDetailModal: React.FC<Props> = ({ userPlant, language, onClose, onUpd
 
   const handleSave = () => {
     onUpdate(form);
-    if (onRefresh) onRefresh();         // ← بعد از ذخیره کلی، رفرش کن
+    if (onRefresh) onRefresh();
     onClose();
   };
 
@@ -121,7 +121,7 @@ const PlantDetailModal: React.FC<Props> = ({ userPlant, language, onClose, onUpd
               language={language}
               onClose={onClose}
               userPlantId={userPlant.id}
-              onRefresh={onRefresh}                // ← پاس داده شد
+              onRefresh={onRefresh}
             />
           )}
           {activeTab === 'growth' && <GrowthTab userPlant={userPlant} language={language} />}
@@ -228,7 +228,6 @@ const InfoCard: React.FC<{ icon: string; title: string; children: React.ReactNod
     <div className="text-slate-800 dark:text-white font-semibold">{children}</div>
   </div>
 );
-// فقط EditTab را با پراپ جدید بازنویسی می‌کنیم
 
 const EditTab: React.FC<{
   form: any;
@@ -237,7 +236,7 @@ const EditTab: React.FC<{
   language: 'en' | 'fa';
   onClose: () => void;
   userPlantId: number;
-  onRefresh?: () => void;                    // ← دریافت شد
+  onRefresh?: () => void;
 }> = ({ form, setForm, onSave, language, onClose, userPlantId, onRefresh }) => {
   const isEn = language === 'en';
   const inputClass = "w-full p-3 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-green-500 transition-shadow";
@@ -271,10 +270,8 @@ const EditTab: React.FC<{
       await gardenService.addGrowthRecord(payload);
       setGrowth({ height: '', width: '', unit: 'cm', notes: '' });
 
-      // 1️⃣ ابتدا داده‌ها را تازه کن
       if (onRefresh) onRefresh();
 
-      // 2️⃣ (اختیاری) مودال را ببند
       // onClose();
     } catch (err: any) {
       setGrowthError(err.message);

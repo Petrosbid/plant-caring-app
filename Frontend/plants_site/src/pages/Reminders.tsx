@@ -79,8 +79,6 @@ const Reminders: React.FC = () => {
         is_completed: newReminder.is_completed,
         is_recurring: newReminder.is_recurring, // Whether this is a recurring reminder
         recurrence_interval: newReminder.is_recurring ? newReminder.recurrence_interval : undefined, // Interval in days for recurring reminders
-        // Don't include user field - backend will auto-populate from auth
-        // Don't include timestamps - backend will auto-populate
       };
 
      await addReminderApi(apiPayload as any);
@@ -373,7 +371,6 @@ const Reminders: React.FC = () => {
                 <AnimatePresence>
                   {reminders.length > 0 ? (
                     reminders.map(reminder => {
-                      // Find the associated plant if available
                       const associatedPlant = userPlants.find(plant => plant.id === reminder.user_plant);
 
                       return (

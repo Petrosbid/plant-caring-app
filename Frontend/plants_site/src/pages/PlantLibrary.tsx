@@ -283,7 +283,6 @@ const PlantLibrary: React.FC = () => {
     fetchPlants();
   }, [page, search, filters, ordering]);
 
-  // Reset page when search/filters/ordering change
   useEffect(() => {
     setPage(1);
   }, [search, filters, ordering]);

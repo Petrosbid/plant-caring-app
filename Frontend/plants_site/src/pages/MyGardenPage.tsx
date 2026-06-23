@@ -9,7 +9,6 @@ import { LoaderGooeyBlobs } from '../components/animation/gooey-loader';
 import PlantDetailModal from '../components/garden/PlantDetailModal';
 import type { UserPlant } from '../types';
 
-// ===== آپشن‌های مرتب‌سازی =====
 const SORT_OPTIONS = [
   { key: 'added_date_desc', labelEn: 'Newest First', labelFa: 'جدیدترین' },
   { key: 'added_date_asc', labelEn: 'Oldest First', labelFa: 'قدیمی‌ترین' },
@@ -18,7 +17,6 @@ const SORT_OPTIONS = [
   { key: 'name', labelEn: 'Name A‑Z', labelFa: 'نام الفبایی' },
 ];
 
-// ===== کامپوننت کارت گیاه باغچه =====
 const GardenPlantCard: React.FC<{
   userPlant: UserPlant;
   language: 'en' | 'fa';
@@ -62,7 +60,6 @@ const GardenPlantCard: React.FC<{
       className="group relative bg-white/70 dark:bg-slate-800/70 backdrop-blur-md rounded-2xl shadow-lg border border-white/30 dark:border-slate-700/50 overflow-hidden hover:shadow-2xl transition-all duration-300 cursor-pointer"
       onClick={onOpenDetail}
     >
-      {/* تصویر */}
       <div className="h-44 bg-slate-100 dark:bg-slate-700 flex items-center justify-center overflow-hidden">
         {plant.primary_image ? (
           <img
@@ -74,7 +71,6 @@ const GardenPlantCard: React.FC<{
           <span className="text-5xl">🌿</span>
         )}
 
-        {/* نام گیاه */}
         <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-3">
           <h3 className="text-white font-semibold text-sm truncate">{displayName}</h3>
           {userPlant.nickname && (
@@ -83,9 +79,7 @@ const GardenPlantCard: React.FC<{
         </div>
       </div>
 
-      {/* اطلاعات */}
       <div className="p-4 space-y-3">
-        {/* وضعیت سلامت */}
         <div className="flex items-center justify-between">
           <span className="text-xs font-medium text-slate-500 dark:text-slate-400">
             {healthLabel}
@@ -93,7 +87,6 @@ const GardenPlantCard: React.FC<{
           <span className={`w-3 h-3 rounded-full ${healthColor}`} />
         </div>
 
-        {/* یادآوری‌ها */}
         <div className="space-y-1 text-xs">
           {waterDue && (
             <div className="flex justify-between text-slate-600 dark:text-slate-300">
@@ -115,14 +108,12 @@ const GardenPlantCard: React.FC<{
           )}
         </div>
 
-        {/* یادداشت (خلاصه) */}
         {userPlant.notes && (
           <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">
             📝 {userPlant.notes}
           </p>
         )}
 
-        {/* دکمه‌ی صفحه عمومی گیاه */}
         <div className="pt-2 border-t border-slate-200 dark:border-slate-700">
           <Link
             to={`/plant/${plant.id}`}
@@ -139,7 +130,6 @@ const GardenPlantCard: React.FC<{
   );
 };
 
-// ===== صفحه اصلی =====
 const MyGardenPage: React.FC = () => {
   const { language } = useLanguageTheme();
   const isEn = language === 'en';
@@ -148,11 +138,9 @@ const MyGardenPage: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [sortKey, setSortKey] = useState('added_date_desc');
 
-  // فیلتر و مرتب‌سازی
   const filteredAndSorted = useMemo(() => {
     let plants = [...userPlants];
 
-    // جستجو
     if (searchTerm.trim()) {
       const query = searchTerm.toLowerCase();
       plants = plants.filter((up) => {
@@ -170,7 +158,6 @@ const MyGardenPage: React.FC = () => {
       });
     }
 
-    // مرتب‌سازی
     switch (sortKey) {
       case 'added_date_asc':
         plants.sort((a, b) => new Date(a.added_date).getTime() - new Date(b.added_date).getTime());
@@ -194,7 +181,7 @@ const MyGardenPage: React.FC = () => {
           return nameA.localeCompare(nameB, 'fa');
         });
         break;
-      default: // added_date_desc
+      default:
         plants.sort((a, b) => new Date(b.added_date).getTime() - new Date(a.added_date).getTime());
         break;
     }
@@ -274,7 +261,6 @@ const MyGardenPage: React.FC = () => {
         </div>
       </div>
 
-      {/* گرید کارت‌ها */}
       <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <AnimatePresence>
           {filteredAndSorted.map((up) => (
@@ -297,7 +283,6 @@ const MyGardenPage: React.FC = () => {
         </div>
       )}
 
-      {/* مودال جزئیات */}
       <AnimatePresence>
         {selectedPlant && (
           <PlantDetailModal

@@ -182,7 +182,6 @@ const DiseaseDetection: React.FC = () => {
     );
   }
 
-  // Upload interface unchanged
   return (
     <div className="container mx-auto px-4 lg:px-6 py-10 lg:py-14">
       <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">

@@ -40,7 +40,6 @@ const DiseaseDetailsPage: React.FC = () => {
         setLoading(true);
         const data = await diseaseService.getDiseaseById(parseInt(id));
         setDisease(data);
-        // بارگذاری کامنت‌ها
         const commentsData = await diseaseCommentService.getComments(parseInt(id));
         setComments(commentsData);
       } catch (err) {
@@ -88,7 +87,6 @@ const DiseaseDetailsPage: React.FC = () => {
       await diseaseCommentService.addComment(disease.id, replyContent, parentId);
       setReplyTo(null);
       setReplyContent('');
-      // به‌روزرسانی کل کامنت‌ها
       const refreshed = await diseaseCommentService.getComments(disease.id);
       setComments(refreshed);
     } catch (err) {
@@ -96,7 +94,6 @@ const DiseaseDetailsPage: React.FC = () => {
     }
   };
 
-  // تابع کمکی برای تبدیل رشته کاما جدا شده به آرایه و نمایش به صورت برچسب
   const renderAffectedPlants = (plantsStr: string | undefined) => {
     if (!plantsStr) return null;
     const plantsArray = plantsStr.split(',').map(p => p.trim()).filter(p => p);
@@ -160,7 +157,6 @@ const DiseaseDetailsPage: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-8 px-4 sm:px-6" dir={isEn ? 'ltr' : 'rtl'}>
       <div className="max-w-6xl mx-auto">
-        {/* دکمه بازگشت */}
         <button
           onClick={() => navigate('/library')}
           className="flex items-center gap-2 text-slate-600 dark:text-slate-400 hover:text-green-600 mb-6 transition"
@@ -169,7 +165,6 @@ const DiseaseDetailsPage: React.FC = () => {
           <span>{isEn ? 'Back to Library' : 'بازگشت به کتابخانه'}</span>
         </button>
 
-        {/* هدر بیماری */}
         <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 dark:border-slate-700/50 overflow-hidden mb-8">
           <div className="bg-gradient-to-r from-red-500 to-orange-600 px-6 py-8 text-white">
             <div className="flex justify-between items-start flex-wrap gap-4">
@@ -206,9 +201,7 @@ const DiseaseDetailsPage: React.FC = () => {
             </div>
           </div>
 
-          {/* محتوای اصلی */}
           <div className="p-6 space-y-6">
-            {/* توضیحات */}
             <div className="prose dark:prose-invert max-w-none">
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                 <FiAlertCircle className="text-red-500" />
@@ -217,7 +210,6 @@ const DiseaseDetailsPage: React.FC = () => {
               <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(description) }} />
             </div>
 
-            {/* علائم */}
             <div className="prose dark:prose-invert max-w-none">
               <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2">
                 <FiActivity className="text-orange-500" />
@@ -226,7 +218,6 @@ const DiseaseDetailsPage: React.FC = () => {
               <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(symptoms) }} />
             </div>
 
-            {/* ===== بخش جدید: گیاهان آسیب‌دیده ===== */}
             {disease.affected_plants_list && (
               <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
                 <h2 className="text-xl font-semibold text-slate-800 dark:text-slate-200 flex items-center gap-2 mb-3">
@@ -237,7 +228,6 @@ const DiseaseDetailsPage: React.FC = () => {
               </div>
             )}
 
-            {/* راه حل درمان */}
             <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
               <button
                 onClick={() => setShowTreatment(!showTreatment)}
@@ -258,7 +248,6 @@ const DiseaseDetailsPage: React.FC = () => {
                     className="mt-3 prose dark:prose-invert max-w-none"
                   >
                     <div dangerouslySetInnerHTML={{ __html: DOMPurify.sanitize(solution) }} />
-                    {/* اگر تحلیل LLM موجود باشد و شامل steps باشد، نمایش می‌دهیم */}
                     {llm && (llm.treatment_steps_en?.length || llm.treatment_steps_fa?.length) && (
                       <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-xl mt-4">
                         <h3 className="font-semibold text-green-800 dark:text-green-300">
@@ -276,7 +265,6 @@ const DiseaseDetailsPage: React.FC = () => {
               </AnimatePresence>
             </div>
 
-            {/* پیشگیری */}
             <div className="border-t border-slate-200 dark:border-slate-700 pt-6">
               <button
                 onClick={() => setShowPrevention(!showPrevention)}
@@ -309,7 +297,6 @@ const DiseaseDetailsPage: React.FC = () => {
           </div>
         </div>
 
-        {/* بخش کامنت‌ها (مشابه گیاه) */}
         <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-2xl p-6 border border-white/30 dark:border-slate-700/50">
           <div className="flex items-center gap-2 mb-4">
             <FiMessageCircle className="w-5 h-5 text-green-600" />

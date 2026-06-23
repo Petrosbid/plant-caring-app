@@ -12,8 +12,6 @@ import Footer from './components/common/Footer';
 
 // Simple route simulation without react-router-dom
 const App = () => {
-  // For demo purposes, we'll show the Home component
-  // In a real app with proper routing, you would use react-router-dom
   const currentPage = window.location.pathname;
 
   let pageComponent;

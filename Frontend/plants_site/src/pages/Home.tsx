@@ -44,7 +44,6 @@ const AnimatedStat: React.FC<{ value: string; from?: number; duration?: number; 
 
 const container = {
   hidden: { opacity: 0 },
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   visible: (_i = 1) => ({
     opacity: 1,
     transition: { staggerChildren: 0.12, delayChildren: 0.08 },
