@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguageTheme } from '../../contexts/LanguageThemeContext';
+import CountryFlag from 'react-country-flag';
+import { FiMenu, FiX } from 'react-icons/fi';
 
 interface NavigationProps {
   navigateTo: (page: string) => void;
@@ -36,11 +38,20 @@ const navItems: NavItem[] = [
       { key: "disease", labelKey: "disease" },
       { key: "recommend", labelKey: "recommend" }
     ]
+  },
+  {
+    key: "about-us",
+    labelKey: "aboutUs",
+    children: [
+      { key: "about-us", labelKey: "aboutUs" },
+      { key: "contact-us", labelKey: "contactUs" }
+    ]
   }
 ];
 
 const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [expandedItems, setExpandedItems] = useState<Record<string, boolean>>({});
   const { user, isAuthenticated, logout } = useAuth();
   const { language, theme, toggleLanguage, toggleTheme, t } = useLanguageTheme();
   const isRtl = language === 'fa';
@@ -50,35 +61,63 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
     setIsOpen(false);
   };
 
+  const toggleExpand = (key: string) => {
+    setExpandedItems(prev => ({
+      ...prev,
+      [key]: !prev[key]
+    }));
+  };
+
+  const flags = {
+    en: <span className="flex items-center gap-1">FA <CountryFlag countryCode="IR" svg /></span>,
+    fa: <span className="flex items-center gap-1">EN <CountryFlag countryCode="US" svg /></span>
+  };
+
   const renderNavItem = (item: NavItem, depth = 0) => {
     const hasChildren = item.children && item.children.length > 0;
     const isActive = currentPage === item.key;
+    const isExpanded = !!expandedItems[item.key];
 
     if (hasChildren) {
       return (
         <div key={item.key} className="space-y-1">
-          <div
-            className={`py-3 px-4 rounded-xl font-medium flex items-center justify-between text-slate-700 dark:text-slate-200 ${
+          <button
+            onClick={() => toggleExpand(item.key)}
+            className={`w-full py-3 px-4 rounded-xl font-semibold flex items-center justify-between text-slate-700 dark:text-slate-200 hover:bg-slate-100/50 dark:hover:bg-slate-800/40 transition-colors ${
               isRtl ? 'flex-row-reverse' : ''
             }`}
           >
             <span>{t(item.labelKey)}</span>
             <svg
-              className={`w-4 h-4 transition-transform ${isRtl ? 'rotate-180' : ''}`}
+              className={`w-4 h-4 transition-transform duration-250 ${
+                isExpanded ? 'rotate-180' : ''
+              } ${isRtl ? 'mr-auto ml-1' : 'ml-auto mr-1'}`}
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
             >
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
             </svg>
-          </div>
-          <div
-            className={`space-y-1 ${
-              isRtl ? 'pr-4 border-r-2' : 'pl-4 border-l-2'
-            } border-slate-200 dark:border-slate-700 ml-2 mr-2`}
-          >
-            {item.children!.map(child => renderNavItem(child, depth + 1))}
-          </div>
+          </button>
+          <AnimatePresence initial={false}>
+            {isExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.22, ease: 'easeInOut' }}
+                className="overflow-hidden"
+              >
+                <div
+                  className={`space-y-1 ${
+                    isRtl ? 'pr-4 border-r border-slate-200 dark:border-slate-800' : 'pl-4 border-l border-slate-200 dark:border-slate-800'
+                  } ml-2 mr-2`}
+                >
+                  {item.children!.map(child => renderNavItem(child, depth + 1))}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       );
     }
@@ -87,11 +126,11 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
       <button
         key={item.key}
         onClick={() => closeAndNavigate(item.key)}
-        className={`w-full text-left py-3 px-4 rounded-xl font-medium transition-colors ${
+        className={`w-full py-3 px-4 rounded-xl font-medium transition-all duration-150 flex items-center ${
           isActive
-            ? 'bg-brand-500/15 text-brand-600 dark:text-brand-400'
-            : 'text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80'
-        } ${isRtl ? 'text-right' : 'text-left'}`}
+            ? 'bg-brand-500/10 text-brand-600 dark:text-brand-400 font-semibold shadow-sm'
+            : 'text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/30'
+        } ${isRtl ? 'text-right justify-start' : 'text-left justify-start'}`}
       >
         {t(item.labelKey)}
       </button>
@@ -119,25 +158,25 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
           <div className="flex items-center gap-2">
             <motion.button
               onClick={toggleLanguage}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 text-xs font-medium"
+              className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 text-xs font-medium flex items-center justify-center gap-1 transition-colors"
               whileTap={{ scale: 0.95 }}
             >
-              {language === 'en' ? t('persian') : t('english')}
+              {language === 'en' ? flags.en : flags.fa}
             </motion.button>
             <motion.button
               onClick={toggleTheme}
-              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700/80"
+              className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
               whileTap={{ scale: 0.95 }}
             >
               {theme === 'light' ? '🌙' : '☀️'}
             </motion.button>
             <motion.button
               onClick={() => setIsOpen(!isOpen)}
-              className="p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80"
+              className="p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition-colors"
               whileTap={{ scale: 0.95 }}
               aria-label="Menu"
             >
-              <span className="text-2xl">{isOpen ? '✕' : '☰'}</span>
+              {isOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
             </motion.button>
           </div>
         </div>
@@ -145,54 +184,65 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
 
       <AnimatePresence>
         {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, height: 0 }}
-            animate={{ opacity: 1, height: 'auto' }}
-            exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.25, ease: 'easeOut' }}
-            className="overflow-hidden border-t border-slate-200/60 dark:border-slate-700/50"
-          >
-            <ul className="p-4 space-y-1 ">
-              {navItems.map((item) => (
-                <li key={item.key}>{renderNavItem(item)}</li>
-              ))}
-              {isAuthenticated ? (
-                <>
-                  <li>
+          <>
+            {/* Backdrop Overlay */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsOpen(false)}
+              className="fixed inset-0 top-[3.5rem] bg-black/40 backdrop-blur-sm z-40"
+            />
+            
+            {/* Dropdown Menu */}
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
+              className="absolute top-full left-0 right-0 bg-white/95 dark:bg-slate-900/95 backdrop-blur-xl border-t border-b border-slate-200/60 dark:border-slate-700/50 shadow-2xl max-h-[calc(100vh-3.5rem)] overflow-y-auto z-50"
+            >
+              <ul className="p-4 space-y-1.5 list-none">
+                {navItems.map((item) => (
+                  <li key={item.key}>{renderNavItem(item)}</li>
+                ))}
+                {isAuthenticated ? (
+                  <>
+                    <li className="border-t border-slate-200/60 dark:border-slate-800 pt-2.5">
+                      <button
+                        onClick={() => closeAndNavigate('profile')}
+                        className={`w-full py-3 px-4 rounded-xl font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-800/40 flex items-center gap-3 ${
+                          isRtl ? 'flex-row-reverse justify-start text-right' : 'justify-start text-left'
+                        }`}
+                      >
+                        <span className="text-lg">👤</span>
+                        <span>{user?.first_name ? `${user.first_name} ${user.last_name || ''}`.trim() : user?.username}</span>
+                      </button>
+                    </li>
+                    <li>
+                      <button
+                        onClick={() => { logout(); setIsOpen(false); }}
+                        className={`w-full py-3 px-4 rounded-xl font-semibold text-red-600 dark:text-red-400 hover:bg-red-500/10 transition-colors ${
+                          isRtl ? 'text-right' : 'text-left'
+                        }`}
+                      >
+                        {t('logout')}
+                      </button>
+                    </li>
+                  </>
+                ) : (
+                  <li className="border-t border-slate-200/60 dark:border-slate-800 pt-2.5">
                     <button
-                      onClick={() => closeAndNavigate('profile')}
-                      className={`w-full py-3 px-4 rounded-xl font-medium text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 flex items-center gap-2 ${
-                        isRtl ? 'flex-row-reverse justify-end' : ''
-                      }`}
+                      onClick={() => closeAndNavigate('login')}
+                      className="w-full py-3 px-4 rounded-xl font-semibold bg-brand-600 hover:bg-brand-700 text-white shadow-md transition-colors text-center"
                     >
-                      <span>👤</span> {user?.first_name}
+                      {t('signIn')}
                     </button>
                   </li>
-                  <li>
-                    <button
-                      onClick={() => { logout(); setIsOpen(false); }}
-                      className={`w-full py-3 px-4 rounded-xl font-medium text-red-600 dark:text-red-400 hover:bg-red-500/10 ${
-                        isRtl ? 'text-right' : 'text-left'
-                      }`}
-                    >
-                      {t('logout')}
-                    </button>
-                  </li>
-                </>
-              ) : (
-                <li>
-                  <button
-                    onClick={() => closeAndNavigate('login')}
-                    className={`w-full py-3 px-4 rounded-xl font-medium bg-brand-500 text-white ${
-                      isRtl ? 'text-right' : 'text-left'
-                    }`}
-                  >
-                    {t('signIn')}
-                  </button>
-                </li>
-              )}
-            </ul>
-          </motion.div>
+                )}
+              </ul>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </motion.nav>

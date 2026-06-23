@@ -43,6 +43,14 @@ const navItems: NavItem[] = [
       { key: "disease", labelKey: "disease" },
       { key: "recommend", labelKey: "recommend" }
     ]
+  },
+  {
+    key: "about-us",
+    labelKey: "aboutUs",
+    children: [
+      { key: "about-us", labelKey: "aboutUs" },
+      { key: "contact-us", labelKey: "contactUs" }
+    ]
   }
 ];
 

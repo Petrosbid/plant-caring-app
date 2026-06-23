@@ -17,7 +17,11 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
     { key: 'reminders', labelKey: 'reminders' },
   ];
 
-  const navResources: { key: string; labelKey: 'library' }[] = [{ key: 'library', labelKey: 'library' }];
+  const navResources = [
+    { key: 'library', labelKey: 'library' },
+    { key: 'about-us', labelKey: 'aboutUs' },
+    { key: 'contact-us', labelKey: 'contactUs' },
+  ];
   const extResources: { label: string; href: string }[] = [
     { label: isEn ? 'Blog' : 'بلاگ', href: '#' },
     { label: isEn ? 'Tutorials' : 'آموزش‌ها', href: '#' },

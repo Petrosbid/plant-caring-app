@@ -78,6 +78,11 @@ export interface User {
   last_name?: string;
   bio?: string;
   phone?: string;
+  phone_number?: string;
+  national_code?: string;
+  birth_date?: string;
+  gender?: string;
+  profile_picture?: string | null;
 }
 
 export interface Reminder {

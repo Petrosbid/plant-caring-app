@@ -1,10 +1,11 @@
 // API service for plant identification app
-import type { Plant, Disease, Reminder, User, PlantComment } from '../types';
+import type { Plant, Disease, Reminder, User, PlantComment, UserPlant, GrowthRecord, DiseaseComment, PaginatedResponse } from '../types';
+import type { PostListItem, PostDetail, BlogComment } from '../types/blog';
 import axios from 'axios';
 
 // Base API URL - points to your backend
-export const API_BASE_URL = 'https://django-3b13q0.chbkn.run/api';
-const BLOG_API_BASE_URL = 'https://django-3b13q0.chbkn.run/api/blog';
+export const API_BASE_URL = 'http://127.0.0.1:8000/api';
+const BLOG_API_BASE_URL = 'http://127.0.0.1:8000/api/blog';
 
 // Create axios instance for blog API with error handling
 const blogApi = axios.create({
@@ -12,12 +13,106 @@ const blogApi = axios.create({
   headers: { 'Content-Type': 'application/json' },
 });
 
+// Add global fetch interceptor to handle transparent token refresh
+const originalFetch = window.fetch;
+
+// Helper to refresh access token using refresh_token
+async function performTokenRefresh(): Promise<string | null> {
+  const refreshToken = localStorage.getItem('refresh_token');
+  if (!refreshToken) return null;
+
+  try {
+    const response = await originalFetch(`${API_BASE_URL}/token/refresh/`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ refresh: refreshToken }),
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      if (data.access) {
+        localStorage.setItem('access_token', data.access);
+        if (data.refresh) {
+          localStorage.setItem('refresh_token', data.refresh);
+        }
+        return data.access;
+      }
+    }
+  } catch (err) {
+    console.error('Error refreshing token:', err);
+  }
+
+  // If refresh fails, clean up credentials
+  localStorage.removeItem('access_token');
+  localStorage.removeItem('refresh_token');
+  localStorage.removeItem('user');
+  
+  // Dispatch event to notify AuthContext to update UI/state
+  window.dispatchEvent(new Event('auth_logout'));
+  return null;
+}
+
+window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+  let response = await originalFetch(input, init);
+
+  // If 401 Unauthorized, try to refresh token and retry
+  if (response.status === 401) {
+    const urlString = typeof input === 'string' 
+      ? input 
+      : (input instanceof URL ? input.toString() : input.url);
+    
+    // Check if it's our API and NOT an authentication route that is expected to fail
+    const isOurApi = urlString.includes('/api/');
+    const isAuthRequest = urlString.includes('/auth/login/') || 
+                          urlString.includes('/token/refresh/') ||
+                          urlString.includes('/auth/register/');
+
+    if (isOurApi && !isAuthRequest) {
+      console.log('Access token expired. Attempting token refresh...');
+      const newAccessToken = await performTokenRefresh();
+      if (newAccessToken) {
+        // Clone init to modify headers
+        const newInit = { ...init };
+        const headers = new Headers(newInit.headers || {});
+        headers.set('Authorization', `Bearer ${newAccessToken}`);
+        newInit.headers = headers;
+
+        // Retry original request
+        console.log('Token refreshed. Retrying API request...');
+        response = await originalFetch(input, newInit);
+      }
+    }
+  }
+
+  return response;
+};
+
 // Add auth token to requests
 blogApi.interceptors.request.use((config) => {
   const token = localStorage.getItem('access_token');
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
+
+// Add response interceptor to handle token refresh for blogApi (Axios)
+blogApi.interceptors.response.use(
+  (response) => response,
+  async (error) => {
+    const originalRequest = error.config;
+    if (error.response?.status === 401 && !originalRequest._retry) {
+      originalRequest._retry = true;
+      console.log('Axios request failed with 401. Attempting token refresh...');
+      const newAccessToken = await performTokenRefresh();
+      if (newAccessToken) {
+        originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
+        return blogApi(originalRequest);
+      }
+    }
+    return Promise.reject(error);
+  }
+);
 
 // Helper to get auth headers for fetch API
 const getAuthHeaders = (): HeadersInit => {
@@ -44,7 +139,7 @@ export const authService = {
     password: string;
     first_name?: string;
     last_name?: string;
-  }): Promise<any> => {
+  }): Promise<User> => {
     const response = await fetch(`${API_BASE_URL}/auth/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -393,7 +488,7 @@ export const diseaseService = {
 // Garden (User Plants) Service
 // ==============================
 export const gardenService = {
-  getUserPlants: async (): Promise<any[]> => {
+  getUserPlants: async (): Promise<UserPlant[]> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/`, {
       method: 'GET',
       headers: getAuthHeaders(),
@@ -406,7 +501,7 @@ export const gardenService = {
     plant: number;
     nickname?: string;
     notes?: string;
-  }): Promise<any> => {
+  }): Promise<UserPlant> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -416,7 +511,7 @@ export const gardenService = {
     return response.json();
   },
 
-  updateUserPlant: async (id: number, plantData: Partial<any>): Promise<any> => {
+  updateUserPlant: async (id: number, plantData: Partial<UserPlant>): Promise<UserPlant> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/${id}/`, {
       method: 'PATCH',
       headers: getAuthHeaders(),
@@ -445,7 +540,7 @@ export const gardenService = {
     width?: number;
     unit?: string;
     notes?: string;
-  }): Promise<any> => {
+  }): Promise<GrowthRecord> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/growth/`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -455,7 +550,7 @@ export const gardenService = {
     return response.json();
   },
 
-  waterPlant: async (id: number): Promise<any> => {
+  waterPlant: async (id: number): Promise<UserPlant> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/${id}/water_plant/`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -464,7 +559,7 @@ export const gardenService = {
     return response.json();
   },
 
-  fertilizePlant: async (id: number): Promise<any> => {
+  fertilizePlant: async (id: number): Promise<UserPlant> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/${id}/fertilize_plant/`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -473,7 +568,7 @@ export const gardenService = {
     return response.json();
   },
 
-  prunePlant: async (id: number): Promise<any> => {
+  prunePlant: async (id: number): Promise<UserPlant> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/${id}/prune_plant/`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -561,37 +656,37 @@ export const reminderService = {
 // Blog Service
 // ==============================
 export const blogService = {
-  getAllPosts: async (params?: { tags?: string; limit?: number }): Promise<any> => {
+  getAllPosts: async (params?: { tags?: string; limit?: number }): Promise<PaginatedResponse<PostListItem> | PostListItem[]> => {
     const response = await blogApi.get('/posts/', { params });
     return response.data;
   },
 
-  getPostBySlug: async (slug: string): Promise<any> => {
+  getPostBySlug: async (slug: string): Promise<PostDetail> => {
     const response = await blogApi.get(`/posts/${slug}/`);
     return response.data;
   },
 
-  likePost: async (slug: string): Promise<any> => {
+  likePost: async (slug: string): Promise<{ likes_count: number; dislikes_count: number; user_has_liked: boolean; user_has_disliked: boolean }> => {
     const response = await blogApi.post(`/posts/${slug}/like/`);
     return response.data;
   },
 
-  dislikePost: async (slug: string): Promise<any> => {
+  dislikePost: async (slug: string): Promise<{ likes_count: number; dislikes_count: number; user_has_liked: boolean; user_has_disliked: boolean }> => {
     const response = await blogApi.post(`/posts/${slug}/dislike/`);
     return response.data;
   },
 
-  getComments: async (slug: string): Promise<any> => {
+  getComments: async (slug: string): Promise<BlogComment[] | PaginatedResponse<BlogComment>> => {
     const response = await blogApi.get(`/posts/${slug}/comments/`);
     return response.data;
   },
 
-  addComment: async (slug: string, commentData: { content: string; parent?: number }): Promise<any> => {
+  addComment: async (slug: string, commentData: { content: string; parent?: number }): Promise<BlogComment> => {
     const response = await blogApi.post(`/posts/${slug}/comments/`, commentData);
     return response.data;
   },
 
-  voteComment: async (commentId: number, voteType: 1 | -1): Promise<any> => {
+  voteComment: async (commentId: number, voteType: 1 | -1): Promise<unknown> => {
     const response = await blogApi.post(`/comments/${commentId}/vote/`, { vote_type: voteType });
     return response.data;
   },
@@ -600,19 +695,19 @@ export const blogService = {
     await blogApi.delete(`/comments/${commentId}/`);
   },
 
-  updateComment: async (commentId: number, content: string): Promise<any> => {
+  updateComment: async (commentId: number, content: string): Promise<BlogComment> => {
     const response = await blogApi.put(`/comments/${commentId}/`, { content });
     return response.data;
   },
 
-  getPopularPosts: async (limit = 10): Promise<any[]> => {
+  getPopularPosts: async (limit = 10): Promise<PostListItem[]> => {
     const response = await blogApi.get('/posts/', {
       params: { ordering: '-likes_count', page_size: limit },
     });
     return response.data.results || response.data;
   },
 
-  getMostViewedPosts: async (limit = 10): Promise<any[]> => {
+  getMostViewedPosts: async (limit = 10): Promise<PostListItem[]> => {
     const response = await blogApi.get('/posts/', {
       params: { ordering: '-view_count', page_size: limit },
     });
@@ -699,7 +794,7 @@ export const favouriteService = {
 //  Disease Service
 // ==============================
 export const diseaseCommentService = {
-  getComments: async (diseaseId: number): Promise<any[]> => {
+  getComments: async (diseaseId: number): Promise<DiseaseComment[]> => {
     const response = await fetch(`${API_BASE_URL}/diseases/${diseaseId}/comments/`, {
       headers: getAuthHeaders(),
     });
@@ -707,7 +802,7 @@ export const diseaseCommentService = {
     return response.json();
   },
 
-  addComment: async (diseaseId: number, content: string, parentId?: number): Promise<any> => {
+  addComment: async (diseaseId: number, content: string, parentId?: number): Promise<DiseaseComment> => {
     const response = await fetch(`${API_BASE_URL}/diseases/${diseaseId}/comments/`, {
       method: 'POST',
       headers: getAuthHeaders(),
@@ -717,7 +812,7 @@ export const diseaseCommentService = {
     return response.json();
   },
 
-  updateComment: async (diseaseId: number, commentId: number, content: string): Promise<any> => {
+  updateComment: async (diseaseId: number, commentId: number, content: string): Promise<DiseaseComment> => {
     const response = await fetch(`${API_BASE_URL}/diseases/${diseaseId}/comments/${commentId}/`, {
       method: 'PUT',
       headers: getAuthHeaders(),

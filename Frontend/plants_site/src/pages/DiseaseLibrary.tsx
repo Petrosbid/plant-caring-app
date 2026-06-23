@@ -162,6 +162,7 @@ const DiseaseLibrary: React.FC = () => {
   const handleFilterChange = (key: 'severity_level' | 'spread_rate', value: string) => {
     setFilters((prev) => {
       if (prev[key] === value) {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         const { [key]: _, ...rest } = prev;
         return rest;
       }

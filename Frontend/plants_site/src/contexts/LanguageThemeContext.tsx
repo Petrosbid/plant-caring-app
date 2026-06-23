@@ -1,6 +1,6 @@
-import React, { createContext, useState, useEffect } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React, { createContext, useState, useEffect, useContext } from 'react';
 import type { ReactNode } from 'react';
-import { use } from 'react';
 
 type Language = 'en' | 'fa';
 type Theme = 'light' | 'dark';
@@ -83,6 +83,8 @@ const translations = {
     garden: 'Garden',
     mygarden: 'MyGarden',
     diseases: 'Diseases',
+    aboutUs: 'About Us',
+    contactUs: 'Contact Us',
     accessDenied: 'Access Denied',
     pleaseSignIn: 'Please sign in to view your profile.',
     back: 'Back',
@@ -157,6 +159,8 @@ const translations = {
     garden: 'باغچه',
     mygarden: 'باغچه من',
     diseases: 'بیماری‌ها',
+    aboutUs: 'درباره ما',
+    contactUs: 'تماس با ما',
     accessDenied: 'دسترسی رد شد',
     pleaseSignIn: 'لطفاً برای مشاهده پروفایل خود وارد شوید.',
     back: 'بازگشت',
@@ -231,7 +235,7 @@ const translations = {
 
 
 export const useLanguageTheme = () => {
-  const context = use(LanguageThemeContext);
+  const context = useContext(LanguageThemeContext);
   if (!context) {
     throw new Error('useLanguageTheme must be used within a LanguageThemeProvider');
   }

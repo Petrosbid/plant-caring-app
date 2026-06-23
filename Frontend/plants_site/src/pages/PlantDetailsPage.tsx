@@ -93,7 +93,7 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
         // کامنت‌ها
         const commentsData = await commentService.getComments(data.id);
         setComments(commentsData);
-      } catch (err) {
+      } catch {
         setError(isEn ? 'Failed to load plant.' : 'خطا در بارگذاری گیاه.');
       } finally {
         setLoading(false);
@@ -188,7 +188,9 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
           text: plant?.scientific_name || '',
           url: window.location.href,
         });
-      } catch {}
+      } catch (err) {
+        console.error('Share failed:', err);
+      }
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert(isEn ? 'Link copied!' : 'لینک کپی شد!');

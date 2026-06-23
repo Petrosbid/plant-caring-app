@@ -76,7 +76,7 @@ const BlogDetailPage: React.FC = () => {
       if (!post || post.tags.length === 0) return;
       try {
         const response = await blogService.getAllPosts({ tags: post.tags.join(','), limit: 5 });
-        const filtered = (response.results || response)
+        const filtered = (Array.isArray(response) ? response : response.results || [])
           .filter((p: PostListItem) => p.slug !== slug)
           .slice(0, 4);
         setRelatedPosts(filtered || []);

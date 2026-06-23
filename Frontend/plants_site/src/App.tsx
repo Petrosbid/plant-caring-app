@@ -20,6 +20,8 @@ import PlantRecommender from './pages/PlantRecommender';
 import type { JSX } from 'react';
 import DiseaseDetailsPage from './pages/DiseaseDetailsPage';
 import DiseaseLibrary from './pages/DiseaseLibrary';
+import AboutUs from './pages/AboutUs';
+import ContactUs from './pages/ContactUs';
 
 function ProtectedRoute({ children }: { children: JSX.Element }) {
   const { user } = useAuth(); 
@@ -56,6 +58,8 @@ function AnimatedRoutes() {
     if (path === '/login' || path === '/register') return 'login';
     if (path === '/profile') return 'profile';
     if (path === '/my-garden') return 'mygarden';
+    if (path === '/about-us') return 'about-us';
+    if (path === '/contact-us') return 'contact-us';
     return 'home';
   };
 
@@ -75,6 +79,8 @@ function AnimatedRoutes() {
       'plant': '/plant/:id',   
       'mygarden': '/my-garden',
       'recommend': '/recommender',
+      'about-us': '/about-us',
+      'contact-us': '/contact-us',
     };
     navigate(routes[page] || '/');
   };
@@ -110,6 +116,8 @@ function AnimatedRoutes() {
               <Route  path="/profile"  element={ <ProtectedRoute><Profile navigateTo={navigateTo} /></ProtectedRoute>  } />
               <Route path="/disease/:id" element={<DiseaseDetailsPage />} />
               <Route path="/diseases" element={<DiseaseLibrary />} />
+              <Route path="/about-us" element={<AboutUs />} />
+              <Route path="/contact-us" element={<ContactUs />} />
             </Routes>
           </motion.div>
         </AnimatePresence>

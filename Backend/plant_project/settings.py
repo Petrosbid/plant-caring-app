@@ -34,10 +34,44 @@ DEBUG = os.getenv('DEBUG', 'True') == 'True'
 ALLOWED_HOSTS = [
     '*'
 ]
+# CORS settings for React app
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'https://django-3b13q0.chbkn.run',
+    'http://django-3b13q0.chbkn.run',
+]
+# only for develop
+CORS_ALLOW_ALL_ORIGINS = True
+CORS_ALLOW_CREDENTIALS = True
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+# CSRF Settings - Add this at the END of your settings file
+CSRF_TRUSTED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+    'http://127.0.0.1:5173',
+    'https://django-3b13q0.chbkn.run',
+    'http://django-3b13q0.chbkn.run',
+]
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+# For development, you might want to allow all origins
+# In production, be more restrictive
+CORS_ALLOW_ALL_ORIGINS = True  # Set to True for development to allow all origins
 
-SMS_IR_API_KEY = os.getenv('SMS_IR_API_KEY', "YOUR_API_KEY")
-SMS_IR_LINE_NUMBER = os.getenv('SMS_IR_LINE_NUMBER', "YOUR_LINE_NUMBER")
-SMS_IR_OTP_TEMPLATE_ID = os.getenv('SMS_IR_OTP_TEMPLATE_ID', "YOUR_OTP_TEMPLATE_ID")
+# Additional CORS settings
+CORS_ALLOW_CREDENTIALS = True
+
 
 # Application definition
 
@@ -73,7 +107,7 @@ MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
-    'django.middleware.csrf.CsrfViewMiddleware',
+    #'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
@@ -175,7 +209,6 @@ REST_FRAMEWORK = {
 MEDIA_URL = 'media/'
 MEDIA_ROOT = BASE_DIR / 'media'
 
-
 CKEDITOR_UPLOAD_PATH = "uploads/"
 CKEDITOR_CONFIGS = {
     'default': {
@@ -189,8 +222,8 @@ SILENCED_SYSTEM_CHECKS = ['ckeditor.W001']
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
+    'ACCESS_TOKEN_LIFETIME': timedelta(days=1),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=20),
     'ROTATE_REFRESH_TOKENS': True,
     'BLACKLIST_AFTER_ROTATION': True,
     'UPDATE_LAST_LOGIN': False,
@@ -216,46 +249,11 @@ SIMPLE_JWT = {
     'JTI_CLAIM': 'jti',
 
     'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
-    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
-    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_LIFETIME': timedelta(days=1),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=20),
 }
 
-# CORS settings for React app
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",  # Default React dev port
-    "http://127.0.0.1:3000",
-    "http://localhost:5173",  # Vite dev server port
-    "http://127.0.0.1:5173",
-    "http://localhost:8080",  # Alternative ports
-    "http://127.0.0.1:8080",
-    "http://localhost:5000",
-    "http://127.0.0.1:5000",
-    "http://localhost:8000",  # Django dev server
-    "http://127.0.0.1:8000",
-    # Add your React app's IP addresses if running on different host
-    "http://192.168.1.10:5173",  # Adjust based on your network
-]
 
-# For development, you might want to allow all origins
-# In production, be more restrictive
-CORS_ALLOW_ALL_ORIGINS = True  # Set to True for development to allow all origins
-
-# Additional CORS settings
-CORS_ALLOW_CREDENTIALS = True
-CORS_ALLOW_HEADERS = [
-    'accept',
-    'accept-encoding',
-    'authorization',
-    'content-type',
-    'dnt',
-    'origin',
-    'user-agent',
-    'x-csrftoken',
-    'x-requested-with',
-]
-
-# OpenRouter API Key
-OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', 'sk-or-v1-default-key-change-me')
 
 # API Documentation (drf-spectacular)
 SPECTACULAR_SETTINGS = {
@@ -298,4 +296,10 @@ SPECTACULAR_SETTINGS = {
         'drf_spectacular.hooks.preprocess_exclude_path_format'
     ],
 }
-AVALAI_API_KEY="aa-Abmgq6GVYUyjc2R8hF2wSURD5ByhdzHlAcYbUbEqSifyjk1H"
+
+
+AVALAI_API_KEY = os.getenv('AVALAI_API_KEY', "AVALAI_API_KEY")
+SMS_IR_API_KEY = os.getenv('SMS_IR_API_KEY', "YOUR_API_KEY")
+SMS_IR_LINE_NUMBER = os.getenv('SMS_IR_LINE_NUMBER', "YOUR_LINE_NUMBER")
+SMS_IR_OTP_TEMPLATE_ID = os.getenv('SMS_IR_OTP_TEMPLATE_ID', "YOUR_OTP_TEMPLATE_ID")
+OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', 'OPENROUTER_API_KEY')

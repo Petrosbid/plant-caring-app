@@ -7,7 +7,7 @@ interface AuthContextType {
   user: User | null;
   login: (username: string, password: string) => Promise<void>;
   logout: () => void;
-  register: (userData: { username: string; email: string; password: string; first_name?: string; last_name?: string }) => Promise<void>;
+  register: (userData: { username: string; email: string; password: string; first_name?: string; last_name?: string }) => Promise<User>;
   updateUser: (userData: Partial<User>) => void;
   isAuthenticated: boolean;
   requestOtpCode: (phoneNumber: string) => Promise<void>;
@@ -26,6 +26,19 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+
+  useEffect(() => {
+    const handleAuthLogout = () => {
+      console.log('Logging out user due to token refresh failure or session expiration...');
+      setUser(null);
+      setIsAuthenticated(false);
+    };
+
+    window.addEventListener('auth_logout', handleAuthLogout);
+    return () => {
+      window.removeEventListener('auth_logout', handleAuthLogout);
+    };
+  }, []);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('access_token');

@@ -44,6 +44,7 @@ const DiseaseDetailsPage: React.FC = () => {
         const commentsData = await diseaseCommentService.getComments(parseInt(id));
         setComments(commentsData);
       } catch (err) {
+        console.error(err);
         setError(isEn ? 'Failed to load disease.' : 'خطا در بارگذاری بیماری.');
       } finally {
         setLoading(false);
@@ -60,7 +61,9 @@ const DiseaseDetailsPage: React.FC = () => {
           text: disease?.description,
           url: window.location.href,
         });
-      } catch { }
+      } catch (err) {
+        console.error(err);
+      }
     } else {
       navigator.clipboard.writeText(window.location.href);
       alert(isEn ? 'Link copied!' : 'لینک کپی شد!');

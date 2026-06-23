@@ -13,8 +13,9 @@ logger = logging.getLogger(__name__)
 
 # دریافت کلید از تنظیمات جنگو
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
+YOUR_GAPGPT_API_KEY=  getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
 # استفاده از یک مدل بینایی استاندارد و قدرتمند سازگار با مستندات AvalAI
-VISION_MODEL = "gemini-3.1-pro-preview"
+VISION_MODEL = "gemma-3-27b-it"
 
 SYSTEM_PROMPT = """You are an expert botanist and plant identification specialist. Your task is to analyze the provided image and determine whether it contains a plant.
 
@@ -116,8 +117,8 @@ def predict_plant(image_data):
 
         # مقداردهی کلاینت AvalAI با ساختار OpenAI SDK
         client = OpenAI(
-            base_url="https://api.avalai.ir/v1",
-            api_key=AVALAI_API_KEY,
+            base_url="https://api.gapgpt.app/v1",
+            api_key=YOUR_GAPGPT_API_KEY,
             timeout=100.0,
         )
 

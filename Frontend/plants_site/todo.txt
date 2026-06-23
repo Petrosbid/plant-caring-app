@@ -1,5 +1,0 @@
-add recommend plant base popularity
-add filter to library, blog
-add font: add best and modern fonts for both language that good for subject of this project
-login warning popup: in actions that need to user logged in, add a modern popup that tell user should log in
-add all varibles and configs that they are privacy or needed to setup in changes to a file and make them in their file base on that

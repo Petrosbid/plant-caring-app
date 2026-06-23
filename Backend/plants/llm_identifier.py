@@ -6,7 +6,7 @@ from .models import Plant
 
 # دریافت کلید از تنظیمات جنگو
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
-
+YOUR_GAPGPT_API_KEY=  getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
 
 def get_plant_info_from_llm(plant_name):
     system_prompt = """
@@ -93,13 +93,13 @@ Return ONLY the raw JSON object.
 
     try:
         client = OpenAI(
-            base_url="[https://api.avalai.ir/v1](https://api.avalai.ir/v1)",
-            api_key=AVALAI_API_KEY
+            base_url="https://api.gapgpt.app/v1",
+            api_key=YOUR_GAPGPT_API_KEY
         )
 
         # فراخوانی متد کامپلیشن
         response = client.chat.completions.create(
-            model="gemma-4-31b-it",
+            model="gemma-3-27b-it",
             messages=[
                 {"role": "system", "content": system_prompt},
                 {"role": "user", "content": f"Plant name: {plant_name}"}
