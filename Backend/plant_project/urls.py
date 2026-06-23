@@ -13,7 +13,6 @@ from drf_spectacular.views import (
 )
 
 urlpatterns = [
-    # Django Admin (Material Design Theme)
     path('admin/', admin.site.urls),
 
     # API Documentation
@@ -35,7 +34,6 @@ urlpatterns = [
     path('ckeditor/', include('ckeditor_uploader.urls')),
 ]
 
-# Serve media files during development
 if settings.DEBUG:
     urlpatterns += (static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
                  + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT))

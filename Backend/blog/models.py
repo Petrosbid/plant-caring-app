@@ -35,17 +35,16 @@ class Post(models.Model):
         DRAFT = 'DF', 'Draft'
         PUBLISHED = 'PB', 'Published'
 
-    # Persian content (default)
+    # Persian content
     title = models.CharField(max_length=250)
     content = RichTextUploadingField()
     
-    # English translations
+    # English content
     title_en = models.CharField(max_length=250, blank=True, null=True)
     content_en = RichTextUploadingField(blank=True, null=True)
     
     slug = models.SlugField(max_length=250, unique_for_date='publish', blank=True)
 
-    # FIX: Use settings.AUTH_USER_MODEL instead of User directly
     author = models.ForeignKey(
         settings.AUTH_USER_MODEL,
         on_delete=models.CASCADE,

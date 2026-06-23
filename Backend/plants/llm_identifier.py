@@ -4,7 +4,6 @@ from django.conf import settings
 from openai import OpenAI
 from .models import Plant
 
-# دریافت کلید از تنظیمات جنگو
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 YOUR_GAPGPT_API_KEY=  getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
 
@@ -97,7 +96,6 @@ Return ONLY the raw JSON object.
             api_key=YOUR_GAPGPT_API_KEY
         )
 
-        # فراخوانی متد کامپلیشن
         response = client.chat.completions.create(
             model="gemma-3-27b-it",
             messages=[

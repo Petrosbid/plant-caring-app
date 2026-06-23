@@ -44,7 +44,6 @@ def update_care_dates(sender, instance, created, **kwargs):
             else:
                 instance.fertilizing_interval_days = 30  # Default to monthly
 
-        # Save the updated intervals
         instance.save()
 
 

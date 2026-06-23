@@ -6,4 +6,4 @@ class GardensConfig(AppConfig):
     name = 'gardens'
 
     def ready(self):
-        import gardens.signals  # Import signals if any
+        import gardens.signals

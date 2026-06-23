@@ -10,7 +10,6 @@ from openai import OpenAI, APIConnectionError, APITimeoutError
 
 logger = logging.getLogger(__name__)
 
-# دریافت تنظیمات AvalAI
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 VISION_MODEL = "gemma-4-31b-it"
 
@@ -37,7 +36,6 @@ If no disease is detected or the image doesn't contain a plant leaf/part, return
 
 
 def encode_image_to_base64(image_path):
-    """تبدیل تصویر به فرمت Base64 برای ارسال به API"""
     try:
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
@@ -47,16 +45,12 @@ def encode_image_to_base64(image_path):
 
 
 def predict_disease(image_data):
-    """
-    تشخیص بیماری گیاه با ارسال تصویر به مدل Vision ارائه‌دهنده AvalAI
-    """
     from .models import Disease
 
     if not AVALAI_API_KEY:
         logger.error("AvalAI API key is missing in settings.")
         return {'id': None, 'details': None, 'error': 'API key configuration error'}
 
-    # تعیین پسوند فایل
     if hasattr(image_data, 'name') and image_data.name:
         file_extension = os.path.splitext(image_data.name)[1]
     elif isinstance(image_data, str) and image_data.strip():
@@ -70,7 +64,6 @@ def predict_disease(image_data):
 
     tmp_path = None
     try:
-        # ایجاد فایل موقت برای ذخیره پکت‌ها یا دیتای ورودی
         with tempfile.NamedTemporaryFile(delete=False, suffix=file_extension) as tmp_file:
             tmp_path = tmp_file.name
             if hasattr(image_data, 'chunks'):
@@ -92,7 +85,6 @@ def predict_disease(image_data):
         return {'id': None, 'details': None}
 
     try:
-        # ۱. انکود کردن عکس به Base64
         base64_image = encode_image_to_base64(tmp_path)
         if not base64_image:
             return {'id': None, 'details': None, 'error': 'Failed to process image bytes'}
@@ -101,7 +93,6 @@ def predict_disease(image_data):
         if mime_type == "image/jpg":
             mime_type = "image/jpeg"
 
-        # ۲. مقداردهی کلاینت ارائه‌دهنده
         client = OpenAI(
             base_url="[https://api.avalai.ir/v1](https://api.avalai.ir/v1)",
             api_key=AVALAI_API_KEY
@@ -109,7 +100,6 @@ def predict_disease(image_data):
 
         logger.info("Sending image to AvalAI Vision API for disease detection...")
         
-        # ۳. ارسال درخواست به مدل چندرسانه‌ای Gemma 4
         response = client.chat.completions.create(
             model=VISION_MODEL,
             messages=[
@@ -135,7 +125,6 @@ def predict_disease(image_data):
 
         content = response.choices[0].message.content.strip()
 
-        # ۴. پاک‌سازی مارک‌داون احتمالی
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         elif "```" in content:
@@ -154,7 +143,6 @@ def predict_disease(image_data):
             logger.info("Plant is diagnosed as healthy.")
             return {'id': None, 'name': 'Healthy', 'details': None, 'confidence': confidence_score}
 
-        # ۵. فراخوانی داینامیک ماژول llm_diseas برای دریافت جزئیات ساختاریافته دوزبانه
         disease_details = None
         try:
             import importlib.util
@@ -169,7 +157,6 @@ def predict_disease(image_data):
         except Exception as e:
             logger.error(f"Failed to import or execute llm_diseas module: {e}")
 
-        # ۶. مطابقت دادن نام بیماری با دیتابیس جنگو (جستجوی فازی)
         detected_disease_id = None
         try:
             predicted_lower = predicted_disease_label.lower()
@@ -210,7 +197,6 @@ def predict_disease(image_data):
         return {'id': None, 'details': None}
 
     finally:
-        # پاک‌سازی امن فایل موقت در آخرین گام
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.unlink(tmp_path)

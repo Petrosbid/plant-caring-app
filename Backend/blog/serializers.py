@@ -3,7 +3,6 @@ from taggit.serializers import TagListSerializerField, TaggitSerializer
 from .models import Post, Comment, UserVote
 from django.contrib.auth import get_user_model
 
-# FIX: Get the correct User model dynamically
 User = get_user_model()
 
 
@@ -35,7 +34,6 @@ class PostListSerializer(serializers.ModelSerializer):
     author = AuthorSerializer(read_only=True)
     excerpt = serializers.SerializerMethodField()
     excerpt_en = serializers.SerializerMethodField()
-    # English title for language switching
     title_en = serializers.ReadOnlyField()
     comments_count = serializers.SerializerMethodField()
     tags = serializers.StringRelatedField(many=True, read_only=True)
@@ -70,7 +68,6 @@ class PostListSerializer(serializers.ModelSerializer):
 
     def get_excerpt_en(self, obj):
         from django.utils.html import strip_tags
-        # Safety check if content is empty
         content = obj.content_en or ""
         text = strip_tags(content)
         return text[:150] + '...' if len(text) > 150 else text
@@ -87,7 +84,6 @@ class PostDetailSerializer(TaggitSerializer, serializers.ModelSerializer):
     comments = CommentSerializer(many=True, read_only=True)
     user_has_liked = serializers.SerializerMethodField()
     user_has_disliked = serializers.SerializerMethodField()
-    # English content for language switching
     title_en = serializers.ReadOnlyField()
     content_en = serializers.ReadOnlyField()
     meta_description_en = serializers.ReadOnlyField()

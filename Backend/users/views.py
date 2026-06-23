@@ -183,7 +183,6 @@ class RegisterRequestOTPView(APIView):
         identifier = data.get('phone') or data.get('email')
         otp_code = generate_otp_code()
 
-        # حذف کدهای قبلی استفاده نشده برای این شناسه
         OTPCode.objects.filter(
             phone=identifier if method == 'phone' else None,
             email=identifier if method == 'email' else None,
@@ -191,10 +190,6 @@ class RegisterRequestOTPView(APIView):
             is_used=False
         ).delete()
 
-        # ذخیره اطلاعات موقت در سشن یا کش – برای سادگی در دیتابیس با فیلدهای اضافی ذخیره می‌کنیم
-        # اما مدل OTPCode ما فیلدهای first_name, last_name, username را ندارد،
-        # بنابراین بهتر است یک مدل موقت ایجاد کنیم یا از کش استفاده کنیم.
-        # برای اختصار، فرض می‌کنیم اطلاعات را در سشن Django ذخیره می‌کنیم.
         request.session['temp_reg_data'] = {
             'method': method,
             'identifier': identifier,
@@ -275,10 +270,8 @@ class RegisterVerifyOTPView(APIView):
         otp.user = user
         otp.save()
 
-        # حذف داده موقت
         del request.session['temp_reg_data']
 
-        # صادر کردن توکن
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)
         refresh_token = str(refresh)

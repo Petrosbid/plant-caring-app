@@ -11,45 +11,44 @@ from openai import OpenAI, APIConnectionError, APITimeoutError
 
 logger = logging.getLogger(__name__)
 
-# دریافت کلید از تنظیمات جنگو
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 YOUR_GAPGPT_API_KEY=  getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
-# استفاده از یک مدل بینایی استاندارد و قدرتمند سازگار با مستندات AvalAI
 VISION_MODEL = "gemma-3-27b-it"
 
-SYSTEM_PROMPT = """You are an expert botanist and plant identification specialist. Your task is to analyze the provided image and determine whether it contains a plant.
-
-Follow these rules strictly:
-
-1. If the image contains one or more plants, identify the most prominent one.
-2. Provide:
-   - Common English name
-   - Scientific name (genus and species)
-   - Confidence percentage (0-100)
-3. Output **only** valid JSON. Do not include any extra text, explanations, or markdown.
-
-Output format when plant is detected:
-{
-  "is_plant": true,
-  "common_name": "English common name",
-  "scientific_name": "Scientific name",
-  "confidence": 95
-}
-
-4. If the image does not contain any plant (e.g., animal, person, landscape without visible plant, object, text, food without plant parts), output:
-{
-  "is_plant": false,
-  "error": "No plant detected in the image. Please upload a clear photo of a leaf, flower, stem, or the whole plant."
-}
-
-Guidelines:
-- If multiple plants exist, focus on the central or largest one.
-- If unsure, reduce confidence accordingly.
-- Do not guess if the image is blurry or ambiguous; return is_plant=false in that case."""
+SYSTEM_PROMPT = """
+    You are an expert botanist and plant identification specialist. Your task is to analyze the provided image and determine whether it contains a plant.
+    
+    Follow these rules strictly:
+    
+    1. If the image contains one or more plants, identify the most prominent one.
+    2. Provide:
+       - Common English name
+       - Scientific name (genus and species)
+       - Confidence percentage (0-100)
+    3. Output **only** valid JSON. Do not include any extra text, explanations, or markdown.
+    
+    Output format when plant is detected:
+    {
+      "is_plant": true,
+      "common_name": "English common name",
+      "scientific_name": "Scientific name",
+      "confidence": 95
+    }
+    
+    4. If the image does not contain any plant (e.g., animal, person, landscape without visible plant, object, text, food without plant parts), output:
+    {
+      "is_plant": false,
+      "error": "No plant detected in the image. Please upload a clear photo of a leaf, flower, stem, or the whole plant."
+    }
+    
+    Guidelines:
+    - If multiple plants exist, focus on the central or largest one.
+    - If unsure, reduce confidence accordingly.
+    - Do not guess if the image is blurry or ambiguous; return is_plant=false in that case.
+"""
 
 
 def encode_image_to_base64(image_path):
-    """تبدیل تصویر به فرمت Base64 برای ارسال به API"""
     try:
         with open(image_path, "rb") as image_file:
             return base64.b64encode(image_file.read()).decode('utf-8')
@@ -61,12 +60,10 @@ def encode_image_to_base64(image_path):
 def predict_plant(image_data):
     from .models import Plant
 
-    # بررسی وجود روت کلید API
     if not AVALAI_API_KEY:
         logger.error("AvalAI API key is missing in settings.")
         return {'id': None, 'name': None, 'error': 'API key configuration error'}
 
-    # تشخیص پسوند فایل و استانداردسازی به حروف کوچک برای جلوگیری از مشکلات mime-type
     if hasattr(image_data, 'name') and image_data.name:
         ext = os.path.splitext(image_data.name)[1].lower()
     elif isinstance(image_data, str) and image_data.strip():
@@ -80,7 +77,6 @@ def predict_plant(image_data):
 
     tmp_path = None
     try:
-        # ذخیره موقت فایل جهت استانداردسازی و انکود
         with tempfile.NamedTemporaryFile(delete=False, suffix=ext) as tmp_file:
             tmp_path = tmp_file.name
             if hasattr(image_data, 'chunks'):
@@ -102,27 +98,22 @@ def predict_plant(image_data):
         return {'id': None, 'name': None, 'error': 'Image processing failed'}
 
     try:
-        # تبدیل عکس به Base64
         base64_image = encode_image_to_base64(tmp_path)
         if not base64_image:
             return {'id': None, 'name': None, 'error': 'Failed to process image bytes'}
 
-        # تعیین Content-Type تصویر بر اساس پسوند اصلاح شده
         mime_type = f"image/{ext.replace('.', '')}"
         if mime_type in ["image/jpg", "image/jpeg"]:
             mime_type = "image/jpeg"
         elif mime_type not in ["image/png", "image/webp", "image/gif"]:
-            # فرمت پیش‌فرض در صورت نامعتبر بودن فرمت‌های ورودی
             mime_type = "image/jpeg"
 
-        # مقداردهی کلاینت AvalAI با ساختار OpenAI SDK
         client = OpenAI(
             base_url="https://api.gapgpt.app/v1",
             api_key=YOUR_GAPGPT_API_KEY,
             timeout=100.0,
         )
 
-        # پیاده‌سازی حلقه Retry برای مقابله با خطاهای شبکه با خطایابی پکیج رسمی
         max_retries = 3
         retry_delay = 2
         response = None
@@ -131,7 +122,6 @@ def predict_plant(image_data):
             try:
                 logger.info(f"Sending request to AvalAI (Attempt {attempt + 1}/{max_retries})...")
 
-                # ارسال درخواست مالتی‌مدیال ویژن به مدل معتبر با فرمت استاندارد Base64
                 response = client.chat.completions.create(
                     model=VISION_MODEL,
                     messages=[
@@ -167,17 +157,13 @@ def predict_plant(image_data):
         if not response:
             return {'id': None, 'name': None, 'error': 'Failed to establish connection to API'}
 
-        # دریافت متن مستقیم از ساختار پاسخ کلاینت رسمی
         content = response.choices[0].message.content.strip()
 
-        # پاک‌سازی تگ‌های مارک‌داون احتمالی در پاسخ متنی
-        # پاک‌سازی تگ‌های مارک‌داون احتمالی در پاسخ متنی
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         elif "```" in content:
             content = content.split("```")[1].split("```")[0].strip()
 
-        # استخراج ساختار شیء جی‌سان با رگرسیون مطمئن‌تر
         json_match = re.search(r'\{.*\}', content, re.DOTALL)
         if not json_match:
             logger.warning(f"No JSON found in model response: {content}")
@@ -185,12 +171,10 @@ def predict_plant(image_data):
 
         result = json.loads(json_match.group())
 
-        # --- نگاشت نتیجه با دیتابیس گیاهان ---
         if result.get('is_plant') is True:
             scientific_name = result.get('scientific_name', '')
             common_name = result.get('common_name', '')
 
-            # جستجوی فازی در دیتابیس برای پیدا کردن گیاه
             detected_plant = Plant.objects.filter(
                 Q(scientific_name__icontains=scientific_name) |
                 Q(farsi_name__icontains=common_name) |

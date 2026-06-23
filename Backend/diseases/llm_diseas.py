@@ -4,7 +4,6 @@ from django.conf import settings
 from openai import OpenAI, APIConnectionError, APITimeoutError
 from .models import Disease
 
-# دریافت کلید از تنظیمات جنگو
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 DISEASE_MODEL = "gemma-4-31b-it"
 
@@ -75,13 +74,11 @@ Now, generate the JSON for disease: **{disease_name}**
 """
 
     try:
-        # مقداردهی کلاینت AvalAI با ساختار OpenAI SDK
         client = OpenAI(
             base_url="https://api.avalai.ir/v1",
             api_key=AVALAI_API_KEY
         )
 
-        # فراخوانی متد کامپلیشن با اعمال فرمت ساختاریافته JSON
         response = client.chat.completions.create(
             model=DISEASE_MODEL,
             messages=[
@@ -95,10 +92,8 @@ Now, generate the JSON for disease: **{disease_name}**
             timeout=90
         )
 
-        # دریافت مستقیم محتوای متنی پاسخ
         content = response.choices[0].message.content.strip()
 
-        # پاکسازی تگ‌های مارک‌داون احتمالی
         if content.startswith("```json"):
             content = content.replace("```json", "").replace("```", "").strip()
         elif content.startswith("```"):
@@ -106,7 +101,6 @@ Now, generate the JSON for disease: **{disease_name}**
 
         disease_data = json.loads(content)
 
-        # اطمینان از اینکه گام‌های درمانی به صورت لیست هندل می‌شوند
         for lang in ['fa', 'en']:
             key = f'treatment_steps_{lang}'
             if not isinstance(disease_data.get(key), list):
@@ -136,7 +130,6 @@ def create_or_update_disease_from_llm(disease_name):
         return None
 
     try:
-        # Extract fields
         name_en = info.get('disease_name_en', disease_name)
         name_fa = info.get('disease_name_fa', '')
         description_en = info.get('description_en', '')
@@ -147,23 +140,19 @@ def create_or_update_disease_from_llm(disease_name):
         prevention_fa = info.get('prevention_fa', '')
         severity = info.get('severity', 'medium')
 
-        # Convert severity to valid choice
         if severity not in ['low', 'medium', 'high', 'critical']:
             severity = 'medium'
 
-        # Combine treatment steps into solution fields
         treatment_steps_en = '\n'.join(info.get('treatment_steps_en', []))
         treatment_steps_fa = '\n'.join(info.get('treatment_steps_fa', []))
         organic_en = info.get('organic_treatment_en', '')
         organic_fa = info.get('organic_treatment_fa', '')
 
-        # Check if disease exists by name_fa (or name_en)
         disease = Disease.objects.filter(name_fa=name_fa).first()
         if not disease:
             disease = Disease.objects.filter(name=name_en).first()
 
         if disease:
-            # Update existing
             disease.name = name_en
             disease.name_fa = name_fa
             disease.description = description_en
@@ -178,7 +167,6 @@ def create_or_update_disease_from_llm(disease_name):
             disease.spread_rate = info.get('spread_rate', 'moderate')
             disease.save()
         else:
-            # Create new
             disease = Disease.objects.create(
                 name=name_en,
                 name_fa=name_fa,

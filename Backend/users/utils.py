@@ -2,7 +2,6 @@
 import re
 
 def normalize_phone_number(phone: str) -> str:
-    """تبدیل شماره به فرمت بین‌المللی +98... (برای ذخیره در دیتابیس و مقایسه)"""
     phone = re.sub(r'\D', '', phone)
 
     if phone.startswith('0098'):

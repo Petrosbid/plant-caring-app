@@ -10,9 +10,7 @@ from users.utils import to_sms_ir_format
 logger = logging.getLogger(__name__)
 
 
-# ------------------- تابع ارسال ایمیل -------------------
 def send_otp_email(email, code):
-    """ارسال کد تایید از طریق ایمیل"""
     subject = 'Your verification code'
     message = f'Your verification code is: {code}\nThis code expires in 5 minutes.'
     from_email = settings.DEFAULT_FROM_EMAIL
@@ -20,7 +18,6 @@ def send_otp_email(email, code):
     send_mail(subject, message, from_email, recipient_list)
 
 
-# ------------------- کلاس سرویس پیامک -------------------
 class SmsIrService:
     def __init__(self):
         self.api_key = settings.SMS_IR_API_KEY
@@ -49,6 +46,5 @@ class SmsIrService:
             raise e
 
 
-# ------------------- تابع تولید کد تصادفی -------------------
 def generate_otp_code():
     return str(random.randint(100000, 999999))

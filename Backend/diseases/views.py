@@ -98,7 +98,6 @@ class DiseaseDiagnoseView(APIView):
             return Response(disease_data, status=status.HTTP_200_OK)
 
         except Disease.DoesNotExist:
-            # If disease not in DB, return minimal info with LLM analysis
             if disease_details:
                 response_data = {
                     'id': disease_id,
@@ -172,7 +171,6 @@ class DiseaseCommentViewSet(mixins.CreateModelMixin,
     def perform_create(self, serializer):
         disease = Disease.objects.get(pk=self.kwargs['disease_pk'])
         comment = serializer.save(user=self.request.user, disease=disease)
-        # افزایش تعداد کامنت‌ها
         Disease.objects.filter(pk=disease.pk).update(comment_count=F('comment_count') + 1)
 
     def destroy(self, request, *args, **kwargs):

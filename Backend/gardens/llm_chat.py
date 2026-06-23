@@ -2,7 +2,6 @@ import json
 from django.conf import settings
 from openai import OpenAI, APIConnectionError, APITimeoutError
 
-# دریافت کلید از تنظیمات جنگو
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 CHAT_MODEL = "gemma-4-31b-it"
 
@@ -14,74 +13,72 @@ def get_plant_chat_response(user_plant, user_question, chat_history=None):
 
     plant = user_plant.plant
 
-    # دریافت مقادیر نمایشی برای فیلدهای انتخابی
     health_status_display = user_plant.get_health_status_display() or 'نامشخص'
     pot_size_display = user_plant.get_pot_size_display() or 'نامشخص'
     care_difficulty_display = plant.get_care_difficulty_display() if plant.care_difficulty else 'نامشخص'
 
     plant_context = f"""
-=== اطلاعات پایه گیاه ===
-نام فارسی: {plant.farsi_name or 'نامشخص'}
-نام انگلیسی: {plant.english_name or 'نامشخص'}
-نام علمی: {plant.scientific_name or 'نامشخص'}
-سختی مراقبت: {care_difficulty_display}
-سمی بودن: {'بله' if plant.is_toxic else 'خیر'}
-توضیحات کلی: {plant.description[:300] if plant.description else 'ندارد'}
-
-=== نیازهای مراقبتی (مقادیر مرجع) ===
-آبیاری: {plant.watering_frequency or 'نامشخص'} (انگلیسی: {plant.watering_frequency_en or '-'})
-کوددهی: {plant.fertilizer_schedule or 'نامشخص'} (انگلیسی: {plant.fertilizer_schedule_en or '-'})
-نور: {plant.light_requirements or 'نامشخص'} (انگلیسی: {plant.light_requirements_en or '-'})
-رطوبت: {plant.humidity_level or 'نامشخص'} (انگلیسی: {plant.humidity_level_en or '-'})
-دمای مناسب: {plant.temperature_range or 'نامشخص'} (انگلیسی: {plant.temperature_range_en or '-'})
-خک مناسب: {plant.soil_type or 'نامشخص'} (انگلیسی: {plant.soil_type_en or '-'})
-هرس: {plant.pruning_info or 'نامشخص'} (انگلیسی: {plant.pruning_info_en or '-'})
-تکثیر: {plant.propagation_methods or 'نامشخص'} (انگلیسی: {plant.propagation_methods_en or '-'})
-
-=== اطلاعات شخصی‌سازی شده برای این گیاه در باغچه کاربر ===
-نام‌خودمانی: {user_plant.nickname or 'ندارد'}
-وضعیت سلامت: {health_status_display}
-سایز گلدان: {pot_size_display}
-یادداشت کاربر: {user_plant.notes or 'ندارد'}
-آخرین آبیاری: {user_plant.last_watered.strftime('%Y/%m/%d') if user_plant.last_watered else 'ثبت نشده'}
-آبیاری بعدی: {user_plant.next_watering_date.strftime('%Y/%m/%d') if user_plant.next_watering_date else 'محاسبه نشده'}
-فاصله آبیاری (روز): {user_plant.watering_interval_days}
-آخرین کوددهی: {user_plant.last_fertilized.strftime('%Y/%m/%d') if user_plant.last_fertilized else 'ثبت نشده'}
-کوددهی بعدی: {user_plant.next_fertilizing_date.strftime('%Y/%m/%d') if user_plant.next_fertilizing_date else 'محاسبه نشده'}
-آخرین هرس: {user_plant.last_pruned.strftime('%Y/%m/%d') if user_plant.last_pruned else 'ثبت نشده'}
-هرس بعدی: {user_plant.next_pruning_date.strftime('%Y/%m/%d') if user_plant.next_pruning_date else 'محاسبه نشده'}
+        === اطلاعات پایه گیاه ===
+        نام فارسی: {plant.farsi_name or 'نامشخص'}
+        نام انگلیسی: {plant.english_name or 'نامشخص'}
+        نام علمی: {plant.scientific_name or 'نامشخص'}
+        سختی مراقبت: {care_difficulty_display}
+        سمی بودن: {'بله' if plant.is_toxic else 'خیر'}
+        توضیحات کلی: {plant.description[:300] if plant.description else 'ندارد'}
+        
+        === نیازهای مراقبتی (مقادیر مرجع) ===
+        آبیاری: {plant.watering_frequency or 'نامشخص'} (انگلیسی: {plant.watering_frequency_en or '-'})
+        کوددهی: {plant.fertilizer_schedule or 'نامشخص'} (انگلیسی: {plant.fertilizer_schedule_en or '-'})
+        نور: {plant.light_requirements or 'نامشخص'} (انگلیسی: {plant.light_requirements_en or '-'})
+        رطوبت: {plant.humidity_level or 'نامشخص'} (انگلیسی: {plant.humidity_level_en or '-'})
+        دمای مناسب: {plant.temperature_range or 'نامشخص'} (انگلیسی: {plant.temperature_range_en or '-'})
+        خک مناسب: {plant.soil_type or 'نامشخص'} (انگلیسی: {plant.soil_type_en or '-'})
+        هرس: {plant.pruning_info or 'نامشخص'} (انگلیسی: {plant.pruning_info_en or '-'})
+        تکثیر: {plant.propagation_methods or 'نامشخص'} (انگلیسی: {plant.propagation_methods_en or '-'})
+        
+        === اطلاعات شخصی‌سازی شده برای این گیاه در باغچه کاربر ===
+        نام‌خودمانی: {user_plant.nickname or 'ندارد'}
+        وضعیت سلامت: {health_status_display}
+        سایز گلدان: {pot_size_display}
+        یادداشت کاربر: {user_plant.notes or 'ندارد'}
+        آخرین آبیاری: {user_plant.last_watered.strftime('%Y/%m/%d') if user_plant.last_watered else 'ثبت نشده'}
+        آبیاری بعدی: {user_plant.next_watering_date.strftime('%Y/%m/%d') if user_plant.next_watering_date else 'محاسبه نشده'}
+        فاصله آبیاری (روز): {user_plant.watering_interval_days}
+        آخرین کوددهی: {user_plant.last_fertilized.strftime('%Y/%m/%d') if user_plant.last_fertilized else 'ثبت نشده'}
+        کوددهی بعدی: {user_plant.next_fertilizing_date.strftime('%Y/%m/%d') if user_plant.next_fertilizing_date else 'محاسبه نشده'}
+        آخرین هرس: {user_plant.last_pruned.strftime('%Y/%m/%d') if user_plant.last_pruned else 'ثبت نشده'}
+        هرس بعدی: {user_plant.next_pruning_date.strftime('%Y/%m/%d') if user_plant.next_pruning_date else 'محاسبه نشده'}
     """
 
     system_prompt = f"""
-You are a friendly expert assistant specialized in indoor and garden plant care.  
-Your goal is to help the user improve the health and happiness of their plants.  
-Below is the information about a specific plant that belongs to the user:
-
-{plant_context}
-
-Response rules:
-1. Only answer questions related to plants, their care, common issues, pests, watering, light, soil, fertilizing, pruning, propagation, and similar topics.
-2. If the user's question is completely unrelated to plants (e.g., politics, sports, math, irrelevant jokes, etc.), politely say you cannot answer that and guide them back to plant-related questions.
-3. If the user's question is vague, meaningless, or too short (less than 3 words with no clear meaning), politely ask them to clarify their question.
-4. Use the actual information from "Basic plant information" and "Personalized information" to give accurate and personalized answers.
-5. Responses should be friendly and fluent. Maximum length 400 words.
-6. If the user has asked a similar question before (chat history will be provided below), you may refer to it and avoid unnecessary repetition.
-7. Never provide medical or legal advice. Only talk about plants.
-8. If the user asks about a visual problem (e.g., leaf discoloration) but hasn't sent a photo, explain that you cannot give a precise diagnosis without seeing the plant, but you can suggest a few common possibilities.
-
-Language rule:  
-- If the user writes in Persian (Farsi), you MUST reply in Persian.  
-- If the user writes in English, you MUST reply in English.  
-- Do not mix languages. Always match the user's language.
-
-Now the conversation history (last 10 messages at most) will be provided, followed by the user's new question.
+        You are a friendly expert assistant specialized in indoor and garden plant care.  
+        Your goal is to help the user improve the health and happiness of their plants.  
+        Below is the information about a specific plant that belongs to the user:
+        
+        {plant_context}
+        
+        Response rules:
+        1. Only answer questions related to plants, their care, common issues, pests, watering, light, soil, fertilizing, pruning, propagation, and similar topics.
+        2. If the user's question is completely unrelated to plants (e.g., politics, sports, math, irrelevant jokes, etc.), politely say you cannot answer that and guide them back to plant-related questions.
+        3. If the user's question is vague, meaningless, or too short (less than 3 words with no clear meaning), politely ask them to clarify their question.
+        4. Use the actual information from "Basic plant information" and "Personalized information" to give accurate and personalized answers.
+        5. Responses should be friendly and fluent. Maximum length 400 words.
+        6. If the user has asked a similar question before (chat history will be provided below), you may refer to it and avoid unnecessary repetition.
+        7. Never provide medical or legal advice. Only talk about plants.
+        8. If the user asks about a visual problem (e.g., leaf discoloration) but hasn't sent a photo, explain that you cannot give a precise diagnosis without seeing the plant, but you can suggest a few common possibilities.
+        
+        Language rule:  
+        - If the user writes in Persian (Farsi), you MUST reply in Persian.  
+        - If the user writes in English, you MUST reply in English.  
+        - Do not mix languages. Always match the user's language.
+        
+        Now the conversation history (last 10 messages at most) will be provided, followed by the user's new question.
     """
 
     messages = [
         {"role": "system", "content": system_prompt}
     ]
 
-    # افزودن تاریخچه چت (در صورت وجود)
     if chat_history:
         for msg in chat_history[-10:]:
             messages.append(msg)
@@ -89,13 +86,11 @@ Now the conversation history (last 10 messages at most) will be provided, follow
     messages.append({"role": "user", "content": user_question})
 
     try:
-        # مقداردهی کلاینت با ساختار استاندارد OpenAI SDK
         client = OpenAI(
             base_url="https://api.avalai.ir/v1",
             api_key=AVALAI_API_KEY
         )
 
-        # فراخوانی متد چت کامپلیشن
         response = client.chat.completions.create(
             model=CHAT_MODEL,
             messages=messages,
@@ -104,7 +99,6 @@ Now the conversation history (last 10 messages at most) will be provided, follow
             timeout=45
         )
 
-        # استخراج مستقیم پاسخ متنی
         reply = response.choices[0].message.content
         return reply.strip()
 

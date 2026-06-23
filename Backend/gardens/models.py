@@ -10,7 +10,6 @@ class UserPlant(models.Model):
     nickname = models.CharField(max_length=255, blank=True, null=True)
     added_date = models.DateTimeField(auto_now_add=True)
 
-    # Care reminder information
     last_watered = models.DateTimeField(
         null=True, blank=True, default=None,
         help_text="Date when the plant was last watered"
@@ -77,19 +76,16 @@ class UserPlant(models.Model):
         return f"{self.nickname or self.plant.farsi_name} in {self.user.username}'s garden"
 
     def needs_watering(self):
-        """Check if the plant needs watering today"""
         if self.next_watering_date:
             return timezone.now().date() >= self.next_watering_date.date()
         return False
 
     def needs_fertilizing(self):
-        """Check if the plant needs fertilizing today"""
         if self.next_fertilizing_date:
             return timezone.now().date() >= self.next_fertilizing_date.date()
         return False
 
     def needs_pruning(self):
-        """Check if the plant needs pruning today"""
         if self.next_pruning_date:
             return timezone.now().date() >= self.next_pruning_date.date()
         return False
@@ -98,7 +94,6 @@ class UserPlant(models.Model):
 
 
 class Reminder(models.Model):
-    """Represents a care reminder for a user's plant."""
     CARE_TYPES = [
         ('watering', 'Watering'),
         ('fertilizing', 'Fertilizing'),
@@ -125,7 +120,6 @@ class Reminder(models.Model):
         return f"{self.title} - {self.user.username}"
 
     def is_overdue(self):
-        """Check if the reminder is overdue"""
         return not self.is_completed and self.scheduled_date < timezone.now()
 
     class Meta:
@@ -176,7 +170,6 @@ class GrowthRecord(models.Model):
 
 
 class PlantChatMessage(models.Model):
-    """ذخیره تاریخچه چت کاربر با دستیار برای هر گیاه خاص در باغچه کاربر"""
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='plant_chats')
     user_plant = models.ForeignKey(UserPlant, on_delete=models.CASCADE, related_name='chat_messages')
     message = models.TextField(verbose_name="پیام کاربر")

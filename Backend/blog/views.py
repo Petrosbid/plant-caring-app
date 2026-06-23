@@ -31,7 +31,6 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
 
     def retrieve(self, request, *args, **kwargs):
         instance = self.get_object()
-        # Increment view count on retrieval
         instance.view_count += 1
         instance.save(update_fields=['view_count'])
         serializer = self.get_serializer(instance, context={'request': request})
@@ -45,22 +44,18 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
         if not request.user.is_authenticated:
             raise PermissionDenied("You must be logged in to like posts.")
         
-        # Check if user already liked
         existing_vote = UserVote.objects.filter(user=request.user, post=post).first()
         
         if existing_vote:
             if existing_vote.vote_type == UserVote.VoteType.LIKE:
-                # Unlike
                 existing_vote.delete()
                 post.likes_count = max(0, post.likes_count - 1)
             else:
-                # Change from dislike to like
                 existing_vote.vote_type = UserVote.VoteType.LIKE
                 existing_vote.save()
                 post.likes_count += 1
                 post.dislikes_count = max(0, post.dislikes_count - 1)
         else:
-            # New like
             UserVote.objects.create(user=request.user, post=post, vote_type=UserVote.VoteType.LIKE)
             post.likes_count += 1
         
@@ -81,22 +76,18 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
         if not request.user.is_authenticated:
             raise PermissionDenied("You must be logged in to dislike posts.")
         
-        # Check if user already disliked
         existing_vote = UserVote.objects.filter(user=request.user, post=post).first()
         
         if existing_vote:
             if existing_vote.vote_type == UserVote.VoteType.DISLIKE:
-                # Remove dislike
                 existing_vote.delete()
                 post.dislikes_count = max(0, post.dislikes_count - 1)
             else:
-                # Change from like to dislike
                 existing_vote.vote_type = UserVote.VoteType.DISLIKE
                 existing_vote.save()
                 post.dislikes_count += 1
                 post.likes_count = max(0, post.likes_count - 1)
         else:
-            # New dislike
             UserVote.objects.create(user=request.user, post=post, vote_type=UserVote.VoteType.DISLIKE)
             post.dislikes_count += 1
         
@@ -126,12 +117,11 @@ class PostViewSet(viewsets.ReadOnlyModelViewSet):
             serializer = CommentSerializer(comment)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         
-        # GET request - return all comments
         comments = post.comments.all()
         serializer = CommentSerializer(comments, many=True)
         return Response(serializer.data)
 
-    @action(detail=False, methods=['get'], url_path='latest')
+    @action(detail=False, methods=['get'], url_path='latest' , permission_classes=[AllowAny])
     def latest_posts(self, request):
         """
         An endpoint to get the 5 latest published posts.

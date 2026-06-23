@@ -2,44 +2,35 @@ import json
 from django.conf import settings
 from openai import OpenAI, APIConnectionError, APITimeoutError, RateLimitError
 
-# دریافت کلید از تنظیمات جنگو
 AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 
-# استفاده از مدل پرچم‌دار، فوق‌العاده سریع و پایدار نسل جدید دی‌پ‌سیک (جایگزین مدل منسوخ شده v3)
 RECOMMENDATION_MODEL = "gemini-2.5-pro-tts"
 
 
 def get_plant_recommendation_from_llm(answers: dict, language: str, additional_notes: str = ""):
-    """
-    دریافت پاسخ‌های کاربر و بازگرداندن نام گیاه پیشنهادی + دلیل انتخاب در قالب JSON استاندارد.
-    answers: دیکشنری شامل پاسخ‌های سوالات
-    language: 'en' یا 'fa'
-    additional_notes: توضیحات اضافی کاربر
-    """
     if not AVALAI_API_KEY:
         print("Error: AvalAI API key is missing in django settings.")
         return None
 
     # ۱. ساخت سیستم پرامپت بر اساس زبان انتخابی
     if language == 'fa':
-        system_prompt = """تو یک متخصص گیاهان آپارتمانی حرفه‌ای هستی با دانش عمیق از شرایط نگهداری، سازگاری با محیط‌های مختلف، نیازهای نوری، آبیاری، رطوبت، دما، خاک و سمیت برای حیوانات.
-بر اساس اطلاعات زیر که کاربر در مورد خانه، سبک زندگی، محدودیت‌ها و سلیقه خود داده است، بهترین گیاه را پیشنهاد بده. فقط و فقط یک گیاه پیشنهاد بده.
-
-اطلاعات کاربر:
-"""
+        system_prompt = """
+            تو یک متخصص گیاهان آپارتمانی حرفه‌ای هستی با دانش عمیق از شرایط نگهداری، سازگاری با محیط‌های مختلف، نیازهای نوری، آبیاری، رطوبت، دما، خاک و سمیت برای حیوانات.
+            بر اساس اطلاعات زیر که کاربر در مورد خانه، سبک زندگی، محدودیت‌ها و سلیقه خود داده است، بهترین گیاه را پیشنهاد بده. فقط و فقط یک گیاه پیشنهاد بده.
+            
+            اطلاعات کاربر:
+        """
     else:
-        system_prompt = """You are a professional houseplant expert with deep knowledge of plant care, environmental adaptability, light needs, watering, and pet safety.
-Based on the following user information, recommend the single best plant. Recommend only one plant.
+        system_prompt = """
+            You are a professional houseplant expert with deep knowledge of plant care, environmental adaptability, light needs, watering, and pet safety.
+            Based on the following user information, recommend the single best plant. Recommend only one plant.
+            User information:
+        """
 
-User information:
-"""
-
-    # ۲. استخراج و متنی کردن پاسخ‌های کاربر برای تزریق به پرامپت
     answers_text = ""
     for key, value in answers.items():
         answers_text += f"- {key}: {value}\n"
 
-    # ۳. ساخت یوزر پرامپت همراه با ساختار اجباری JSON (بدون اتکا به فلگ response_format برای پایداری بیشتر)
     if language == 'fa':
         user_prompt = f"""
 {answers_text}
@@ -76,7 +67,6 @@ Important: The plant must be fully compatible with all restrictions mentioned.
 """
 
     try:
-        # ۴. مقداردهی کلاینت طبق استاندارد SDK سازگار با OpenAI در AvalAI
         client = OpenAI(
             base_url="https://api.avalai.ir/v1/",
             api_key=AVALAI_API_KEY
@@ -92,10 +82,8 @@ Important: The plant must be fully compatible with all restrictions mentioned.
             timeout=600.0
         )
 
-        # ۶. دریافت متن خروجی و پاکسازی فاصله‌های خالی ابتدا و انتها
         content = response.choices[0].message.content.strip()
 
-        # ۷. پاکسازی هوشمند و همه‌جانبه مارک‌داون (در صورتی که مدل تگ‌های ```json یا ``` تولید کرده باشد)
         if content.startswith("```"):
             lines = content.splitlines()
             if lines[0].startswith("```"):
@@ -104,11 +92,9 @@ Important: The plant must be fully compatible with all restrictions mentioned.
                 lines = lines[:-1]
             content = "\n".join(lines).strip()
 
-        # ۸. تبدیل متن خروجی به دیتای قابل استفاده (Dictionary پایتون)
         recommendation = json.loads(content)
         return recommendation
 
-    # ۹. مدیریت هوشمند خطاهای احتمالی شبکه و API برای جلوگیری از کرش کردن جنگو
     except RateLimitError as rate_err:
         print(f"AvalAI Rate Limit hit: {repr(rate_err)}. Please verify your account tier or balance.")
         return None

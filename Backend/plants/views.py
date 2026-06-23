@@ -288,7 +288,6 @@ class PlantSearchView(APIView):
             plants = plants.filter(care_difficulty=care_difficulty)
 
         if light_requirement:
-            # جستجو در فیلد فارسی و انگلیسی
             plants = plants.filter(
                 Q(light_requirements__icontains=light_requirement) |
                 Q(light_requirements_en__icontains=light_requirement)
@@ -300,9 +299,7 @@ class PlantSearchView(APIView):
 
 
 class PlantRecommenderView(APIView):
-    """
-    دریافت پاسخ‌های کاربر و بازگرداندن پیشنهاد گیاه
-    """
+
     permission_classes = [AllowAny]  # یا [IsAuthenticated] در صورت نیاز
     parser_classes = [JSONParser]
 
@@ -314,18 +311,15 @@ class PlantRecommenderView(APIView):
         if not answers:
             return Response({'error': 'Answers are required'}, status=status.HTTP_400_BAD_REQUEST)
 
-        # دریافت پیشنهاد از LLM
         recommendation = get_plant_recommendation_from_llm(answers, language, additional_notes)
         if not recommendation:
             return Response({'error': 'Could not generate recommendation'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # استخراج نام گیاه (اولویت با فارسی یا انگلیسی)
         plant_name_fa = recommendation.get('plant_name_fa', '')
         plant_name_en = recommendation.get('plant_name_en', '')
         scientific_name = recommendation.get('scientific_name', '')
         reason = recommendation.get('reason_en' if language == 'en' else 'reason_fa', '')
 
-        # جستجو در دیتابیس
         plant = None
         if plant_name_fa:
             plant = Plant.objects.filter(farsi_name__iexact=plant_name_fa).first()
@@ -334,16 +328,13 @@ class PlantRecommenderView(APIView):
         if not plant and scientific_name:
             plant = Plant.objects.filter(scientific_name__iexact=scientific_name).first()
 
-        # اگر گیاه وجود نداشت، آن را با LLM ایجاد کن
         if not plant:
-            # از نام فارسی یا انگلیسی استفاده کن
             search_name = plant_name_fa or plant_name_en
             if search_name:
                 plant = create_or_update_plant_from_llm(search_name)
             if not plant:
                 return Response({'error': 'Plant could not be created'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-        # بازگرداندن اطلاعات به فرانت‌اند
         serializer = PlantDetailSerializer(plant, context={'request': request})
         plant_data = serializer.data
 

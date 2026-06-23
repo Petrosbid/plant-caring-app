@@ -4,7 +4,6 @@ from .models import Plant, PlantImage, PlantComment, PlantFavourite
 
 
 class PlantImageInline(admin.TabularInline):
-    """نمایش و مدیریت تصاویر گیاه در صفحه ویرایش گیاه"""
     model = PlantImage
     extra = 1  # تعداد فیلدهای خالی برای افزودن تصویر جدید
     fields = ('image', 'caption', 'is_primary', 'created_at', 'image_preview')
@@ -12,7 +11,6 @@ class PlantImageInline(admin.TabularInline):
     ordering = ('-is_primary', 'created_at')
 
     def image_preview(self, obj):
-        """پیش‌نمایش تصویر در پنل ادمین"""
         if obj.image:
             return format_html('<img src="{}" style="width: 80px; height: auto;" />', obj.image.url)
         return "بدون تصویر"
@@ -20,7 +18,6 @@ class PlantImageInline(admin.TabularInline):
 
 
 class PlantCommentInline(admin.TabularInline):
-    """نمایش و مدیریت کامنت‌های گیاه در صفحه ویرایش گیاه"""
     model = PlantComment
     extra = 0
     fields = ('user', 'content', 'is_approved', 'created_at', 'parent')
@@ -35,7 +32,7 @@ class PlantAdmin(admin.ModelAdmin):
                     'care_difficulty', 'favourite_count', 'comment_count', 'view_count')
     search_fields = ('farsi_name', 'english_name', 'other_names', 'other_names_en', 'scientific_name', 'description', 'description_en')
     list_filter = ('is_toxic', 'care_difficulty', 'created_at')
-    prepopulated_fields = {}  # در صورت نیاز می‌توانید slug اضافه کنید
+    prepopulated_fields = {}
     readonly_fields = ('view_count', 'garden_count', 'favourite_count', 'comment_count',
                        'created_at', 'updated_at')
     fieldsets = (
@@ -101,7 +98,6 @@ class PlantCommentAdmin(admin.ModelAdmin):
     reject_comments.short_description = "عدم تأیید کامنت‌های انتخاب شده"
 
 
-# اگر نیاز به مدیریت علاقه‌مندی‌ها نیز دارید (اختیاری)
 @admin.register(PlantFavourite)
 class PlantFavouriteAdmin(admin.ModelAdmin):
     list_display = ('id', 'user', 'plant', 'created_at')
