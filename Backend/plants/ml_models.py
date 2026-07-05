@@ -7,26 +7,44 @@ import base64
 import time
 from django.conf import settings
 from django.db.models import Q
-from openai import OpenAI, APIConnectionError, APITimeoutError
 
 logger = logging.getLogger(__name__)
 
-AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
-YOUR_GAPGPT_API_KEY=  getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
-VISION_MODEL = "gemma-3-27b-it"
+# =====================================================================
+# CONFIGURATION & SWITCH
+# =====================================================================
+USE_GEMINI = True
+
+VISION_MODEL = "gemini-3.5-flash" if USE_GEMINI else "gemma-3-27b-it"
+
+# =====================================================================
+# IMPORTS & CLIENT INITIALIZATION
+# =====================================================================
+if USE_GEMINI:
+    from google import genai
+    from google.genai import types
+    from google.genai.errors import APIError
+
+    GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', "AQ.Ab8RN6KI05T4Tw6pydyIqo4v_hPHDu6ScI5M_eAtCqtIG_8flA")
+    client = genai.Client(api_key=GEMINI_API_KEY)
+else:
+    from openai import OpenAI, APIConnectionError, APITimeoutError
+
+    YOUR_GAPGPT_API_KEY = getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
+    AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 
 SYSTEM_PROMPT = """
     You are an expert botanist and plant identification specialist. Your task is to analyze the provided image and determine whether it contains a plant.
-    
+
     Follow these rules strictly:
-    
+
     1. If the image contains one or more plants, identify the most prominent one.
     2. Provide:
        - Common English name
        - Scientific name (genus and species)
        - Confidence percentage (0-100)
     3. Output **only** valid JSON. Do not include any extra text, explanations, or markdown.
-    
+
     Output format when plant is detected:
     {
       "is_plant": true,
@@ -34,13 +52,13 @@ SYSTEM_PROMPT = """
       "scientific_name": "Scientific name",
       "confidence": 95
     }
-    
+
     4. If the image does not contain any plant (e.g., animal, person, landscape without visible plant, object, text, food without plant parts), output:
     {
       "is_plant": false,
       "error": "No plant detected in the image. Please upload a clear photo of a leaf, flower, stem, or the whole plant."
     }
-    
+
     Guidelines:
     - If multiple plants exist, focus on the central or largest one.
     - If unsure, reduce confidence accordingly.
@@ -60,9 +78,14 @@ def encode_image_to_base64(image_path):
 def predict_plant(image_data):
     from .models import Plant
 
-    if not AVALAI_API_KEY:
-        logger.error("AvalAI API key is missing in settings.")
-        return {'id': None, 'name': None, 'error': 'API key configuration error'}
+    if USE_GEMINI:
+        if not GEMINI_API_KEY:
+            logger.error("Gemini API key is missing.")
+            return {'id': None, 'name': None, 'error': 'API key configuration error'}
+    else:
+        if not YOUR_GAPGPT_API_KEY and not AVALAI_API_KEY:
+            logger.error("OpenAI/GapGPT API key is missing in settings.")
+            return {'id': None, 'name': None, 'error': 'API key configuration error'}
 
     if hasattr(image_data, 'name') and image_data.name:
         ext = os.path.splitext(image_data.name)[1].lower()
@@ -98,67 +121,93 @@ def predict_plant(image_data):
         return {'id': None, 'name': None, 'error': 'Image processing failed'}
 
     try:
-        base64_image = encode_image_to_base64(tmp_path)
-        if not base64_image:
-            return {'id': None, 'name': None, 'error': 'Failed to process image bytes'}
-
         mime_type = f"image/{ext.replace('.', '')}"
         if mime_type in ["image/jpg", "image/jpeg"]:
             mime_type = "image/jpeg"
         elif mime_type not in ["image/png", "image/webp", "image/gif"]:
             mime_type = "image/jpeg"
 
-        client = OpenAI(
-            base_url="https://api.gapgpt.app/v1",
-            api_key=YOUR_GAPGPT_API_KEY,
-            timeout=100.0,
-        )
+        content = ""
 
-        max_retries = 3
-        retry_delay = 2
-        response = None
-        print(f"data:{mime_type};base64,{base64_image}")
-        for attempt in range(max_retries):
+        # ---- EXECUTION BLOCK FOR VISION MODEL ----
+        if USE_GEMINI:
             try:
-                logger.info(f"Sending request to AvalAI (Attempt {attempt + 1}/{max_retries})...")
+                with open(tmp_path, "rb") as f:
+                    image_bytes = f.read()
 
-                response = client.chat.completions.create(
+                response = client.models.generate_content(
                     model=VISION_MODEL,
-                    messages=[
-                        {
-                            "role": "user",
-                            "content": [
-                                {
-                                    "type": "text",
-                                    "text": f"{SYSTEM_PROMPT}\n\nAnalyze this image and return JSON as instructed."
-                                },
-                                {
-                                    "type": "image_url",
-                                    "image_url": {
-                                        "url": f"data:{mime_type};base64,{base64_image}"
-                                    }
-                                }
-                            ]
-                        }
+                    contents=[
+                        types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+                        f"{SYSTEM_PROMPT}\n\nAnalyze this image and return JSON as instructed."
                     ],
-                    temperature=0.2,
-                    timeout=100
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.2,
+                    )
                 )
+                content = response.text.strip()
+            except APIError as api_err:
+                logger.error(f"Google GenAI Vision API Error: {repr(api_err)}")
+                return {'id': None, 'name': None, 'error': 'Google Vision Model Error'}
+            except Exception as e:
+                logger.error(f"Unexpected error calling Gemini Vision: {repr(e)}")
+                return {'id': None, 'name': None, 'error': 'Google Vision Unexpected Error'}
 
-                break
-            except (APIConnectionError, APITimeoutError) as net_err:
-                logger.warning(f"Network issue encountered on attempt {attempt + 1}: {net_err}")
-                if attempt < max_retries - 1:
-                    logger.info(f"Waiting {retry_delay} seconds before retrying...")
-                    time.sleep(retry_delay)
-                else:
-                    raise net_err
+        else:
+            base64_image = encode_image_to_base64(tmp_path)
+            if not base64_image:
+                return {'id': None, 'name': None, 'error': 'Failed to process image bytes'}
 
-        if not response:
-            return {'id': None, 'name': None, 'error': 'Failed to establish connection to API'}
+            openai_client = OpenAI(
+                base_url="[https://api.gapgpt.app/v1](https://api.gapgpt.app/v1)",
+                api_key=YOUR_GAPGPT_API_KEY,
+                timeout=100.0,
+            )
 
-        content = response.choices[0].message.content.strip()
+            max_retries = 3
+            retry_delay = 2
+            openai_response = None
 
+            for attempt in range(max_retries):
+                try:
+                    logger.info(f"Sending request to OpenAI/GapGPT (Attempt {attempt + 1}/{max_retries})...")
+                    openai_response = openai_client.chat.completions.create(
+                        model=VISION_MODEL,
+                        messages=[
+                            {
+                                "role": "user",
+                                "content": [
+                                    {
+                                        "type": "text",
+                                        "text": f"{SYSTEM_PROMPT}\n\nAnalyze this image and return JSON as instructed."
+                                    },
+                                    {
+                                        "type": "image_url",
+                                        "image_url": {
+                                            "url": f"data:{mime_type};base64,{base64_image}"
+                                        }
+                                    }
+                                ]
+                            }
+                        ],
+                        temperature=0.2,
+                        timeout=100
+                    )
+                    break
+                except (APIConnectionError, APITimeoutError) as net_err:
+                    logger.warning(f"Network issue encountered on attempt {attempt + 1}: {net_err}")
+                    if attempt < max_retries - 1:
+                        time.sleep(retry_delay)
+                    else:
+                        raise net_err
+
+            if not openai_response:
+                return {'id': None, 'name': None, 'error': 'Failed to establish connection to OpenAI/GapGPT API'}
+
+            content = openai_response.choices[0].message.content.strip()
+
+        # ---- JSON CLEANING & PARSING BLOCK ----
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         elif "```" in content:
@@ -212,7 +261,6 @@ def predict_plant(image_data):
         logger.error(f"Prediction error: {e}", exc_info=True)
         return {'id': None, 'name': None, 'error': f'Prediction failed: {str(e)}'}
     finally:
-        # پاک‌سازی فایل موقت
         if tmp_path and os.path.exists(tmp_path):
             try:
                 os.unlink(tmp_path)

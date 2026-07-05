@@ -1,20 +1,38 @@
-# diseases/llm_disease.py
 import json
 from django.conf import settings
-from openai import OpenAI, APIConnectionError, APITimeoutError
 from .models import Disease
 
-AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
-DISEASE_MODEL = "gemma-4-31b-it"
+# =====================================================================
+# CONFIGURATION & SWITCH
+# =====================================================================
+USE_GEMINI = True
+
+DISEASE_MODEL = "gemini-3.5-flash" if USE_GEMINI else "gemma-4-31b-it"
+
+# =====================================================================
+# IMPORTS & CLIENT INITIALIZATION
+# =====================================================================
+if USE_GEMINI:
+    from google import genai
+    from google.genai import types
+    from google.genai.errors import APIError
+
+    GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', "AQ.Ab8RN6KI05T4Tw6pydyIqo4v_hPHDu6ScI5M_eAtCqtIG_8flA")
+    client = genai.Client(api_key=GEMINI_API_KEY)
+else:
+    from openai import OpenAI, APIConnectionError, APITimeoutError
+    AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 
 
 def get_disease_details_from_llm(disease_name, plant_name=None):
-    """
-    دریافت اطلاعات دقیق و جامع بیماری از LLM (دوزبانه)
-    """
-    if not AVALAI_API_KEY:
-        print("AvalAI API key is missing in settings.")
-        return None
+    if USE_GEMINI:
+        if not GEMINI_API_KEY:
+            print("Gemini API key is missing.")
+            return None
+    else:
+        if not AVALAI_API_KEY:
+            print("AvalAI API key is missing in settings.")
+            return None
 
     context_plant = f" on the plant '{plant_name}'" if plant_name else " on plants"
 
@@ -73,27 +91,48 @@ Return ONLY a valid JSON object (no markdown, no extra text). The JSON must stri
 Now, generate the JSON for disease: **{disease_name}**
 """
 
+    content = ""
+    if USE_GEMINI:
+        try:
+            response = client.models.generate_content(
+                model=DISEASE_MODEL,
+                contents=system_prompt,
+                config=types.GenerateContentConfig(
+                    response_mime_type="application/json",
+                    temperature=0.2,
+                )
+            )
+            content = response.text.strip()
+        except Exception as e:
+            print(f"Gemini API error in disease generation: {repr(e)}")
+            return None
+    else:
+        try:
+            openai_client = OpenAI(
+                base_url="[https://api.avalai.ir/v1](https://api.avalai.ir/v1)",
+                api_key=AVALAI_API_KEY
+            )
+
+            response = openai_client.chat.completions.create(
+                model=DISEASE_MODEL,
+                messages=[
+                    {"role": "system", "content": "You are a professional plant pathologist. Respond only with valid JSON as instructed."},
+                    {"role": "user", "content": system_prompt}
+                ],
+                response_format={"type": "json_object"},
+                temperature=0.2,
+                max_tokens=2000,
+                timeout=90
+            )
+            content = response.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"OpenAI API error in disease generation: {repr(e)}")
+            return None
+
+    if not content:
+        return None
+
     try:
-        client = OpenAI(
-            base_url="https://api.avalai.ir/v1",
-            api_key=AVALAI_API_KEY
-        )
-
-        response = client.chat.completions.create(
-            model=DISEASE_MODEL,
-            messages=[
-                {"role": "system",
-                 "content": "You are a professional plant pathologist. Respond only with valid JSON as instructed."},
-                {"role": "user", "content": system_prompt}
-            ],
-            response_format={"type": "json_object"},
-            temperature=0.2,
-            max_tokens=2000,
-            timeout=90
-        )
-
-        content = response.choices[0].message.content.strip()
-
         if content.startswith("```json"):
             content = content.replace("```json", "").replace("```", "").strip()
         elif content.startswith("```"):
@@ -110,21 +149,12 @@ Now, generate the JSON for disease: **{disease_name}**
 
         return disease_data
 
-    except (APIConnectionError, APITimeoutError) as net_err:
-        print(f"Network error calling AvalAI for disease information: {repr(net_err)}")
-        return None
     except json.JSONDecodeError as json_err:
         print(f"JSON decode error from disease model response: {repr(json_err)}")
-        return None
-    except Exception as e:
-        print(f"Exception in get_disease_details_from_llm: {repr(e)}")
         return None
 
 
 def create_or_update_disease_from_llm(disease_name):
-    """
-    Create or update a Disease record using LLM-generated data.
-    """
     info = get_disease_details_from_llm(disease_name)
     if not info:
         return None

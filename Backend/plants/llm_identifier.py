@@ -1,13 +1,40 @@
 import json
 import re
 from django.conf import settings
-from openai import OpenAI
 from .models import Plant
 
-AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
-YOUR_GAPGPT_API_KEY=  getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
+# =====================================================================
+# CONFIGURATION & SWITCH
+# =====================================================================
+USE_GEMINI = True
+
+IDENTIFIER_MODEL = "gemini-3.5-flash" if USE_GEMINI else "gemma-3-27b-it"
+
+# =====================================================================
+# IMPORTS & CLIENT INITIALIZATION
+# =====================================================================
+if USE_GEMINI:
+    from google import genai
+    from google.genai import types
+    from google.genai.errors import APIError
+
+    GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', "AQ.Ab8RN6KI05T4Tw6pydyIqo4v_hPHDu6ScI5M_eAtCqtIG_8flA")
+    client = genai.Client(api_key=GEMINI_API_KEY)
+else:
+    from openai import OpenAI
+    YOUR_GAPGPT_API_KEY = getattr(settings, 'YOUR_GAPGPT_API_KEY', None)
+
 
 def get_plant_info_from_llm(plant_name):
+    if USE_GEMINI:
+        if not GEMINI_API_KEY:
+            print("Error: Gemini API key is missing.")
+            return None
+    else:
+        if not YOUR_GAPGPT_API_KEY:
+            print("Error: GapGPT API key is missing in django settings.")
+            return None
+
     system_prompt = """
 You are an expert botanist with deep knowledge of horticulture and indoor/outdoor plant care.  
 I will give you the name of a plant (in any language).  
@@ -20,7 +47,7 @@ that follows the structure below.
   سپس بلافاصله `<h2>راهنمای مراقبت</h2>` اضافه کنید.  
   بعد از آن، برای هر یک از موارد مراقبت به ترتیب زیر، یک `<h3>` و یک `<p>` بنویسید:  
   آبیاری (با جزئیات زمان‌ها، روش بررسی رطوبت خاک، تغییرات فصلی)، کوددهی، نور، رطوبت، دما، خاک، هرس، تکثیر.  
-  هیچ پاراگراف اضافه‌ای بعد از بخش تکثیر ننویسید.  
+  هیش پاراگراف اضافه‌ای بعد از بخش تکثیر ننویسید.  
 
 - **`description_en` (English)**:  
   Same logic: one or two intro paragraphs (no tags) covering appearance, approximate price (in USD or general), native habitat, interesting facts.  
@@ -54,7 +81,6 @@ that follows the structure below.
 
 **is_toxic** true or false (must be lowercase json booleans)
 
-
 ---
 
 ### JSON structure (all fields required)
@@ -83,66 +109,82 @@ that follows the structure below.
     "propagation_methods_en": "allowed value in English",
     "care_difficulty": "easy/medium/hard",
     "is_toxic": True/False,
-    "other_names" : اسامی معروف و عامه دیگر گیاه
+    "other_names" : اسامی معروف و عامه دیگر گیاه,
     "other_names_en" : اسامی معروف و عامه دیگر گیاه به انگلیسی
 }
 
 Return ONLY the raw JSON object.
 """
 
-    try:
-        client = OpenAI(
-            base_url="https://api.gapgpt.app/v1",
-            api_key=YOUR_GAPGPT_API_KEY
-        )
-
-        response = client.chat.completions.create(
-            model="gemma-3-27b-it",
-            messages=[
-                {"role": "system", "content": system_prompt},
-                {"role": "user", "content": f"Plant name: {plant_name}"}
-            ],
-            timeout=50
-        )
-
-        content = response.choices[0].message.content.strip()
-
-        # 1. Clean markdown code fences if present
-        if "```json" in content:
-            content = content.split("```json")[1].split("```")[0].strip()
-        elif "```" in content:
-            content = content.split("```")[1].split("```")[0].strip()
-
-        # 2. Extract anything between the first '{' and last '}' to isolate the object
-        start_idx = content.find('{')
-        end_idx = content.rfind('}')
-        if start_idx != -1 and end_idx != -1:
-            content = content[start_idx:end_idx + 1]
-
-        # 3. Quick-fix Python booleans commonly hallucinated by LLMs
-        content = re.sub(r':\s*True\b', ': true', content)
-        content = re.sub(r':\s*False\b', ': false', content)
-
+    content = ""
+    if USE_GEMINI:
         try:
-            care_data = json.loads(content)
-            return care_data
-        except json.JSONDecodeError as e:
-            print("Error Parsing JSON, attempting recovery. Raw:", repr(content))
+            response = client.models.generate_content(
+                model=IDENTIFIER_MODEL,
+                contents=f"Plant name: {plant_name}",
+                config=types.GenerateContentConfig(
+                    system_instruction=system_prompt,
+                    response_mime_type="application/json",
+                ),
+            )
+            content = response.text.strip()
+        except APIError as api_err:
+            print(f"Google GenAI API Error in identifier: {repr(api_err)}")
+            return None
+        except Exception as e:
+            print(f"Unexpected error calling Gemini in identifier: {repr(e)}")
+            return None
+    else:
+        try:
+            openai_client = OpenAI(
+                base_url="[https://api.gapgpt.app/v1](https://api.gapgpt.app/v1)",
+                api_key=YOUR_GAPGPT_API_KEY
+            )
 
-            salvaged_data = {}
-            matches = re.findall(r'"(\w+)":\s*"(.*?)"', content)
-            for key, val in matches:
-                salvaged_data[key] = val
-
-            if salvaged_data:
-                if 'is_toxic' in content:
-                    salvaged_data['is_toxic'] = 'false' not in content.lower()
-                return salvaged_data
-
+            response = openai_client.chat.completions.create(
+                model=IDENTIFIER_MODEL,
+                messages=[
+                    {"role": "system", "content": system_prompt},
+                    {"role": "user", "content": f"Plant name: {plant_name}"}
+                ],
+                timeout=50
+            )
+            content = response.choices[0].message.content.strip()
+        except Exception as e:
+            print(f"Network request or unexpected error occurred in OpenAI identifier: {repr(e)}")
             return None
 
-    except Exception as e:
-        print(f"Network request or unexpected error occurred: {repr(e)}")
+    # ---- JSON CLEANING & PARSING BLOCK ----
+    if not content:
+        return None
+
+    if "```json" in content:
+        content = content.split("```json")[1].split("```")[0].strip()
+    elif "```" in content:
+        content = content.split("```")[1].split("```")[0].strip()
+
+    start_idx = content.find('{')
+    end_idx = content.rfind('}')
+    if start_idx != -1 and end_idx != -1:
+        content = content[start_idx:end_idx + 1]
+
+    content = re.sub(r':\s*True\b', ': true', content)
+    content = re.sub(r':\s*False\b', ': false', content)
+
+    try:
+        care_data = json.loads(content)
+        return care_data
+    except json.JSONDecodeError as e:
+        print("Error Parsing JSON, attempting recovery. Raw:", repr(content))
+        salvaged_data = {}
+        matches = re.findall(r'"(\w+)":\s*"(.*?)"', content)
+        for key, val in matches:
+            salvaged_data[key] = val
+
+        if salvaged_data:
+            if 'is_toxic' in content:
+                salvaged_data['is_toxic'] = 'false' not in content.lower()
+            return salvaged_data
         return None
 
 

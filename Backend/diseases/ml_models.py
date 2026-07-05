@@ -4,14 +4,33 @@ import json
 import tempfile
 import logging
 import base64
+import time
 from django.conf import settings
 from django.db.models import Q
-from openai import OpenAI, APIConnectionError, APITimeoutError
 
 logger = logging.getLogger(__name__)
 
-AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
-VISION_MODEL = "gemma-4-31b-it"
+# =====================================================================
+# CONFIGURATION & SWITCH
+# =====================================================================
+USE_GEMINI = True
+
+VISION_MODEL = "gemini-3.5-flash" if USE_GEMINI else "gemma-4-31b-it"
+
+# =====================================================================
+# IMPORTS & CLIENT INITIALIZATION
+# =====================================================================
+if USE_GEMINI:
+    from google import genai
+    from google.genai import types
+    from google.genai.errors import APIError
+
+    GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', "AQ.Ab8RN6KI05T4Tw6pydyIqo4v_hPHDu6ScI5M_eAtCqtIG_8flA")
+    client = genai.Client(api_key=GEMINI_API_KEY)
+else:
+    from openai import OpenAI, APIConnectionError, APITimeoutError
+
+    AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 
 SYSTEM_PROMPT = """You are an expert plant pathologist. Your task is to analyze the provided image, identify if the plant has a disease, and name the specific disease.
 
@@ -47,9 +66,14 @@ def encode_image_to_base64(image_path):
 def predict_disease(image_data):
     from .models import Disease
 
-    if not AVALAI_API_KEY:
-        logger.error("AvalAI API key is missing in settings.")
-        return {'id': None, 'details': None, 'error': 'API key configuration error'}
+    if USE_GEMINI:
+        if not GEMINI_API_KEY:
+            logger.error("Gemini API key is missing.")
+            return {'id': None, 'details': None, 'error': 'API key configuration error'}
+    else:
+        if not AVALAI_API_KEY:
+            logger.error("AvalAI API key is missing in settings.")
+            return {'id': None, 'details': None, 'error': 'API key configuration error'}
 
     if hasattr(image_data, 'name') and image_data.name:
         file_extension = os.path.splitext(image_data.name)[1]
@@ -85,46 +109,71 @@ def predict_disease(image_data):
         return {'id': None, 'details': None}
 
     try:
-        base64_image = encode_image_to_base64(tmp_path)
-        if not base64_image:
-            return {'id': None, 'details': None, 'error': 'Failed to process image bytes'}
-
         mime_type = f"image/{file_extension.replace('.', '')}"
-        if mime_type == "image/jpg":
+        if mime_type in ["image/jpg", "image/jpeg"]:
             mime_type = "image/jpeg"
 
-        client = OpenAI(
-            base_url="[https://api.avalai.ir/v1](https://api.avalai.ir/v1)",
-            api_key=AVALAI_API_KEY
-        )
+        content = ""
 
-        logger.info("Sending image to AvalAI Vision API for disease detection...")
-        
-        response = client.chat.completions.create(
-            model=VISION_MODEL,
-            messages=[
-                {
-                    "role": "user",
-                    "content": [
-                        {
-                            "type": "text",
-                            "text": f"{SYSTEM_PROMPT}\n\nAnalyze this plant image and return the output format strictly."
-                        },
-                        {
-                            "type": "image_url",
-                            "image_url": {
-                                "url": f"data:{mime_type};base64,{base64_image}"
-                              }
-                        }
-                    ]
-                }
-            ],
-            temperature=0.2,
-            timeout=50
-        )
+        # ---- 1. GEMINI VISION FLOW ----
+        if USE_GEMINI:
+            try:
+                with open(tmp_path, "rb") as f:
+                    image_bytes = f.read()
 
-        content = response.choices[0].message.content.strip()
+                response = client.models.generate_content(
+                    model=VISION_MODEL,
+                    contents=[
+                        types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
+                        f"{SYSTEM_PROMPT}\n\nAnalyze this plant image and return the output format strictly."
+                    ],
+                    config=types.GenerateContentConfig(
+                        response_mime_type="application/json",
+                        temperature=0.2,
+                    )
+                )
+                content = response.text.strip()
+            except APIError as api_err:
+                logger.error(f"Google GenAI Disease Vision API Error: {repr(api_err)}")
+                return {'id': None, 'details': None, 'error': 'API connection error'}
 
+        # ---- 2. OPENAI / AVALAI VISION FLOW ----
+        else:
+            base64_image = encode_image_to_base64(tmp_path)
+            if not base64_image:
+                return {'id': None, 'details': None, 'error': 'Failed to process image bytes'}
+
+            openai_client = OpenAI(
+                base_url="[https://api.avalai.ir/v1](https://api.avalai.ir/v1)",
+                api_key=AVALAI_API_KEY
+            )
+
+            logger.info("Sending image to AvalAI Vision API for disease detection...")
+            openai_response = openai_client.chat.completions.create(
+                model=VISION_MODEL,
+                messages=[
+                    {
+                        "role": "user",
+                        "content": [
+                            {
+                                "type": "text",
+                                "text": f"{SYSTEM_PROMPT}\n\nAnalyze this plant image and return the output format strictly."
+                            },
+                            {
+                                "type": "image_url",
+                                "image_url": {
+                                    "url": f"data:{mime_type};base64,{base64_image}"
+                                }
+                            }
+                        ]
+                    }
+                ],
+                temperature=0.2,
+                timeout=50
+            )
+            content = openai_response.choices[0].message.content.strip()
+
+        # ---- PARSING LOGIC ----
         if "```json" in content:
             content = content.split("```json")[1].split("```")[0].strip()
         elif "```" in content:
@@ -161,7 +210,7 @@ def predict_disease(image_data):
         try:
             predicted_lower = predicted_disease_label.lower()
             detected_disease = Disease.objects.filter(
-                Q(name__iexact=predicted_disease_label) | 
+                Q(name__iexact=predicted_disease_label) |
                 Q(name_fa__icontains=predicted_disease_label)
             ).first()
 
@@ -180,8 +229,9 @@ def predict_disease(image_data):
         except Exception as db_error:
             logger.error(f"Database lookup error: {db_error}")
 
-        logger.info(f"Vision Prediction: {predicted_disease_label} ({confidence_score:.2f}%), ID: {detected_disease_id}")
-        
+        logger.info(
+            f"Vision Prediction: {predicted_disease_label} ({confidence_score:.2f}%), ID: {detected_disease_id}")
+
         return {
             'id': detected_disease_id,
             'name': predicted_disease_label,
@@ -189,12 +239,9 @@ def predict_disease(image_data):
             'confidence': confidence_score
         }
 
-    except (APIConnectionError, APITimeoutError) as net_err:
-        logger.error(f"Network error with AvalAI client: {repr(net_err)}")
-        return {'id': None, 'details': None, 'error': 'API network timeout'}
     except Exception as e:
         logger.error(f"Error during disease vision prediction flow: {e}")
-        return {'id': None, 'details': None}
+        return {'id': None, 'details': None, 'error': str(e)}
 
     finally:
         if tmp_path and os.path.exists(tmp_path):
