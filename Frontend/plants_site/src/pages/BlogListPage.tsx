@@ -1,6 +1,6 @@
 // src/pages/BlogListPage.tsx
 import React, { useState, useEffect, useMemo, useRef } from 'react';
-import axios from 'axios';
+import { blogService } from '../services/api';
 import type { PostListItem } from '../types/blog';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import { LoaderGooeyBlobs } from '../components/animation/gooey-loader';
@@ -117,26 +117,36 @@ const BlogListPage: React.FC = () => {
 
   // Fetch posts
   useEffect(() => {
+    let ignore = false;
     const fetchPosts = async () => {
       try {
         setLoading(true);
         setError(null);
-        const response = await axios.get('/api/blog/posts/');
-        const data = response.data.results || response.data;
-        let postsData = Array.isArray(data) ? data : [];
-        postsData = postsData.map((post: any) => ({
-          ...post,
-          category: post.category || ['Tech', 'Design', 'Productivity', 'General'][Math.floor(Math.random() * 4)]
-        }));
-        setPosts(postsData);
+        const data = await blogService.getAllPosts();
+        if (!ignore) {
+          const results = Array.isArray(data) ? data : data.results || [];
+          let postsData = Array.isArray(results) ? results : [];
+          postsData = postsData.map((post: any) => ({
+            ...post,
+            category: post.category || ['Tech', 'Design', 'Productivity', 'General'][Math.floor(Math.random() * 4)]
+          }));
+          setPosts(postsData);
+        }
       } catch (err) {
-        console.error(err);
-        setError(language === 'en' ? 'Failed to load blog posts. Please try again later.' : 'خطا در بارگذاری مطالب. لطفاً دوباره تلاش کنید.');
+        if (!ignore) {
+          console.error(err);
+          setError(language === 'en' ? 'Failed to load blog posts. Please try again later.' : 'خطا در بارگذاری مطالب. لطفاً دوباره تلاش کنید.');
+        }
       } finally {
-        setLoading(false);
+        if (!ignore) {
+          setLoading(false);
+        }
       }
     };
     fetchPosts();
+    return () => {
+      ignore = true;
+    };
   }, [language]);
 
   const categories = useMemo(() => {

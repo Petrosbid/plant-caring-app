@@ -1,6 +1,6 @@
 // src/pages/DiseaseLibrary.tsx
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { diseaseService } from '../services/api';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
@@ -57,7 +57,7 @@ const DiseaseCard: React.FC<{ disease: Disease; language: 'en' | 'fa'; delay?: n
 
   return (
     <FadeContent delay={delay} blur duration={1000} ease="ease-out" initialOpacity={0.1}>
-      <motion.div className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 overflow-hidden hover:shadow-card-hover transition-all duration-300 h-full">
+      <m.div className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 overflow-hidden hover:shadow-card-hover transition-all duration-300 h-full">
         <Link to={`/disease/${disease.id}`} className="block h-full">
           <div className="p-5">
             <div className="flex justify-between items-start gap-2 mb-2">
@@ -95,7 +95,7 @@ const DiseaseCard: React.FC<{ disease: Disease; language: 'en' | 'fa'; delay?: n
             </div>
           </div>
         </Link>
-      </motion.div>
+      </m.div>
     </FadeContent>
   );
 };
@@ -166,13 +166,13 @@ const DiseaseLibrary: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 py-8 min-h-screen" dir={isEn ? 'ltr' : 'rtl'}>
-      <motion.h1
+      <m.h1
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-8"
       >
         {isEn ? 'Disease Library' : 'کتابخانه بیماری‌ها'}
-      </motion.h1>
+      </m.h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Filters */}

@@ -4,7 +4,7 @@ import { useAuth } from '../contexts/AuthContext';
 import { useUserPlants } from '../hooks/useUserPlants';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import { authService } from '../services/api';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { toast, Toaster } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
 
@@ -330,7 +330,7 @@ const PlantsTab: React.FC = () => {
       {userPlants.map((plant: any) => {
         const daysSince = Math.floor((now - new Date(plant.last_watered).getTime()) / (1000 * 60 * 60 * 24));
         return (
-          <motion.div
+          <m.div
             key={plant.id}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
@@ -350,7 +350,7 @@ const PlantsTab: React.FC = () => {
             <button className="text-brand-600 dark:text-brand-400 hover:bg-brand-500/10 p-2.5 rounded-full transition-colors">
               💧
             </button>
-          </motion.div>
+          </m.div>
         );
       })}
     </div>
@@ -417,7 +417,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ navigateTo }) => {
           <main className="flex-1 min-w-0">
             <AnimatePresence mode="wait">
               {activeTab === TABS.PROFILE && (
-                <motion.div
+                <m.div
                   key="profile"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -426,11 +426,11 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ navigateTo }) => {
                 >
                   <ProfileHeader user={user} onAvatarChange={handleAvatarChange} />
                   <ProfileForm user={user} genderChoices={genderChoices} />
-                </motion.div>
+                </m.div>
               )}
 
               {activeTab === TABS.PLANTS && (
-                <motion.div
+                <m.div
                   key="plants"
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -446,7 +446,7 @@ const UserDashboard: React.FC<UserDashboardProps> = ({ navigateTo }) => {
                       + {t('addNewPlant')}
                     </button>
                   </div>
-                </motion.div>
+                </m.div>
               )}
             </AnimatePresence>
           </main>

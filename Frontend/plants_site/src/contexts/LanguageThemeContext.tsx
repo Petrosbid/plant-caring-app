@@ -1,5 +1,5 @@
 /* eslint-disable react-refresh/only-export-components */
-import React, { createContext, useState, useEffect, useContext } from 'react';
+import React, { createContext, useState, useEffect, use } from 'react';
 import type { ReactNode } from 'react';
 
 type Language = 'en' | 'fa';
@@ -235,7 +235,7 @@ const translations = {
 
 
 export const useLanguageTheme = () => {
-  const context = useContext(LanguageThemeContext);
+  const context = use(LanguageThemeContext);
   if (!context) {
     throw new Error('useLanguageTheme must be used within a LanguageThemeProvider');
   }

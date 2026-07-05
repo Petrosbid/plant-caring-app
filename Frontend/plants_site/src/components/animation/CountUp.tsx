@@ -14,6 +14,17 @@ interface CountUpProps {
   onEnd?: () => void;
 }
 
+const getDecimalPlaces = (num: number): number => {
+  const str = num.toString();
+  if (str.includes('.')) {
+    const decimals = str.split('.')[1];
+    if (parseInt(decimals) !== 0) {
+      return decimals.length;
+    }
+  }
+  return 0;
+};
+
 export default function CountUp({
   to,
   from = 0,
@@ -39,17 +50,6 @@ export default function CountUp({
 
   const isInView = useInView(ref, { once: true, margin: '0px' });
 
-  const getDecimalPlaces = (num: number): number => {
-    const str = num.toString();
-    if (str.includes('.')) {
-      const decimals = str.split('.')[1];
-      if (parseInt(decimals) !== 0) {
-        return decimals.length;
-      }
-    }
-    return 0;
-  };
-
   const maxDecimals = Math.max(getDecimalPlaces(from), getDecimalPlaces(to));
 
   const formatValue = useCallback(
@@ -69,6 +69,22 @@ export default function CountUp({
     [maxDecimals, separator]
   );
 
+  const onStartRef = useRef(onStart);
+  const onEndRef = useRef(onEnd);
+  const formatValueRef = useRef(formatValue);
+
+  useEffect(() => {
+    onStartRef.current = onStart;
+  }, [onStart]);
+
+  useEffect(() => {
+    onEndRef.current = onEnd;
+  }, [onEnd]);
+
+  useEffect(() => {
+    formatValueRef.current = formatValue;
+  }, [formatValue]);
+
   useEffect(() => {
     if (ref.current) {
       ref.current.textContent = formatValue(direction === 'down' ? to : from);
@@ -77,8 +93,8 @@ export default function CountUp({
 
   useEffect(() => {
     if (isInView && startWhen) {
-      if (typeof onStart === 'function') {
-        onStart();
+      if (typeof onStartRef.current === 'function') {
+        onStartRef.current();
       }
 
       const timeoutId = setTimeout(() => {
@@ -87,8 +103,8 @@ export default function CountUp({
 
       const durationTimeoutId = setTimeout(
         () => {
-          if (typeof onEnd === 'function') {
-            onEnd();
+          if (typeof onEndRef.current === 'function') {
+            onEndRef.current();
           }
         },
         delay * 1000 + duration * 1000
@@ -99,17 +115,17 @@ export default function CountUp({
         clearTimeout(durationTimeoutId);
       };
     }
-  }, [isInView, startWhen, motionValue, direction, from, to, delay, onStart, onEnd, duration]);
+  }, [isInView, startWhen, motionValue, direction, from, to, delay, duration]);
 
   useEffect(() => {
     const unsubscribe = springValue.on('change', (latest: number) => {
       if (ref.current) {
-        ref.current.textContent = formatValue(latest);
+        ref.current.textContent = formatValueRef.current(latest);
       }
     });
 
     return () => unsubscribe();
-  }, [springValue, formatValue]);
+  }, [springValue]);
 
   return <span className={className} ref={ref} />;
 }

@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import { useLanguageTheme } from '../../contexts/LanguageThemeContext';
 
 interface FooterProps {
@@ -29,7 +29,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
   ];
 
   return (
-    <motion.footer
+    <m.footer
       initial={{ opacity: 0 }}
       whileInView={{ opacity: 1 }}
       viewport={{ once: true }}
@@ -39,13 +39,13 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
       <div className="container mx-auto px-4 lg:px-6 py-12 lg:py-16">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 lg:gap-12">
           <div className="lg:col-span-1">
-            <motion.div
+            <m.div
               className="flex items-center gap-2 mb-4"
               whileHover={{ scale: 1.02 }}
             >
               <span className="text-2xl">🌱</span>
               <span className="font-display text-xl font-semibold text-white">Verna</span>
-            </motion.div>
+            </m.div>
             <p className="text-slate-400 text-sm leading-relaxed max-w-xs">
               {isEn
                 ? 'Helping plant lovers everywhere take better care of their green companions.'
@@ -112,7 +112,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
               <p className="font-display font-semibold text-white mb-2">{isEn ? 'Follow Us' : 'دنبال کنید'}</p>
               <div className="flex gap-3">
                 {['📘', '🐦', '📷'].map((icon, i) => (
-                  <motion.a
+                  <m.a
                     key={i}
                     href="#"
                     className="text-slate-400 hover:text-brand-400 transition-colors text-lg"
@@ -120,7 +120,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
                     whileTap={{ scale: 0.95 }}
                   >
                     {icon}
-                  </motion.a>
+                  </m.a>
                 ))}
               </div>
             </div>
@@ -133,7 +133,7 @@ const Footer: React.FC<FooterProps> = ({ navigateTo }) => {
           </p>
         </div>
       </div>
-    </motion.footer>
+    </m.footer>
   );
 };
 

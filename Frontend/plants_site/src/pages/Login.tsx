@@ -1,6 +1,6 @@
 // Login.tsx
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import Register from './register';
@@ -8,6 +8,20 @@ import Register from './register';
 interface LoginProps {
   navigateTo: (page: string) => void;
 }
+
+const ErrorDisplay: React.FC<{ error: string | null }> = ({ error }) => {
+  if (!error) return null;
+  return (
+    <m.div
+      initial={{ opacity: 0, height: 0 }}
+      animate={{ opacity: 1, height: 'auto' }}
+      className="rounded-xl bg-red-50 dark:bg-red-900/30 p-4 mb-6 flex gap-3"
+    >
+      <span className="text-red-500 text-lg">⚠️</span>
+      <p className="text-sm font-medium text-red-800 dark:text-red-200">{error}</p>
+    </m.div>
+  );
+};
 
 const Login: React.FC<LoginProps> = ({ navigateTo }) => {
   const { t } = useLanguageTheme();
@@ -152,7 +166,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                 {isEn ? 'Forgot password?' : 'فراموشی رمز عبور؟'}
               </button>
           </div>
-          <motion.button
+          <m.button
             type="submit"
             disabled={loading}
             className="w-full py-3 rounded-xl font-medium text-white bg-brand-500 hover:bg-brand-600 disabled:opacity-50 disabled:cursor-not-allowed focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-2 transition-colors"
@@ -160,7 +174,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
             whileTap={loading ? {} : { scale: 0.99 }}
           >
             {loading ? (isEn ? 'Processing...' : 'در حال پردازش...') : isEn ? 'Sign In' : 'ورود'}
-          </motion.button>
+          </m.button>
         </form>
       );
     } else {
@@ -181,7 +195,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
             />
           </div>
           {!otpSent ? (
-            <motion.button
+            <m.button
               type="button"
               onClick={handleSendOtp}
               disabled={loading || !phoneNumber}
@@ -190,7 +204,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
               whileTap={loading ? {} : { scale: 0.99 }}
             >
               {loading ? (isEn ? 'Sending...' : 'در حال ارسال...') : isEn ? 'Send Verification Code' : 'ارسال کد تایید'}
-            </motion.button>
+            </m.button>
           ) : (
             <>
               <div>
@@ -207,7 +221,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                 />
               </div>
               <div className="flex gap-3">
-                <motion.button
+                <m.button
                   type="button"
                   onClick={handleVerifyOtp}
                   disabled={loading || !otpCode}
@@ -216,8 +230,8 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                   whileTap={loading ? {} : { scale: 0.99 }}
                 >
                   {loading ? (isEn ? 'Verifying...' : 'در حال تایید...') : isEn ? 'Login' : 'ورود'}
-                </motion.button>
-                <motion.button
+                </m.button>
+                <m.button
                   type="button"
                   onClick={() => {
                     setOtpSent(false);
@@ -228,7 +242,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                   className="flex-1 py-3 rounded-xl font-medium border border-slate-300 dark:border-slate-600 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-50"
                 >
                   {isEn ? 'Back' : 'بازگشت'}
-                </motion.button>
+                </m.button>
               </div>
             </>
           )}
@@ -239,22 +253,9 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
 
 
 
-  const ErrorDisplay = () => (
-    error && (
-      <motion.div
-        initial={{ opacity: 0, height: 0 }}
-        animate={{ opacity: 1, height: 'auto' }}
-        className="rounded-xl bg-red-50 dark:bg-red-900/30 p-4 mb-6 flex gap-3"
-      >
-        <span className="text-red-500 text-lg">⚠️</span>
-        <p className="text-sm font-medium text-red-800 dark:text-red-200">{error}</p>
-      </motion.div>
-    )
-  );
-
   return (
     <div className="min-h-screen flex items-center justify-center gradient-mesh bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
-      <motion.div
+      <m.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
@@ -262,14 +263,14 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
       >
         <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-8 lg:p-10">
           <div className="text-center mb-8">
-            <motion.div
+            <m.div
               initial={{ scale: 0.9 }}
               animate={{ scale: 1 }}
               transition={{ type: 'spring', stiffness: 200 }}
               className="mx-auto w-16 h-16 rounded-2xl bg-brand-500/15 dark:bg-brand-500/25 flex items-center justify-center text-4xl mb-4"
             >
               🌱
-            </motion.div>
+            </m.div>
             <h2 className="font-display text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white">
               {isSignUp
                 ? (isEn ? 'Create Account' : 'ایجاد حساب کاربری')
@@ -282,7 +283,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
             </p>
           </div>
 
-          <ErrorDisplay />
+          <ErrorDisplay error={error} />
           {isSignUp ? (
             <Register onSuccess={() => navigateTo('profile')} switchToLogin={() => setIsSignUp(false)} />
           ) : (
@@ -338,7 +339,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
             </button>
           </p>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

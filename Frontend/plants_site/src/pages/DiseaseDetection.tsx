@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { diseaseService } from '../services/api';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 
@@ -82,10 +82,10 @@ const DiseaseDetection: React.FC = () => {
 
     return (
       <div className="container mx-auto px-4 lg:px-6 py-10 lg:py-14">
-        <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
+        <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
           {t('disease')}
-        </motion.h1>
-        <motion.div
+        </m.h1>
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: 10 }}
@@ -177,22 +177,22 @@ const DiseaseDetection: React.FC = () => {
               </div>
             </div>
           </div>
-        </motion.div>
+        </m.div>
       </div>
     );
   }
 
   return (
     <div className="container mx-auto px-4 lg:px-6 py-10 lg:py-14">
-      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
+      <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
         {t('disease')}
-      </motion.h1>
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">
+      </m.h1>
+      <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">
         <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-6">
           {isEn ? 'Upload a photo of a plant showing symptoms' : 'تصویر گیاهی که علائم دارد را بارگذاری کنید'}
         </h2>
         {!previewUrl ? (
-          <motion.div layout className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-10 text-center cursor-pointer hover:border-brand-500 dark:hover:border-brand-400 hover:bg-brand-500/5 dark:hover:bg-brand-500/10 transition-all duration-300"
+          <m.div layout className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-10 text-center cursor-pointer hover:border-brand-500 dark:hover:border-brand-400 hover:bg-brand-500/5 dark:hover:bg-brand-500/10 transition-all duration-300"
             onDrop={handleDrop} onDragOver={(e) => e.preventDefault()} onClick={() => document.getElementById('fileInput')?.click()}>
             <div className="flex flex-col items-center justify-center gap-3">
               <span className="text-5xl">🔍</span>
@@ -202,26 +202,26 @@ const DiseaseDetection: React.FC = () => {
               <p className="text-slate-400 dark:text-slate-500 text-xs">{isEn ? 'Supports JPG, PNG up to 10MB' : 'پشتیبانی از JPG، PNG تا 10 مگابایت'}</p>
             </div>
             <input id="fileInput" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div layout className="text-center">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 rounded-xl overflow-hidden shadow-lg">
+          <m.div layout className="text-center">
+            <m.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 rounded-xl overflow-hidden shadow-lg">
               <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto w-full object-cover" />
-            </motion.div>
+            </m.div>
             <button onClick={handleReset} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium text-sm">
               {isEn ? 'Choose Another Image' : 'انتخاب تصویر دیگر'}
             </button>
-          </motion.div>
+          </m.div>
         )}
         <AnimatePresence>
           {error && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-xl text-sm">
+            <m.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-xl text-sm">
               {error}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
         <div className="mt-6 text-center">
-          <motion.button onClick={handleScan} disabled={isLoading || !selectedFile}
+          <m.button onClick={handleScan} disabled={isLoading || !selectedFile}
             className={`font-medium py-3 px-6 rounded-xl transition-all ${
               isLoading || !selectedFile ? 'bg-slate-300 dark:bg-slate-600 cursor-not-allowed text-slate-500' : 'bg-brand-500 hover:bg-brand-600 text-white shadow-lg hover:shadow-glow'
             }`}
@@ -229,9 +229,9 @@ const DiseaseDetection: React.FC = () => {
             whileTap={!(isLoading || !selectedFile) ? { scale: 0.98 } : {}}
           >
             {isLoading ? (isEn ? 'Scanning...' : 'در حال اسکن...') : (isEn ? 'Scan for Diseases' : 'اسکن بیماری‌ها')}
-          </motion.button>
+          </m.button>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

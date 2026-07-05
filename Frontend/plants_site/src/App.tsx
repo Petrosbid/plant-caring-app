@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { LazyMotion, m, AnimatePresence, domMax } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext'; // استفاده از useAuth
 import { LanguageThemeProvider, useLanguageTheme } from './contexts/LanguageThemeContext';
 import Home from './pages/Home';
@@ -90,7 +90,7 @@ function AnimatedRoutes() {
       <Header navigateTo={navigateTo} currentPage={getCurrentPage()} />
       <main className="flex-grow">
         <AnimatePresence mode="wait">
-          <motion.div
+          <m.div
             key={location.pathname}
             variants={pageVariants}
             initial="initial"
@@ -119,7 +119,7 @@ function AnimatedRoutes() {
               <Route path="/about-us" element={<AboutUs />} />
               <Route path="/contact-us" element={<ContactUs />} />
             </Routes>
-          </motion.div>
+          </m.div>
         </AnimatePresence>
       </main>
       <Footer navigateTo={navigateTo} />
@@ -142,7 +142,9 @@ export default function App() {
     <LanguageThemeProvider>
       <AuthProvider>
         <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
-          <AppContent />
+          <LazyMotion features={domMax}>
+            <AppContent />
+          </LazyMotion>
         </BrowserRouter>
       </AuthProvider>
     </LanguageThemeProvider>

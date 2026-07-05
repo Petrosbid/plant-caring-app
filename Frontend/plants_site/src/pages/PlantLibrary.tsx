@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { plantService } from '../services/api';
 import { useUserPlants } from '../hooks/useUserPlants';
@@ -162,7 +162,7 @@ const PlantCard: React.FC<{ plant: Plant; language: 'en' | 'fa'; isInGarden: boo
   const water = language === 'en' ? plant.watering_frequency_en || plant.watering_frequency : plant.watering_frequency;
   return (
     <FadeContent delay={delay} blur={true} duration={1000} ease="ease-out" initialOpacity={0.1}>
-    <motion.div
+    <m.div
       className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 overflow-hidden hover:shadow-card-hover transition-all duration-300 relative"
     >
       {isInGarden && (
@@ -224,7 +224,7 @@ const PlantCard: React.FC<{ plant: Plant; language: 'en' | 'fa'; isInGarden: boo
           </div>
         </div>
       </Link>
-    </motion.div>
+    </m.div>
     </FadeContent>
   );
 };
@@ -303,13 +303,13 @@ const PlantLibrary: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 py-8 min-h-screen" dir={language === 'fa' ? 'rtl' : 'ltr'}>
-      <motion.h1
+      <m.h1
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-8"
       >
         {t('library')}
-      </motion.h1>
+      </m.h1>
 
       <div className="flex flex-col lg:flex-row gap-8">
         {/* Sidebar Filters */}
@@ -393,7 +393,7 @@ const PlantLibrary: React.FC = () => {
           </div>
 
           {/* Plant Grid */}
-          <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <m.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {plants.map((plant, index) => {
                 const isLast = index === plants.length - 1;
                 const fadeDelay = index * 0.05;
@@ -403,7 +403,7 @@ const PlantLibrary: React.FC = () => {
                   </div>
                 );
               })}
-          </motion.div>
+          </m.div>
 
           {loading && (
             <div className="flex justify-center py-8">
@@ -416,7 +416,7 @@ const PlantLibrary: React.FC = () => {
             </p>
           )}
           {!loading && plants.length === 0 && (
-            <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
+            <m.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="text-center py-16">
               <span className="text-5xl mb-4 block">🔍</span>
               <h3 className="font-display text-xl font-semibold text-slate-900 dark:text-white mb-2">
                 {isEn ? 'No plants found' : 'گیاهی یافت نشد'}
@@ -424,7 +424,7 @@ const PlantLibrary: React.FC = () => {
               <p className="text-slate-500 dark:text-slate-400">
                 {isEn ? 'Try different filters.' : 'فیلترها را تغییر دهید.'}
               </p>
-            </motion.div>
+            </m.div>
           )}
         </main>
       </div>

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import Card from '../components/ui/Card';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 
@@ -109,7 +109,7 @@ const CareGuide: React.FC = () => {
   return (
     <div className="min-h-screen bg-slate-50/80 dark:bg-slate-900/50 py-12 lg:py-16">
       <div className="container mx-auto px-4 lg:px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 12 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-12"
@@ -120,18 +120,18 @@ const CareGuide: React.FC = () => {
               ? 'Comprehensive care instructions to help your plants thrive and flourish'
               : 'دستورالعمل‌های جامع مراقبت برای کمک به رشد و شکوفایی گیاهان شما'}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Care Tabs */}
         <div className="mb-12">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 8 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1 }}
             className="flex flex-wrap justify-center gap-2 mb-8"
           >
             {Object.keys(careGuides).map((key) => (
-              <motion.button
+              <m.button
                 key={key}
                 className={`px-6 py-3 rounded-xl font-medium transition-colors ${
                   activeTab === key
@@ -143,11 +143,11 @@ const CareGuide: React.FC = () => {
                 whileTap={{ scale: 0.98 }}
               >
                 {careGuides[key as keyof typeof careGuides].title.split(' ')[1]}
-              </motion.button>
+              </m.button>
             ))}
-          </motion.div>
+          </m.div>
 
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
+          <m.div key={activeTab} initial={{ opacity: 0, y: 8 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.25 }}>
             <Card
               title={careGuides[activeTab as keyof typeof careGuides].title}
               subtitle={careGuides[activeTab as keyof typeof careGuides].description}
@@ -161,7 +161,7 @@ const CareGuide: React.FC = () => {
                 ))}
               </ul>
             </Card>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* Care Schedule Table */}
@@ -208,7 +208,7 @@ const CareGuide: React.FC = () => {
         </div>
 
         {/* Quick Tips */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           whileInView={{ opacity: 1 }}
           viewport={{ once: true }}
@@ -285,7 +285,7 @@ const CareGuide: React.FC = () => {
               </li>
             </ul>
           </Card>
-        </motion.div>
+        </m.div>
       </div>
     </div>
   );

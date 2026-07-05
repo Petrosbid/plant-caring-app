@@ -1,6 +1,6 @@
 // src/pages/MyGardenPage.tsx
 import React, { useState, useMemo } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { Link } from 'react-router-dom';
 import { FiExternalLink, FiSearch } from 'react-icons/fi';
 import { useUserPlants } from '../hooks/useUserPlants';
@@ -51,7 +51,7 @@ const GardenPlantCard: React.FC<{
       : isEn ? 'Unhealthy' : 'ناسالم';
 
   return (
-    <motion.div
+    <m.div
       layout
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -126,7 +126,7 @@ const GardenPlantCard: React.FC<{
           </Link>
         </div>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 
@@ -213,13 +213,13 @@ const MyGardenPage: React.FC = () => {
 
   return (
     <div className="container mx-auto px-4 lg:px-6 py-8 min-h-screen" dir={language === 'fa' ? 'rtl' : 'ltr'}>
-      <motion.h1
+      <m.h1
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         className="text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-8"
       >
         {isEn ? 'My Garden' : 'باغ من'}
-      </motion.h1>
+      </m.h1>
 
       {/* نوار جستجو و مرتب‌سازی */}
       <div className="flex flex-col sm:flex-row gap-4 mb-8">
@@ -261,7 +261,7 @@ const MyGardenPage: React.FC = () => {
         </div>
       </div>
 
-      <motion.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <m.div layout className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         <AnimatePresence>
           {filteredAndSorted.map((up) => (
             <GardenPlantCard
@@ -272,7 +272,7 @@ const MyGardenPage: React.FC = () => {
             />
           ))}
         </AnimatePresence>
-      </motion.div>
+      </m.div>
 
       {filteredAndSorted.length === 0 && (
         <div className="text-center py-16">

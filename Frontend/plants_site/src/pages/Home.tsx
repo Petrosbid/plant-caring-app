@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import Button from '../components/ui/Button';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import LatestPostsCarousel from '../components/home/LatestPostsCarousel';
@@ -121,46 +121,46 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
           />
         </div>
         <div className="relative z-10 container mx-auto px-4 lg:px-6">
-          <motion.div
+          <m.div
             variants={container}
             initial="hidden"
             animate="visible"
             className="text-center max-w-4xl mx-auto pt-[85px]"
           >
-            <motion.div variants={item} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 dark:bg-brand-500/20 text-brand-700 dark:text-brand-600 text-sm font-medium mb-6">
+            <m.div variants={item} className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 dark:bg-brand-500/20 text-brand-700 dark:text-brand-600 text-sm font-medium mb-6">
               <span className="animate-float">🌱</span>
               <span>{isEn ? 'AI-Powered Plant Care' : 'مراقبت از گیاه با هوش مصنوعی'}</span>
-            </motion.div>
-            <motion.h1
+            </m.div>
+            <m.h1
               variants={item}
               className="font-display text-4xl sm:text-5xl lg:text-6xl xl:text-7xl font-semibold text-slate-900 dark:text-white tracking-tight mb-6 leading-tight"
             >
               {language === 'fa' ? 'ورنا' : 'Verna'}
-            </motion.h1>
-            <motion.p
+            </m.h1>
+            <m.p
               variants={item}
               className="text-lg sm:text-xl lg:text-2xl text-slate-600 dark:text-slate-300 max-w-3xl mx-auto mb-10 leading-relaxed"
             >
               {isEn
                 ? 'Identify plants, detect diseases, and get personalized care tips for your green companions'
                 : 'شناسایی گیاهان، تشخیص بیماری‌ها و دریافت نکات مراقبت شخصی‌سازی شده برای همدمان سبز'}
-            </motion.p>
-            <motion.div variants={item} className="flex flex-col sm:flex-row justify-center gap-4">
+            </m.p>
+            <m.div variants={item} className="flex flex-col sm:flex-row justify-center gap-4">
               <Button variant="primary" size="lg" onClick={() => navigateTo('identify')}>
                 {t('identify')}
               </Button>
               <Button variant="secondary" size="lg" onClick={() => navigateTo('disease')}>
                 {t('disease')}
               </Button>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         </div>
       </section>
 
       {/* Features */}
       <section className="py-20 lg:py-24 bg-slate-50/80 dark:bg-slate-900/50">
         <div className="container mx-auto px-4 lg:px-6">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: '-60px' }}
@@ -175,9 +175,9 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                 ? 'Everything you need to keep your plants healthy and thriving'
                 : 'همه چیزی که برای سالم و پررونق نگه داشتن گیاهانتان نیاز دارید'}
             </p>
-          </motion.div>
+          </m.div>
 
-          <motion.div
+          <m.div
             variants={container}
             initial="hidden"
             whileInView="visible"
@@ -185,7 +185,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
             className="grid grid-cols-1 md:grid-cols-3 gap-8"
           >
             {features.map((f) => (
-              <motion.div
+              <m.div
                 key={f.page}
                 variants={item}
                 className="group relative bg-white dark:bg-slate-800/80 rounded-2xl p-8 shadow-card hover:shadow-card-hover border border-slate-200/60 dark:border-slate-700/50 transition-all duration-300 overflow-hidden"
@@ -210,9 +210,9 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                     <span className="text-lg">→</span>
                   </button>
                 </div>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -226,7 +226,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                 {t('vernaStoryDesc')}
             </p>
           <div className={`grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center ${language === 'fa' ? 'lg:rtl' : ''}`}>
-            <motion.div
+            <m.div
               initial={{ opacity: 0, x: language === 'fa' ? 50 : -50 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -242,7 +242,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                   className="w-full h-full object-cover transform group-hover:scale-105 transition-transform duration-700 ease-out mix-blend-normal dark:opacity-90"
                 />
                 
-                <motion.div 
+                <m.div 
                   animate={{ y: [0, -10, 0] }}
                   transition={{ duration: 4, repeat: Infinity, ease: "easeInOut" }}
                   className="absolute bottom-6 left-6 right-6 backdrop-blur-md bg-white/70 dark:bg-slate-900/70 p-4 rounded-2xl border border-white/20 dark:border-slate-700/30 shadow-lg flex items-center gap-4"
@@ -254,11 +254,11 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                     <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Project Name Identity</p>
                     <p className="text-sm font-semibold text-slate-800 dark:text-white font-display">Verna • ورنا</p>
                   </div>
-                </motion.div>
+                </m.div>
               </div>
-            </motion.div>
+            </m.div>
 
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 30 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-100px" }}
@@ -268,7 +268,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
 
               <div className="space-y-6 max-w-xl">
                 
-                <motion.div 
+                <m.div 
                   whileHover={{ x: language === 'fa' ? -6 : 6 }}
                   className="flex gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 transition-colors"
                 >
@@ -281,9 +281,9 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                       {t('vernaFaMeaning')}
                     </p>
                   </div>
-                </motion.div>
+                </m.div>
 
-                <motion.div 
+                <m.div 
                   whileHover={{ x: language === 'fa' ? -6 : 6 }}
                   className="flex gap-4 p-5 rounded-2xl bg-slate-50 dark:bg-slate-800/40 border border-slate-100 dark:border-slate-800/60 transition-colors"
                 >
@@ -296,9 +296,9 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                       {t('vernaEnMeaning')}
                     </p>
                   </div>
-                </motion.div>
+                </m.div>
 
-                <motion.div 
+                <m.div 
                   whileHover={{ x: language === 'fa' ? -6 : 6 }}
                   className="flex gap-4 p-5 rounded-2xl bg-brand-500/5 dark:bg-brand-500/10 border border-brand-500/20 dark:border-brand-500/20 transition-colors"
                 >
@@ -311,10 +311,10 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                       {t('vernaMatchDesc')}
                     </p>
                   </div>
-                </motion.div>
+                </m.div>
 
               </div>
-            </motion.div>
+            </m.div>
 
           </div>
         </div>
@@ -322,7 +322,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
       {/* Carousels*/}
       <section className="py-20 lg:py-24 bg-slate-50/80 dark:bg-slate-900/50">
         <div className="container mx-auto px-4 lg:px-6">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
@@ -331,7 +331,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
           style={{ width: "80%"}}
         />
         
-        <motion.h2
+        <m.h2
           initial={{ opacity: 0, y: 20 }}
           whileInView={{ opacity: 1, y: 0 }}
           viewport={{ once: true, margin: "-60px" }}
@@ -339,14 +339,14 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
           className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
         >
           {isEn ? "Our newest blogs" : "تازه ترین مقالات ما"}
-        </motion.h2>
+        </m.h2>
           
-          <motion.div>
+          <m.div>
             <LatestPostsCarousel />
-          </motion.div>
+          </m.div>
       </div>
       <div className="container mx-auto px-4 lg:px-6">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -354,7 +354,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
               style={{ width: "80%"}}
             />
-            <motion.h2
+            <m.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -362,14 +362,14 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'Most favorite Plants' : 'محبوب‌ترین گیاهان'}
-            </motion.h2>
-           <motion.div>
+            </m.h2>
+           <m.div>
             <FavoritePlantsCarousel  />
-          </motion.div>
+          </m.div>
 
       </div>
       <div className="container mx-auto px-4 lg:px-6">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -377,7 +377,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
               style={{ width: "80%"}}
             />
-            <motion.h2
+            <m.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -385,14 +385,14 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'Most favorite blogs' : 'محبوب‌ترین مقالات '}
-            </motion.h2>
-           <motion.div>
+            </m.h2>
+           <m.div>
             <PopularBlogsCarousel  />
-          </motion.div>
+          </m.div>
 
       </div>
       <div className="container mx-auto px-4 lg:px-6">
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -400,7 +400,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
               style={{ width: "80%"}}
             />
-            <motion.h2
+            <m.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -408,13 +408,13 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'most viewd blogs' : 'پربازدیدترین بیماری‌ها'}
-            </motion.h2>
-           <motion.div>
+            </m.h2>
+           <m.div>
             <MostViewedDiseasesCarousel  />
-          </motion.div>
+          </m.div>
       </div>
       <div className="container mx-auto px-4 lg:px-6">  
-            <motion.div
+            <m.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -422,7 +422,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="h-1 bg-gradient-to-r from-transparent via-green-500 to-transparent mx-auto mb-8 text-center"
               style={{ width: "80%"}}
             />
-            <motion.h2
+            <m.h2
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: "-60px" }}
@@ -430,23 +430,23 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               className="font-display text-3xl sm:text-4xl font-semibold text-slate-900 dark:text-white text-center"
             >
               {isEn ? 'Most viewd blogs' : 'پربیننده‌ترین مقالات '}
-            </motion.h2>
-           <motion.div>
+            </m.h2>
+           <m.div>
             <MostViewedBlogsCarousel  />
-          </motion.div>
+          </m.div>
       </div>
         </section>
       {/* Stats */}
       <section className="py-20 lg:py-24 bg-white dark:bg-slate-900 text-center">
         <div className="container mx-auto px-4 lg:px-6">
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             whileInView={{ opacity: 1 }}
             viewport={{ once: true }}
             className="grid grid-cols-2 md:grid-cols-4 gap-8"
           >
             {stats.map((s, i) => (
-              <motion.div key={i} className="stat-item">
+              <m.div key={i} className="stat-item">
                 <AnimatedStat
                   value={s.value}
                   from={0}
@@ -457,9 +457,9 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
                 <p className="text-slate-600 dark:text-slate-400 text-sm font-medium">
                   {isEn ? s.labelEn : s.labelFa}
                 </p>
-              </motion.div>
+              </m.div>
             ))}
-          </motion.div>
+          </m.div>
         </div>
       </section>
 
@@ -468,7 +468,7 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
         <div className="absolute inset-0 bg-gradient-to-br from-brand-800 via-brand-700 to-emerald-800" />
         <div className="absolute inset-0 bg-[url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23ffffff\' fill-opacity=\'0.08\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E')] opacity-50" />
         <div className="container mx-auto px-4 lg:px-6 relative z-10">
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true }}
@@ -486,16 +486,16 @@ const Home: React.FC<HomeProps> = ({ navigateTo }) => {
               <Button variant="secondary" size="lg" onClick={() => navigateTo('identify')}>
                 {isEn ? 'Get Started' : 'شروع کنید'}
               </Button>
-              <motion.button
+              <m.button
                 onClick={() => navigateTo('library')}
                 className="px-6 py-3 rounded-xl font-medium bg-white/20 hover:bg-white/30 text-white border border-white/30 transition-colors"
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
               >
                 {isEn ? 'Explore Plants' : 'کشف گیاهان'}
-              </motion.button>
+              </m.button>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </section>
     </div>

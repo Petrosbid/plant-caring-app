@@ -1,6 +1,6 @@
 // src/pages/DiseaseDetailsPage.tsx
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { useParams, Link, useNavigate } from 'react-router-dom';
 import DOMPurify from 'dompurify';
 import {
@@ -96,7 +96,10 @@ const DiseaseDetailsPage: React.FC = () => {
 
   const renderAffectedPlants = (plantsStr: string | undefined) => {
     if (!plantsStr) return null;
-    const plantsArray = plantsStr.split(',').map(p => p.trim()).filter(p => p);
+    const plantsArray = plantsStr.split(',').flatMap(p => {
+      const trimmed = p.trim();
+      return trimmed ? [trimmed] : [];
+    });
     if (plantsArray.length === 0) return null;
     return (
       <div className="flex flex-wrap gap-2">
@@ -241,7 +244,7 @@ const DiseaseDetailsPage: React.FC = () => {
               </button>
               <AnimatePresence>
                 {showTreatment && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
@@ -260,7 +263,7 @@ const DiseaseDetailsPage: React.FC = () => {
                         </ul>
                       </div>
                     )}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -278,7 +281,7 @@ const DiseaseDetailsPage: React.FC = () => {
               </button>
               <AnimatePresence>
                 {showPrevention && (
-                  <motion.div
+                  <m.div
                     initial={{ opacity: 0, height: 0 }}
                     animate={{ opacity: 1, height: 'auto' }}
                     exit={{ opacity: 0, height: 0 }}
@@ -290,7 +293,7 @@ const DiseaseDetailsPage: React.FC = () => {
                         <p>{isEn ? llm.prevention_en : llm.prevention_fa}</p>
                       </div>
                     )}
-                  </motion.div>
+                  </m.div>
                 )}
               </AnimatePresence>
             </div>
@@ -374,7 +377,7 @@ const DiseaseCommentItem: React.FC<{
   handleReply: (parentId: number) => void;
 }> = ({ comment, isEn, depth, replyTo, setReplyTo, replyContent, setReplyContent, handleReply }) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
@@ -426,7 +429,7 @@ const DiseaseCommentItem: React.FC<{
           />
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

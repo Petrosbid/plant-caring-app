@@ -1,6 +1,6 @@
 // Register.tsx
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 
@@ -132,7 +132,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
             className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
         </div>
       )}
-      <motion.button
+      <m.button
         onClick={handleSendCode}
         disabled={loading}
         className="w-full py-3 rounded-xl font-medium text-white bg-brand-500 hover:bg-brand-600 disabled:opacity-50"
@@ -140,7 +140,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         whileTap={{ scale: 0.99 }}
       >
         {loading ? (isEn ? 'Sending...' : 'در حال ارسال...') : (isEn ? 'Send Verification Code' : 'ارسال کد تایید')}
-      </motion.button>
+      </m.button>
     </div>
   );
 
@@ -156,13 +156,13 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         <input type="text" value={code} onChange={(e) => setCode(e.target.value)}
           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
       </div>
-      <motion.button
+      <m.button
         onClick={handleVerifyCode}
         disabled={loading}
         className="w-full py-3 rounded-xl font-medium text-white bg-brand-500 hover:bg-brand-600"
       >
         {loading ? (isEn ? 'Verifying...' : 'در حال تایید...') : (isEn ? 'Complete Registration' : 'تکمیل ثبت‌نام')}
-      </motion.button>
+      </m.button>
       <button
         onClick={() => { setStep('form'); setCode(''); setError(null); }}
         className="w-full text-center text-sm text-brand-600 dark:text-brand-400"

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import type { Plant } from '../types';
 import { plantService, gardenService } from '../services/api';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
@@ -80,14 +80,14 @@ const PlantIdentification: React.FC = () => {
 
     return (
       <AnimatePresence>
-        <motion.div
+        <m.div
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4"
           onClick={() => setResult(null)}
         >
-          <motion.div
+          <m.div
             initial={{ scale: 0.95, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
@@ -105,14 +105,14 @@ const PlantIdentification: React.FC = () => {
                     {isEn ? 'Successfully identified your plant!' : 'گیاه شما با موفقیت شناسایی شد!'}
                   </p>
                 </div>
-                <motion.button
+                <m.button
                   onClick={() => setResult(null)}
                   className="text-white hover:bg-white/20 rounded-lg p-2 text-2xl transition-colors"
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.9 }}
                 >
                   &times;
-                </motion.button>
+                </m.button>
               </div>
             </div>
 
@@ -178,7 +178,7 @@ const PlantIdentification: React.FC = () => {
                       {isEn ? 'Would you like to add this plant to your personal garden collection?' : 'آیا مایلید این گیاه را به مجموعه باغ شخصی خود اضافه کنید؟'}
                     </p>
                     <div className="flex flex-wrap gap-3">
-                      <motion.button
+                      <m.button
                         onClick={async () => {
                           try {
                             await gardenService.addUserPlant({ plant: result.id, nickname: result.farsi_name, notes: result.description });
@@ -194,37 +194,37 @@ const PlantIdentification: React.FC = () => {
                         whileTap={{ scale: 0.98 }}
                       >
                         {isEn ? 'Yes, Add to Garden' : 'بله، به باغ اضافه کن'}
-                      </motion.button>
-                      <motion.button
+                      </m.button>
+                      <m.button
                         onClick={() => setResult(null)}
                         className="px-5 py-2.5 rounded-xl bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-800 dark:text-white font-medium transition-colors"
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                       >
                         {isEn ? 'No, Thanks' : 'خیر، ممنون'}
-                      </motion.button>
+                      </m.button>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-          </motion.div>
-        </motion.div>
+          </m.div>
+        </m.div>
       </AnimatePresence>
     );
   }
 
   return (
     <div className="container mx-auto px-4 lg:px-6 py-10 lg:py-14">
-      <motion.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
+      <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
         {t('identify')}
-      </motion.h1>
-      <motion.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">
+      </m.h1>
+      <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">
         <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-6">
           {isEn ? 'Upload a photo of a plant to identify it' : 'یک عکس از گیاه بارگذاری کنید تا شناسایی شود'}
         </h2>
         {!previewUrl ? (
-          <motion.div
+          <m.div
             layout
             className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-10 text-center cursor-pointer hover:border-brand-500 dark:hover:border-brand-400 hover:bg-brand-500/5 dark:hover:bg-brand-500/10 transition-all duration-300"
             onDrop={handleDrop}
@@ -245,26 +245,26 @@ const PlantIdentification: React.FC = () => {
               </p>
             </div>
             <input id="fileInput" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-          </motion.div>
+          </m.div>
         ) : (
-          <motion.div layout className="text-center">
-            <motion.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 rounded-xl overflow-hidden shadow-lg">
+          <m.div layout className="text-center">
+            <m.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 rounded-xl overflow-hidden shadow-lg">
               <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto w-full object-cover" />
-            </motion.div>
+            </m.div>
             <button onClick={handleReset} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium text-sm">
               {isEn ? 'Choose Another Image' : 'انتخاب تصویر دیگر'}
             </button>
-          </motion.div>
+          </m.div>
         )}
         <AnimatePresence>
           {error && (
-            <motion.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-xl text-sm">
+            <m.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-xl text-sm">
               {error}
-            </motion.div>
+            </m.div>
           )}
         </AnimatePresence>
         <div className="mt-6 text-center">
-          <motion.button
+          <m.button
             onClick={handleIdentify}
             disabled={isLoading || !selectedFile}
             className={`font-medium py-3 px-6 rounded-xl transition-all ${
@@ -274,9 +274,9 @@ const PlantIdentification: React.FC = () => {
             whileTap={!(isLoading || !selectedFile) ? { scale: 0.98 } : {}}
           >
             {isLoading ? (isEn ? 'Identifying...' : 'در حال شناسایی...') : (isEn ? 'Identify Plant' : 'شناسایی گیاه')}
-          </motion.button>
+          </m.button>
         </div>
-      </motion.div>
+      </m.div>
     </div>
   );
 };

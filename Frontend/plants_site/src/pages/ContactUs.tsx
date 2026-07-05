@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { useForm } from 'react-hook-form';
 import { toast, Toaster } from 'react-hot-toast';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
@@ -130,7 +130,7 @@ const ContactUs: React.FC = () => {
   };
 
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -145,7 +145,7 @@ const ContactUs: React.FC = () => {
 
       <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
         {/* Page Header */}
-        <motion.div variants={itemVariants} className="text-center mb-16">
+        <m.div variants={itemVariants} className="text-center mb-16">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 dark:bg-brand-500/20 text-brand-800 dark:text-brand-400 text-sm font-medium mb-4">
             📞 {isEn ? 'Contact Support' : 'پشتیبانی و ارتباط با ما'}
           </span>
@@ -157,13 +157,13 @@ const ContactUs: React.FC = () => {
               ? 'Have questions about features, accuracy, or partnership? Drop us a line, and our green team will be in touch.'
               : 'سوالی درباره ویژگی‌ها، دقت تشخیص یا همکاری دارید؟ پیام خود را برای ما بفرستید، تیم پشتیبانی ما به زودی با شما تماس خواهد گرفت.'}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Core Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start mb-20">
           
           {/* Contact Details (Left Column) */}
-          <motion.div variants={itemVariants} className="lg:col-span-5 space-y-6">
+          <m.div variants={itemVariants} className="lg:col-span-5 space-y-6">
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-1 gap-6">
               {contactInfo.map((info, idx) => (
                 <div 
@@ -187,10 +187,10 @@ const ContactUs: React.FC = () => {
                 </div>
               ))}
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Form Container (Right Column) */}
-          <motion.div variants={itemVariants} className="lg:col-span-7">
+          <m.div variants={itemVariants} className="lg:col-span-7">
             <Card className="p-6 lg:p-8 bg-white dark:bg-slate-800/60">
               <h2 className="font-display text-xl font-bold text-slate-900 dark:text-white mb-6">
                 {isEn ? 'Send us a Message' : 'ارسال پیام مستقیم'}
@@ -315,11 +315,11 @@ const ContactUs: React.FC = () => {
                 </Button>
               </form>
             </Card>
-          </motion.div>
+          </m.div>
         </div>
 
         {/* FAQ Accordion Section */}
-        <motion.section variants={itemVariants} className="max-w-4xl mx-auto">
+        <m.section variants={itemVariants} className="max-w-4xl mx-auto">
           <div className="text-center mb-10">
             <h2 className="font-display text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-2 flex items-center justify-center gap-2">
               <FiHelpCircle className="text-brand-500" />
@@ -354,7 +354,7 @@ const ContactUs: React.FC = () => {
                   
                   <AnimatePresence initial={false}>
                     {isOpen && (
-                      <motion.div
+                      <m.div
                         initial={{ height: 0, opacity: 0 }}
                         animate={{ height: 'auto', opacity: 1 }}
                         exit={{ height: 0, opacity: 0 }}
@@ -363,16 +363,16 @@ const ContactUs: React.FC = () => {
                         <div className="px-5 pb-5 pt-1 text-slate-600 dark:text-slate-300 text-sm leading-relaxed border-t border-slate-100 dark:border-slate-700/30">
                           {isEn ? faq.aEn : faq.aFa}
                         </div>
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
               );
             })}
           </div>
-        </motion.section>
+        </m.section>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

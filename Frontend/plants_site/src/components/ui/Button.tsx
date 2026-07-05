@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 
 interface ButtonProps {
   children: React.ReactNode;
@@ -46,7 +46,7 @@ const Button: React.FC<ButtonProps> = ({
   const classes = `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${widthClass} ${disabledClass}`;
 
   return (
-    <motion.button
+    <m.button
       type={type}
       className={classes}
       onClick={onClick}
@@ -56,7 +56,7 @@ const Button: React.FC<ButtonProps> = ({
       transition={{ type: 'tween', duration: 0.15 }}
     >
       {children}
-    </motion.button>
+    </m.button>
   );
 };
 

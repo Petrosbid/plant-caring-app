@@ -1,6 +1,6 @@
 // PlantDetailsPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import DOMPurify from 'dompurify';
@@ -320,7 +320,7 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
           {/* Quick Care Grid */}
           <div className={styles.quickCareGrid}>
             {careItems.map((item, i) => (
-              <motion.div
+              <m.div
                 key={i}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -330,7 +330,7 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
                 <span className={styles.careIcon}>{item.icon}</span>
                 <h4 className={styles.careTitle}>{item.title}</h4>
                 <p className={styles.careValue}>{item.value}</p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
 
@@ -393,17 +393,17 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
           <div className={styles.sidebarCard}>
             <h3 className={styles.sidebarTitle}>🌿 {isEn ? 'Actions' : 'عملیات'}</h3>
             <div className={styles.actionButtons}>
-              <motion.button whileTap={{ scale: 0.95 }} onClick={handleFavoriteToggle} disabled={favLoading} className={`${styles.actionBtn} ${isFavorited ? styles.favorited : ''}`}>
+              <m.button whileTap={{ scale: 0.95 }} onClick={handleFavoriteToggle} disabled={favLoading} className={`${styles.actionBtn} ${isFavorited ? styles.favorited : ''}`}>
                 <FiHeart className={isFavorited ? 'text-red-500 fill-red-500' : ''} />
                 {isEn ? (isFavorited ? 'Favorited' : 'Favorite') : (isFavorited ? 'حذف علاقه' : 'علاقه‌مندی')}
-              </motion.button>
-              <motion.button whileTap={{ scale: 0.95 }} onClick={handleGardenToggle} disabled={gardenActionLoading} className={`${styles.actionBtn} ${isInGarden ? styles.inGarden : ''}`}>
+              </m.button>
+              <m.button whileTap={{ scale: 0.95 }} onClick={handleGardenToggle} disabled={gardenActionLoading} className={`${styles.actionBtn} ${isInGarden ? styles.inGarden : ''}`}>
                 <FiBookmark />
                 {isEn ? (isInGarden ? 'In Garden' : 'Add to Garden') : (isInGarden ? 'در باغچه' : 'افزودن به باغچه')}
-              </motion.button>
-              <motion.button whileTap={{ scale: 0.95 }} onClick={handleShare} className={styles.actionBtn}>
+              </m.button>
+              <m.button whileTap={{ scale: 0.95 }} onClick={handleShare} className={styles.actionBtn}>
                 <FiShare2 /> {isEn ? 'Share' : 'اشتراک'}
-              </motion.button>
+              </m.button>
             </div>
           </div>
 
@@ -439,7 +439,7 @@ const CommentItem: React.FC<{
   handleReply: (parentId: number) => void;
 }> = ({ comment, isEn, depth, replyTo, setReplyTo, replyContent, setReplyContent, handleReply }) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0 }}
@@ -484,7 +484,7 @@ const CommentItem: React.FC<{
           />
         ))}
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

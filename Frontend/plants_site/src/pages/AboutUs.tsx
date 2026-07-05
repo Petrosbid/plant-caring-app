@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import Card from '../components/ui/Card';
 
@@ -88,7 +88,7 @@ const AboutUs: React.FC = () => {
   ];
 
   return (
-    <motion.div
+    <m.div
       initial="hidden"
       animate="visible"
       variants={containerVariants}
@@ -101,7 +101,7 @@ const AboutUs: React.FC = () => {
 
       <div className="container mx-auto px-4 lg:px-8 max-w-6xl">
         {/* Hero Section */}
-        <motion.div variants={itemVariants} className="text-center mb-16 lg:mb-24">
+        <m.div variants={itemVariants} className="text-center mb-16 lg:mb-24">
           <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-brand-500/10 dark:bg-brand-500/20 text-brand-800 dark:text-brand-400 text-sm font-medium mb-4">
             ✨ {isEn ? 'Get to Know Us' : 'درباره ما بیشتر بدانید'}
           </span>
@@ -113,10 +113,10 @@ const AboutUs: React.FC = () => {
               ? 'Verna is your digital companion in plant caring, bridging ancient heritage with next-generation artificial intelligence to help your garden thrive.'
               : 'ورنا همدم دیجیتال شما در نگهداری از گیاهان است؛ پیوندی میان اصالت گذشته و هوش مصنوعی نسل جدید برای رشد و شادابی باغچه و گلدان‌های شما.'}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* The Story of Verna (Origin Story) */}
-        <motion.section variants={itemVariants} className="mb-20 lg:mb-28">
+        <m.section variants={itemVariants} className="mb-20 lg:mb-28">
           <div className="relative group p-8 lg:p-12 rounded-3xl border border-slate-200/60 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/40 backdrop-blur-md shadow-card hover:shadow-card-hover transition-all duration-500 overflow-hidden">
             <div className="absolute -inset-4 bg-gradient-to-tr from-brand-500/5 to-emerald-500/5 opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
             <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-12 items-center">
@@ -148,10 +148,10 @@ const AboutUs: React.FC = () => {
               </div>
             </div>
           </div>
-        </motion.section>
+        </m.section>
 
         {/* Pillars / Values Section */}
-        <motion.section variants={itemVariants} className="mb-20 lg:mb-28">
+        <m.section variants={itemVariants} className="mb-20 lg:mb-28">
           <div className="text-center mb-12">
             <h2 className="font-display text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4">
               {isEn ? 'Our Core Pillars' : 'ستون‌های اصلی ما'}
@@ -178,10 +178,10 @@ const AboutUs: React.FC = () => {
               </Card>
             ))}
           </div>
-        </motion.section>
+        </m.section>
 
         {/* Team Section */}
-        <motion.section variants={itemVariants} className="mb-8">
+        <m.section variants={itemVariants} className="mb-8">
           <div className="text-center mb-12">
             <h2 className="font-display text-2xl lg:text-3xl font-bold text-slate-900 dark:text-white mb-4">
               {isEn ? 'Meet Our Expert Team' : 'تیم کارشناسان ما'}
@@ -195,7 +195,7 @@ const AboutUs: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {team.map((member, idx) => (
-              <motion.div
+              <m.div
                 key={idx}
                 whileHover={{ y: -5 }}
                 className="group p-6 rounded-2xl border border-slate-200/60 dark:border-slate-700/50 bg-white/70 dark:bg-slate-800/40 backdrop-blur-md text-center shadow-card hover:shadow-card-hover transition-all duration-300"
@@ -220,12 +220,12 @@ const AboutUs: React.FC = () => {
                 <p className="text-sm text-slate-600 dark:text-slate-300 leading-relaxed">
                   {isEn ? member.bioEn : member.bioFa}
                 </p>
-              </motion.div>
+              </m.div>
             ))}
           </div>
-        </motion.section>
+        </m.section>
       </div>
-    </motion.div>
+    </m.div>
   );
 };
 

@@ -44,7 +44,7 @@ const NotificationPopover: React.FC<NotificationPopoverProps> = ({ onClose }) =>
       }
     };
     load();
-  }, []);
+  }, [isEn]);
 
   const renderNotificationList = (items: Notification[], title: string) => {
     if (items.length === 0) return null;

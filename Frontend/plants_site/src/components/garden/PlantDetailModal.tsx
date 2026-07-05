@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import {
   FiX, FiSave, FiInfo, FiEdit, FiTrendingUp,
   FiBell, FiMessageCircle
@@ -55,14 +55,14 @@ const PlantDetailModal: React.FC<Props> = ({ userPlant, language, onClose, onUpd
   ];
 
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
       onClick={onClose}
     >
-      <motion.div
+      <m.div
         initial={{ scale: 0.92, y: 30 }}
         animate={{ scale: 1, y: 0 }}
         exit={{ scale: 0.92, y: 30 }}
@@ -134,8 +134,8 @@ const PlantDetailModal: React.FC<Props> = ({ userPlant, language, onClose, onUpd
             )
           )}
         </div>
-      </motion.div>
-    </motion.div>
+      </m.div>
+    </m.div>
   );
 };
 
@@ -497,7 +497,7 @@ const GrowthTab: React.FC<{ userPlant: UserPlant; language: 'en' | 'fa' }> = ({ 
   return (
     <div className="space-y-4">
       {userPlant.growth_records.map((rec, idx) => (
-        <motion.div
+        <m.div
           key={rec.id}
           initial={{ opacity: 0, x: -10 }}
           animate={{ opacity: 1, x: 0 }}
@@ -515,7 +515,7 @@ const GrowthTab: React.FC<{ userPlant: UserPlant; language: 'en' | 'fa' }> = ({ 
             </p>
             {rec.notes && <p className="text-xs text-slate-500 mt-1">{rec.notes}</p>}
           </div>
-        </motion.div>
+        </m.div>
       ))}
     </div>
   );

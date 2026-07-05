@@ -269,12 +269,24 @@ export default function FloatingLines({
   mixBlendMode = 'screen'
 }: FloatingLinesProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
-  const targetMouseRef = useRef<Vector2>(new Vector2(-1000, -1000));
-  const currentMouseRef = useRef<Vector2>(new Vector2(-1000, -1000));
+  const targetMouseRef = useRef<Vector2>(null as any);
+  if (!targetMouseRef.current) {
+    targetMouseRef.current = new Vector2(-1000, -1000);
+  }
+  const currentMouseRef = useRef<Vector2>(null as any);
+  if (!currentMouseRef.current) {
+    currentMouseRef.current = new Vector2(-1000, -1000);
+  }
   const targetInfluenceRef = useRef<number>(0);
   const currentInfluenceRef = useRef<number>(0);
-  const targetParallaxRef = useRef<Vector2>(new Vector2(0, 0));
-  const currentParallaxRef = useRef<Vector2>(new Vector2(0, 0));
+  const targetParallaxRef = useRef<Vector2>(null as any);
+  if (!targetParallaxRef.current) {
+    targetParallaxRef.current = new Vector2(0, 0);
+  }
+  const currentParallaxRef = useRef<Vector2>(null as any);
+  if (!currentParallaxRef.current) {
+    currentParallaxRef.current = new Vector2(0, 0);
+  }
 
   const getLineCount = (waveType: 'top' | 'middle' | 'bottom'): number => {
     if (typeof lineCount === 'number') return lineCount;
@@ -506,7 +518,13 @@ export default function FloatingLines({
     bendStrength,
     mouseDamping,
     parallax,
-    parallaxStrength
+    parallaxStrength,
+    topLineCount,
+    middleLineCount,
+    bottomLineCount,
+    topLineDistance,
+    middleLineDistance,
+    bottomLineDistance
   ]);
 
   return (

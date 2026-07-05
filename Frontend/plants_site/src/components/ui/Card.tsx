@@ -1,5 +1,5 @@
 import React from 'react';
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 
 interface CardProps {
   children: React.ReactNode;
@@ -10,7 +10,7 @@ interface CardProps {
 
 const Card: React.FC<CardProps> = ({ children, className = '', title, subtitle }) => {
   return (
-    <motion.div
+    <m.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.3 }}
@@ -31,7 +31,7 @@ const Card: React.FC<CardProps> = ({ children, className = '', title, subtitle }
         </div>
       )}
       <div className={title || subtitle ? 'p-6' : ''}>{children}</div>
-    </motion.div>
+    </m.div>
   );
 };
 

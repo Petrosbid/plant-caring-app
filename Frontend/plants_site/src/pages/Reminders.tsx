@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { useReminders } from '../hooks/useReminders';
 import { useUserPlants } from '../hooks/useUserPlants';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
@@ -116,7 +116,7 @@ const Reminders: React.FC = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-emerald-100 dark:from-gray-900 dark:to-gray-800 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-7xl mx-auto">
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -130,21 +130,21 @@ const Reminders: React.FC = () => {
               ? 'Set reminders to take care of your plants on time'
               : 'یادآوری‌ها را تنظیم کنید تا به موقع از گیاهان خود مراقبت کنید'}
           </p>
-        </motion.div>
+        </m.div>
 
         {error && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="mb-6 p-4 bg-red-100 dark:bg-red-900/30 border border-red-300 dark:border-red-700 text-red-700 dark:text-red-200 rounded-xl text-center"
           >
             {error}
-          </motion.div>
+          </m.div>
         )}
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Add Reminder Card */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.1 }}
@@ -312,7 +312,7 @@ const Reminders: React.FC = () => {
 
                   <AnimatePresence>
                     {newReminder.is_recurring && (
-                      <motion.div
+                      <m.div
                         initial={{ opacity: 0, height: 0 }}
                         animate={{ opacity: 1, height: 'auto' }}
                         exit={{ opacity: 0, height: 0 }}
@@ -330,7 +330,7 @@ const Reminders: React.FC = () => {
                           onChange={handleInputChange}
                           className="w-full px-4 py-3 border border-slate-300 dark:border-slate-600 rounded-xl focus:outline-none focus:ring-2 focus:ring-green-500 focus:border-transparent bg-white dark:bg-gray-700 text-slate-900 dark:text-white transition-all"
                         />
-                      </motion.div>
+                      </m.div>
                     )}
                   </AnimatePresence>
                 </div>
@@ -343,10 +343,10 @@ const Reminders: React.FC = () => {
                 </button>
               </form>
             </div>
-          </motion.div>
+          </m.div>
 
           {/* Reminders List */}
-          <motion.div
+          <m.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ delay: 0.2 }}
@@ -374,7 +374,7 @@ const Reminders: React.FC = () => {
                       const associatedPlant = userPlants.find(plant => plant.id === reminder.user_plant);
 
                       return (
-                        <motion.div
+                        <m.div
                           key={reminder.id}
                           layout
                           initial={{ opacity: 0, y: 20 }}
@@ -476,11 +476,11 @@ const Reminders: React.FC = () => {
                                 : (t('home') === 'Home' ? 'Completed' : 'تکمیل شده')}
                             </span>
                           </div>
-                        </motion.div>
+                        </m.div>
                       );
                     })
                   ) : (
-                    <motion.div
+                    <m.div
                       initial={{ opacity: 0 }}
                       animate={{ opacity: 1 }}
                       className="text-center py-12"
@@ -496,12 +496,12 @@ const Reminders: React.FC = () => {
                           ? 'Add your first reminder to stay on top of your plant care routine'
                           : 'اولین یادآوری خود را اضافه کنید تا مراقبت از گیاهان خود را به موقع انجام دهید'}
                       </p>
-                    </motion.div>
+                    </m.div>
                   )}
                 </AnimatePresence>
               </div>
             </div>
-          </motion.div>
+          </m.div>
         </div>
       </div>
     </div>

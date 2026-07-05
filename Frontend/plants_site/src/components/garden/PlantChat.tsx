@@ -1,5 +1,5 @@
 // src/components/garden/PlantChat.tsx
-import { motion } from 'framer-motion';
+import {m} from 'framer-motion';
 import React, { useState, useRef, useEffect } from 'react';
 import { FiSend } from 'react-icons/fi';
 
@@ -81,7 +81,7 @@ const PlantChat: React.FC<{ plantId: number; language: 'en' | 'fa' }> = ({ plant
       {/* Messages */}
       <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-thumb-slate-300 dark:scrollbar-thumb-slate-600">
         {messages.map((msg, i) => (
-          <motion.div
+          <m.div
             key={i}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
@@ -97,15 +97,15 @@ const PlantChat: React.FC<{ plantId: number; language: 'en' | 'fa' }> = ({ plant
             >
               <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.text}</p>
             </div>
-          </motion.div>
+          </m.div>
         ))}
         {loading && (
           <div className="flex justify-start">
             <div className="bg-white dark:bg-slate-700 px-4 py-3 rounded-2xl rounded-bl-md shadow-sm border border-slate-200/60 dark:border-slate-600/50">
               <div className="flex gap-1">
-                <span className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce" />
-                <span className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce delay-75" />
-                <span className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-bounce delay-150" />
+                <span className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-pulse" />
+                <span className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-pulse delay-75" />
+                <span className="w-2 h-2 bg-slate-400 dark:bg-slate-500 rounded-full animate-pulse delay-150" />
               </div>
             </div>
           </div>

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
+import { blogService } from "../../services/api";
 import { Link } from "react-router-dom";
 import type { PostListItem } from "../../types/blog";
 import { Swiper, SwiperSlide } from "swiper/react";
@@ -17,18 +17,23 @@ const LatestPostsCarousel: React.FC = () => {
   const isEn = language === "en";
 
   useEffect(() => {
+    let ignore = false;
     const fetchLatest = async () => {
       try {
-        const response = await axios.get<PostListItem[] | { results: PostListItem[] }>(
-          "/api/blog/posts/latest/"
-        );
-        const data = response.data;
-        setLatestPosts(Array.isArray(data) ? data : data.results || []);
+        const data = await blogService.getLatestPosts();
+        if (!ignore) {
+          setLatestPosts(data);
+        }
       } catch (error) {
-        console.error("Failed to fetch latest posts:", error);
+        if (!ignore) {
+          console.error("Failed to fetch latest posts:", error);
+        }
       }
     };
     fetchLatest();
+    return () => {
+      ignore = true;
+    };
   }, []);
 
   if (latestPosts.length === 0) return null;

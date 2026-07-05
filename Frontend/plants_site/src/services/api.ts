@@ -708,6 +708,11 @@ export const blogService = {
     return response.data.results || response.data;
   },
 
+  getLatestPosts: async (): Promise<PostListItem[]> => {
+    const response = await blogApi.get('/posts/latest/');
+    return response.data.results || response.data;
+  },
+
   getMostViewedPosts: async (limit = 10): Promise<PostListItem[]> => {
     const response = await blogApi.get('/posts/', {
       params: { ordering: '-view_count', page_size: limit },

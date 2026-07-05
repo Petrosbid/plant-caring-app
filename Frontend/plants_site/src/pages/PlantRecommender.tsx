@@ -1,6 +1,6 @@
 // src/pages/PlantRecommender.tsx
 import React, { useState, useEffect } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
 import { LoaderGooeyBlobs } from '../components/animation/gooey-loader';
 import { SECTIONS, QUESTIONS, type Question } from '../types/recommendationQuestions';
@@ -17,11 +17,11 @@ import { storageKeys, getStorageItem, setStorageItem } from '../utils/storage';
 type Answers = Record<string, string | string[] | boolean>;
 
 const sectionIcons = [
-  <FiHome className="w-6 h-6" />,
-  <FiHeart className="w-6 h-6" />,
-  <FiShield className="w-6 h-6" />,
-  <FiAward className="w-6 h-6" />,
-  <FiCpu  className="w-6 h-6" />
+  <FiHome key="home" className="w-6 h-6" />,
+  <FiHeart key="heart" className="w-6 h-6" />,
+  <FiShield key="shield" className="w-6 h-6" />,
+  <FiAward key="award" className="w-6 h-6" />,
+  <FiCpu key="cpu"  className="w-6 h-6" />
 ];
 
 const PlantRecommender: React.FC = () => {
@@ -343,7 +343,7 @@ const PlantRecommender: React.FC = () => {
     <div className="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900 py-10 px-4 sm:px-6" dir={isEn ? 'ltr' : 'rtl'}>
       <div className="max-w-5xl mx-auto">
         {/* Header with glass effect */}
-        <motion.div
+        <m.div
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           className="text-center mb-10"
@@ -356,7 +356,7 @@ const PlantRecommender: React.FC = () => {
               ? 'Answer a few questions and get a personalized plant recommendation based on your home, lifestyle, and preferences.'
               : 'به چند سوال پاسخ دهید و یک پیشنهاد شخصی‌سازی شده بر اساس خانه، سبک زندگی و سلیقه خود دریافت کنید.'}
           </p>
-        </motion.div>
+        </m.div>
 
         {/* Progress Bar - Modern design with step indicator */}
         <div className="mb-10">
@@ -369,7 +369,7 @@ const PlantRecommender: React.FC = () => {
             </span>
           </div>
           <div className="h-2.5 bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden">
-            <motion.div
+            <m.div
               className="h-full bg-gradient-to-r from-green-500 to-emerald-500 rounded-full"
               initial={{ width: 0 }}
               animate={{ width: `${totalProgress}%` }}
@@ -401,7 +401,7 @@ const PlantRecommender: React.FC = () => {
         </div>
 
         {/* Section Card with Glassmorphism */}
-        <motion.div
+        <m.div
           key={currentSection}
           initial={{ opacity: 0, x: isEn ? 30 : -30 }}
           animate={{ opacity: 1, x: 0 }}
@@ -425,7 +425,7 @@ const PlantRecommender: React.FC = () => {
 
           <div className="p-6 space-y-8">
             {sectionQuestions.map((q, idx) => (
-              <motion.div
+              <m.div
                 key={q.id}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -445,14 +445,14 @@ const PlantRecommender: React.FC = () => {
                     {isEn ? 'This question is required.' : 'این سوال اجباری است.'}
                   </p>
                 )}
-              </motion.div>
+              </m.div>
             ))}
           </div>
-        </motion.div>
+        </m.div>
 
         {/* Additional Notes */}
         {isLastSection && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="backdrop-blur-sm bg-white/60 dark:bg-slate-800/60 rounded-2xl p-6 mb-8 border border-white/30 dark:border-slate-700/50"
@@ -468,13 +468,13 @@ const PlantRecommender: React.FC = () => {
               placeholder={isEn ? 'Anything else you want to share? (e.g., specific plant you love, allergies, etc.)' : 'هر اطلاعات دیگری که می‌خواهید به اشتراک بگذارید؟ (مثلاً گیاه خاص مورد علاقه، آلرژی و...)'}
               className="w-full rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white/90 dark:bg-slate-800/90 text-slate-800 dark:text-white p-3 focus:outline-none focus:border-green-400 focus:ring-2 focus:ring-green-200 dark:focus:ring-green-500/30 transition-all"
             />
-          </motion.div>
+          </m.div>
         )}
 
         {/* Navigation Buttons with modern design */}
         <div className="flex justify-between items-center mt-6">
           {currentSection > 1 && (
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={goToPrevSection}
@@ -482,11 +482,11 @@ const PlantRecommender: React.FC = () => {
             >
               <FiChevronLeft className={isEn ? '' : 'rotate-180'} />
               {isEn ? 'Previous' : 'قبلی'}
-            </motion.button>
+            </m.button>
           )}
           <div className="flex-1"></div>
           {!isLastSection ? (
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={goToNextSection}
@@ -494,9 +494,9 @@ const PlantRecommender: React.FC = () => {
             >
               {isEn ? 'Next' : 'بعدی'}
               <FiChevronRight className={isEn ? '' : 'rotate-180'} />
-            </motion.button>
+            </m.button>
           ) : (
-            <motion.button
+            <m.button
               whileHover={{ scale: 1.02 }}
               whileTap={{ scale: 0.98 }}
               onClick={handleSubmit}
@@ -511,7 +511,7 @@ const PlantRecommender: React.FC = () => {
                   {isEn ? 'Get Recommendation' : 'دریافت پیشنهاد'}
                 </>
               )}
-            </motion.button>
+            </m.button>
           )}
         </div>
 
@@ -529,14 +529,14 @@ const PlantRecommender: React.FC = () => {
       {/* Result Modal - Enhanced */}
       <AnimatePresence>
         {showResultModal && result && (
-          <motion.div
+          <m.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
             className="fixed inset-0 bg-black/70 backdrop-blur-md flex items-center justify-center z-50 p-4"
             onClick={() => setShowResultModal(false)}
           >
-            <motion.div
+            <m.div
               initial={{ scale: 0.9, opacity: 0, y: 30 }}
               animate={{ scale: 1, opacity: 1, y: 0 }}
               exit={{ scale: 0.9, opacity: 0, y: 30 }}
@@ -607,8 +607,8 @@ const PlantRecommender: React.FC = () => {
                   </button>
                 </div>
               </div>
-            </motion.div>
-          </motion.div>
+            </m.div>
+          </m.div>
         )}
       </AnimatePresence>
     </div>

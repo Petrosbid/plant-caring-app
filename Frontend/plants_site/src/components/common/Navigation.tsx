@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import {m, AnimatePresence} from 'framer-motion';
 import { useAuth } from '../../contexts/AuthContext';
 import { useLanguageTheme } from '../../contexts/LanguageThemeContext';
 import CountryFlag from 'react-country-flag';
@@ -101,7 +101,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
           </button>
           <AnimatePresence initial={false}>
             {isExpanded && (
-              <motion.div
+              <m.div
                 initial={{ opacity: 0, height: 0 }}
                 animate={{ opacity: 1, height: 'auto' }}
                 exit={{ opacity: 0, height: 0 }}
@@ -115,7 +115,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
                 >
                   {item.children!.map(child => renderNavItem(child, depth + 1))}
                 </div>
-              </motion.div>
+              </m.div>
             )}
           </AnimatePresence>
         </div>
@@ -138,7 +138,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
   };
 
   return (
-    <motion.nav
+    <m.nav
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="md:hidden sticky top-0 z-50 glass border-b border-slate-200/60 dark:border-slate-700/50"
@@ -146,38 +146,38 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
     >
       <div className="container mx-auto px-4">
         <div className="flex justify-between items-center h-14">
-          <motion.button
+          <m.button
             onClick={() => navigateTo('home')}
             className="flex items-center gap-2"
             whileTap={{ scale: 0.98 }}
           >
             <span className="text-xl">🌱</span>
             <span className="font-display font-semibold text-brand-600 dark:text-brand-400">{language === 'fa' ? 'ورنا' : 'Verna'}</span>
-          </motion.button>
+          </m.button>
 
           <div className="flex items-center gap-2">
-            <motion.button
+            <m.button
               onClick={toggleLanguage}
               className="px-2 py-1.5 rounded-lg bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 text-xs font-medium flex items-center justify-center gap-1 transition-colors"
               whileTap={{ scale: 0.95 }}
             >
               {language === 'en' ? flags.en : flags.fa}
-            </motion.button>
-            <motion.button
+            </m.button>
+            <m.button
               onClick={toggleTheme}
               className="p-2 rounded-lg bg-slate-100 dark:bg-slate-700/80 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors"
               whileTap={{ scale: 0.95 }}
             >
               {theme === 'light' ? '🌙' : '☀️'}
-            </motion.button>
-            <motion.button
+            </m.button>
+            <m.button
               onClick={() => setIsOpen(!isOpen)}
               className="p-2 rounded-lg text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700/80 transition-colors"
               whileTap={{ scale: 0.95 }}
               aria-label="Menu"
             >
               {isOpen ? <FiX className="w-6 h-6" /> : <FiMenu className="w-6 h-6" />}
-            </motion.button>
+            </m.button>
           </div>
         </div>
       </div>
@@ -186,7 +186,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
         {isOpen && (
           <>
             {/* Backdrop Overlay */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
@@ -195,7 +195,7 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
             />
             
             {/* Dropdown Menu */}
-            <motion.div
+            <m.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
@@ -241,11 +241,11 @@ const Navigation: React.FC<NavigationProps> = ({ navigateTo, currentPage }) => {
                   </li>
                 )}
               </ul>
-            </motion.div>
+            </m.div>
           </>
         )}
       </AnimatePresence>
-    </motion.nav>
+    </m.nav>
   );
 };
 

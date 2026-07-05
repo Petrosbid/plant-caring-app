@@ -1,6 +1,6 @@
 "use client";
 import * as React from "react";
-import { motion, type HTMLMotionProps } from "motion/react";
+import { m, type HTMLMotionProps } from "framer-motion";
 import { cn } from "../../utils/cn";
 export interface LoaderGooeyBlobsProps
 extends Omit<HTMLMotionProps<"div">, "children"> {
@@ -36,7 +36,7 @@ return (
     className="flex gap-1"
   >
     {[0, 1, 2].map((index) => (
-      <motion.div
+      <m.div
         key={index}
         className="rounded-full"
         style={{
