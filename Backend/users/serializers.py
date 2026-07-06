@@ -1,6 +1,8 @@
 from rest_framework import serializers
-from .utils import normalize_phone_number
+
 from .models import CustomUser, OTPCode
+from .utils import normalize_phone_number
+
 
 class UserSerializer(serializers.ModelSerializer):
     """
@@ -8,24 +10,39 @@ class UserSerializer(serializers.ModelSerializer):
     Password is write-only and optional on updates.
     Profile picture is read-only in the JSON payload; use the dedicated upload endpoint.
     """
+
     password = serializers.CharField(write_only=True, required=False)
-    profile_picture = serializers.ImageField(read_only=True)  # output URL, not for writing
+    profile_picture = serializers.ImageField(
+        read_only=True
+    )  # output URL, not for writing
 
     class Meta:
         model = CustomUser
         fields = (
-            'id', 'username', 'password', 'email',
-            'first_name', 'last_name', 'bio', 'phone',
-            'national_code', 'birth_date', 'gender', 'profile_picture',
-            'push_token', 'timezone', 'notify_reminders_exact',
-            'notify_reminders_daily', 'notify_reminders_tomorrow'
+            "id",
+            "username",
+            "password",
+            "email",
+            "first_name",
+            "last_name",
+            "bio",
+            "phone",
+            "national_code",
+            "birth_date",
+            "gender",
+            "profile_picture",
+            "push_token",
+            "timezone",
+            "notify_reminders_exact",
+            "notify_reminders_daily",
+            "notify_reminders_tomorrow",
         )
         extra_kwargs = {
-            'password': {'write_only': True},
+            "password": {"write_only": True},
         }
 
     def create(self, validated_data):
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         user = CustomUser.objects.create_user(**validated_data)
         if password:
             user.set_password(password)
@@ -33,7 +50,7 @@ class UserSerializer(serializers.ModelSerializer):
         return user
 
     def update(self, instance, validated_data):
-        password = validated_data.pop('password', None)
+        password = validated_data.pop("password", None)
         for attr, value in validated_data.items():
             setattr(instance, attr, value)
         instance.save()
@@ -45,9 +62,10 @@ class UserSerializer(serializers.ModelSerializer):
 
 class ProfilePictureSerializer(serializers.ModelSerializer):
     """Serializer used exclusively for updating the profile picture."""
+
     class Meta:
         model = CustomUser
-        fields = ('profile_picture',)
+        fields = ("profile_picture",)
 
 
 class PhoneSerializer(serializers.Serializer):
@@ -60,6 +78,7 @@ class PhoneSerializer(serializers.Serializer):
             raise serializers.ValidationError(str(e))
         return normalized
 
+
 class OTPVerifySerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
     code = serializers.CharField(max_length=6)
@@ -70,6 +89,7 @@ class RegisterInitPhoneSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
     username = serializers.CharField()
+    password = serializers.CharField(required=False, allow_blank=False, write_only=True)
 
     def validate_phone(self, value):
         normalized = normalize_phone_number(value)
@@ -88,6 +108,7 @@ class RegisterInitEmailSerializer(serializers.Serializer):
     first_name = serializers.CharField(required=False, allow_blank=True)
     last_name = serializers.CharField(required=False, allow_blank=True)
     username = serializers.CharField()
+    password = serializers.CharField(required=False, allow_blank=False, write_only=True)
 
     def validate_email(self, value):
         if CustomUser.objects.filter(email=value).exists():
@@ -103,4 +124,4 @@ class RegisterInitEmailSerializer(serializers.Serializer):
 class RegisterVerifySerializer(serializers.Serializer):
     identifier = serializers.CharField()  # phone or email
     code = serializers.CharField(max_length=6)
-    purpose = serializers.CharField(default='register')
+    purpose = serializers.CharField(default="register")

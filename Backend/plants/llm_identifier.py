@@ -8,7 +8,7 @@ from .models import Plant
 # =====================================================================
 USE_GEMINI = True
 
-IDENTIFIER_MODEL = "gemini-3.5-flash" if USE_GEMINI else "gemma-3-27b-it"
+IDENTIFIER_MODEL = "gemini-3.1-flash-lite" if USE_GEMINI else "gemma-3-27b-it"
 
 # =====================================================================
 # IMPORTS & CLIENT INITIALIZATION

@@ -1,17 +1,26 @@
 // API service for plant identification app
-import type { Plant, Disease, Reminder, User, PlantComment, UserPlant, GrowthRecord, DiseaseComment, PaginatedResponse } from '../types';
-import type { PostListItem, PostDetail, BlogComment } from '../types/blog';
-import axios from 'axios';
+import type {
+  Plant,
+  Disease,
+  Reminder,
+  User,
+  PlantComment,
+  UserPlant,
+  GrowthRecord,
+  DiseaseComment,
+  PaginatedResponse,
+} from "../types";
+import type { PostListItem, PostDetail, BlogComment } from "../types/blog";
+import axios from "axios";
 
 // Base API URL - points to your backend
-export const API_BASE_URL = 'http://127.0.0.1:8000/api';
+export const API_BASE_URL = "http://127.0.0.1:8000/api";
 export const BLOG_API_BASE_URL = `${API_BASE_URL}/blog`;
-
 
 // Create axios instance for blog API with error handling
 const blogApi = axios.create({
   baseURL: BLOG_API_BASE_URL,
-  headers: { 'Content-Type': 'application/json' },
+  headers: { "Content-Type": "application/json" },
 });
 
 // Add global fetch interceptor to handle transparent token refresh
@@ -19,14 +28,14 @@ const originalFetch = window.fetch;
 
 // Helper to refresh access token using refresh_token
 async function performTokenRefresh(): Promise<string | null> {
-  const refreshToken = localStorage.getItem('refresh_token');
+  const refreshToken = localStorage.getItem("refresh_token");
   if (!refreshToken) return null;
 
   try {
     const response = await originalFetch(`${API_BASE_URL}/token/refresh/`, {
-      method: 'POST',
+      method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({ refresh: refreshToken }),
     });
@@ -34,54 +43,61 @@ async function performTokenRefresh(): Promise<string | null> {
     if (response.ok) {
       const data = await response.json();
       if (data.access) {
-        localStorage.setItem('access_token', data.access);
+        localStorage.setItem("access_token", data.access);
         if (data.refresh) {
-          localStorage.setItem('refresh_token', data.refresh);
+          localStorage.setItem("refresh_token", data.refresh);
         }
         return data.access;
       }
     }
   } catch (err) {
-    console.error('Error refreshing token:', err);
+    console.error("Error refreshing token:", err);
   }
 
   // If refresh fails, clean up credentials
-  localStorage.removeItem('access_token');
-  localStorage.removeItem('refresh_token');
-  localStorage.removeItem('user');
-  
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  localStorage.removeItem("user");
+
   // Dispatch event to notify AuthContext to update UI/state
-  window.dispatchEvent(new Event('auth_logout'));
+  window.dispatchEvent(new Event("auth_logout"));
   return null;
 }
 
-window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Response> => {
+window.fetch = async (
+  input: RequestInfo | URL,
+  init?: RequestInit,
+): Promise<Response> => {
   let response = await originalFetch(input, init);
 
   // If 401 Unauthorized, try to refresh token and retry
   if (response.status === 401) {
-    const urlString = typeof input === 'string' 
-      ? input 
-      : (input instanceof URL ? input.toString() : input.url);
-    
+    const urlString =
+      typeof input === "string"
+        ? input
+        : input instanceof URL
+          ? input.toString()
+          : input.url;
+
     // Check if it's our API and NOT an authentication route that is expected to fail
-    const isOurApi = urlString.includes('/api/');
-    const isAuthRequest = urlString.includes('/auth/login/') || 
-                          urlString.includes('/token/refresh/') ||
-                          urlString.includes('/auth/register/');
+    const isOurApi = urlString.includes("/api/");
+    const isAuthRequest =
+      urlString.includes("/auth/login/") ||
+      urlString.includes("/token/refresh/") ||
+      urlString.includes("/auth/register/");
 
     if (isOurApi && !isAuthRequest) {
-      console.log('Access token expired. Attempting token refresh...');
+      console.log("Access token expired. Attempting token refresh...");
       const newAccessToken = await performTokenRefresh();
       if (newAccessToken) {
         // Clone init to modify headers
         const newInit = { ...init };
         const headers = new Headers(newInit.headers || {});
-        headers.set('Authorization', `Bearer ${newAccessToken}`);
+        headers.set("Authorization", `Bearer ${newAccessToken}`);
         newInit.headers = headers;
 
         // Retry original request
-        console.log('Token refreshed. Retrying API request...');
+        console.log("Token refreshed. Retrying API request...");
         response = await originalFetch(input, newInit);
       }
     }
@@ -92,7 +108,7 @@ window.fetch = async (input: RequestInfo | URL, init?: RequestInit): Promise<Res
 
 // Add auth token to requests
 blogApi.interceptors.request.use((config) => {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
   if (token) config.headers.Authorization = `Bearer ${token}`;
   return config;
 });
@@ -104,7 +120,7 @@ blogApi.interceptors.response.use(
     const originalRequest = error.config;
     if (error.response?.status === 401 && !originalRequest._retry) {
       originalRequest._retry = true;
-      console.log('Axios request failed with 401. Attempting token refresh...');
+      console.log("Axios request failed with 401. Attempting token refresh...");
       const newAccessToken = await performTokenRefresh();
       if (newAccessToken) {
         originalRequest.headers.Authorization = `Bearer ${newAccessToken}`;
@@ -112,21 +128,21 @@ blogApi.interceptors.response.use(
       }
     }
     return Promise.reject(error);
-  }
+  },
 );
 
 // Helper to get auth headers for fetch API
 const getAuthHeaders = (): HeadersInit => {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
   return {
-    'Content-Type': 'application/json',
+    "Content-Type": "application/json",
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
   };
 };
 
 // Helper for file upload headers
 const getFileUploadHeaders = (): HeadersInit => {
-  const token = localStorage.getItem('access_token');
+  const token = localStorage.getItem("access_token");
   return token ? { Authorization: `Bearer ${token}` } : {};
 };
 
@@ -142,13 +158,13 @@ export const authService = {
     last_name?: string;
   }): Promise<User> => {
     const response = await fetch(`${API_BASE_URL}/auth/register/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(userData),
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || 'Registration failed');
+      throw new Error(errorData.detail || "Registration failed");
     }
     return response.json();
   },
@@ -158,78 +174,80 @@ export const authService = {
     password: string;
   }): Promise<{ access: string; refresh: string }> => {
     const response = await fetch(`${API_BASE_URL}/auth/login/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(credentials),
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || 'Login failed');
+      throw new Error(errorData.detail || "Login failed");
     }
     return response.json();
   },
 
   logout: async (refreshToken: string): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/auth/logout/`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ refresh: refreshToken }),
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || 'Logout failed');
+      throw new Error(errorData.detail || "Logout failed");
     }
   },
 
   getProfile: async (): Promise<User> => {
     const response = await fetch(`${API_BASE_URL}/auth/profile/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch profile');
+    if (!response.ok) throw new Error("Failed to fetch profile");
     return response.json();
   },
 
   updateProfile: async (userData: Partial<User>): Promise<User> => {
     const response = await fetch(`${API_BASE_URL}/auth/profile/`, {
-      method: 'PUT',
+      method: "PUT",
       headers: getAuthHeaders(),
       body: JSON.stringify(userData),
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || 'Failed to update profile');
+      throw new Error(errorData.detail || "Failed to update profile");
     }
     return response.json();
   },
 
   updateProfilePicture: async (formData: FormData): Promise<User> => {
-    const token = localStorage.getItem('access_token');
+    const token = localStorage.getItem("access_token");
     const response = await fetch(`${API_BASE_URL}/auth/profile/picture/`, {
-      method: 'PUT',
+      method: "PUT",
       headers: token ? { Authorization: `Bearer ${token}` } : {},
       body: formData,
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || 'Failed to update profile picture');
+      throw new Error(errorData.detail || "Failed to update profile picture");
     }
     return response.json();
   },
 
   deleteAccount: async (): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/auth/profile/delete/`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: getAuthHeaders(),
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || 'Failed to delete account');
+      throw new Error(errorData.detail || "Failed to delete account");
     }
   },
 
   // ---------- OTP for Login ----------
-  requestOtp: async (phoneNumber: string) => {
+  requestOtp: async (
+    phoneNumber: string,
+  ): Promise<{ message: string; simulated_otp?: string }> => {
     const response = await axios.post(`${API_BASE_URL}/auth/api/otp/request/`, {
       phone_number: phoneNumber,
     });
@@ -242,27 +260,27 @@ export const authService = {
       code,
     });
     if (response.data.access && response.data.refresh) {
-      localStorage.setItem('access_token', response.data.access);
-      localStorage.setItem('refresh_token', response.data.refresh);
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
     }
     return response.data;
   },
 
   // ---------- OTP for Registration ----------
   registerRequestOtp: async (
-    method: 'phone' | 'email',
+    method: "phone" | "email",
     data: {
       phone?: string;
       email?: string;
       first_name?: string;
       last_name?: string;
       username: string;
-    }
-  ) => {
+    },
+  ): Promise<{ message: string; simulated_otp?: string }> => {
     const payload = { method, ...data };
     const response = await axios.post(
       `${API_BASE_URL}/auth/api/register/otp/request/`,
-      payload
+      payload,
     );
     return response.data;
   },
@@ -270,12 +288,12 @@ export const authService = {
   registerVerifyOtp: async (identifier: string, code: string) => {
     const response = await axios.post(
       `${API_BASE_URL}/auth/api/register/otp/verify/`,
-      { identifier, code }
+      { identifier, code },
     );
     if (response.data.access && response.data.refresh) {
-      localStorage.setItem('access_token', response.data.access);
-      localStorage.setItem('refresh_token', response.data.refresh);
-      localStorage.setItem('user', JSON.stringify(response.data.user));
+      localStorage.setItem("access_token", response.data.access);
+      localStorage.setItem("refresh_token", response.data.refresh);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
     }
     return response.data;
   },
@@ -291,28 +309,28 @@ export const plantService = {
       is_toxic?: boolean;
       care_difficulty?: string;
       light_requirement?: string;
-    }
+    },
   ): Promise<Plant[]> => {
     const params = new URLSearchParams();
-    if (query) params.append('search', query);
+    if (query) params.append("search", query);
     if (filters?.is_toxic !== undefined)
-      params.append('is_toxic', String(filters.is_toxic));
+      params.append("is_toxic", String(filters.is_toxic));
     if (filters?.care_difficulty)
-      params.append('care_difficulty', filters.care_difficulty);
+      params.append("care_difficulty", filters.care_difficulty);
     if (filters?.light_requirement)
-      params.append('light_requirement', filters.light_requirement);
+      params.append("light_requirement", filters.light_requirement);
     const headers = getAuthHeaders();
     const response = await fetch(
       `${API_BASE_URL}/plants/search/?${params.toString()}`,
-      { headers }
+      { headers },
     );
-    if (!response.ok) throw new Error('Failed to search plants');
+    if (!response.ok) throw new Error("Failed to search plants");
     return response.json();
   },
 
   getRelatedPlants: async (id: number): Promise<Plant[]> => {
     const response = await fetch(`${API_BASE_URL}/plants/${id}/related/`);
-    if (!response.ok) throw new Error('Failed to fetch related plants');
+    if (!response.ok) throw new Error("Failed to fetch related plants");
     return response.json();
   },
 
@@ -335,51 +353,51 @@ export const plantService = {
     const query = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, val]) => {
-        if (val !== undefined && val !== null && val !== '')
+        if (val !== undefined && val !== null && val !== "")
           query.append(key, String(val));
       });
     }
     const res = await fetch(`${API_BASE_URL}/plants/?${query.toString()}`);
-    if (!res.ok) throw new Error('Failed to fetch plants');
+    if (!res.ok) throw new Error("Failed to fetch plants");
     return res.json();
   },
 
   getAllPlants: async (): Promise<Plant[]> => {
     const response = await fetch(`${API_BASE_URL}/plants/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch plants');
+    if (!response.ok) throw new Error("Failed to fetch plants");
     return response.json();
   },
 
   getPlantById: async (id: number): Promise<Plant> => {
     const response = await fetch(`${API_BASE_URL}/plants/${id}/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch plant');
+    if (!response.ok) throw new Error("Failed to fetch plant");
     return response.json();
   },
 
   identifyPlant: async (imageFile: File): Promise<Plant> => {
     const formData = new FormData();
-    formData.append('image', imageFile);
+    formData.append("image", imageFile);
     const response = await fetch(`${API_BASE_URL}/plants/identify/`, {
-      method: 'POST',
+      method: "POST",
       headers: getFileUploadHeaders() as HeadersInit,
       body: formData,
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Plant identification failed');
+      throw new Error(errorData.error || "Plant identification failed");
     }
     return response.json();
   },
 
   getFavoritePlants: async (limit = 10): Promise<Plant[]> => {
     const data = await plantService.getPlants({
-      ordering: '-favourite_count',
+      ordering: "-favourite_count",
       page_size: limit,
     });
     return data.results;
@@ -392,33 +410,33 @@ export const plantService = {
 export const diseaseService = {
   getAllDiseases: async (): Promise<Disease[]> => {
     const response = await fetch(`${API_BASE_URL}/diseases/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch diseases');
+    if (!response.ok) throw new Error("Failed to fetch diseases");
     return response.json();
   },
 
   getDiseaseById: async (id: number): Promise<Disease> => {
     const response = await fetch(`${API_BASE_URL}/diseases/${id}/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch disease');
+    if (!response.ok) throw new Error("Failed to fetch disease");
     return response.json();
   },
 
   detectDisease: async (imageFile: File): Promise<Disease> => {
     const formData = new FormData();
-    formData.append('image', imageFile);
+    formData.append("image", imageFile);
     const response = await fetch(`${API_BASE_URL}/diseases/diagnose/`, {
-      method: 'POST',
+      method: "POST",
       headers: getFileUploadHeaders() as HeadersInit,
       body: formData,
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || 'Disease diagnosis failed');
+      throw new Error(errorData.error || "Disease diagnosis failed");
     }
     return response.json();
   },
@@ -426,9 +444,9 @@ export const diseaseService = {
   searchDiseases: async (query: string): Promise<Disease[]> => {
     const response = await fetch(
       `${API_BASE_URL}/diseases/search/?search=${encodeURIComponent(query)}`,
-      { headers: getAuthHeaders() }
+      { headers: getAuthHeaders() },
     );
-    if (!response.ok) throw new Error('Failed to search diseases');
+    if (!response.ok) throw new Error("Failed to search diseases");
     return response.json();
   },
 
@@ -440,22 +458,21 @@ export const diseaseService = {
     const query = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, val]) => {
-        if (val !== undefined && val !== null && val !== '')
+        if (val !== undefined && val !== null && val !== "")
           query.append(key, String(val));
       });
     }
     const res = await fetch(`${API_BASE_URL}/diseases/?${query.toString()}`);
-    if (!res.ok) throw new Error('Failed to fetch diseases');
+    if (!res.ok) throw new Error("Failed to fetch diseases");
     return res.json();
   },
 
   getMostViewedDiseases: async (limit = 10): Promise<Disease[]> => {
     const data = await diseaseService.getDiseasesPaginated({
-      ordering: '-view_count',
+      ordering: "-view_count",
       page_size: limit,
     });
     return data.results;
-    
   },
 
   getDiseasesPaginated: async (params?: {
@@ -469,18 +486,20 @@ export const diseaseService = {
     const query = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, val]) => {
-        if (val !== undefined && val !== null && val !== '')
+        if (val !== undefined && val !== null && val !== "")
           query.append(key, String(val));
       });
     }
     const res = await fetch(`${API_BASE_URL}/diseases/?${query.toString()}`);
-    if (!res.ok) throw new Error('Failed to fetch diseases');
+    if (!res.ok) throw new Error("Failed to fetch diseases");
     return res.json();
   },
 
   getDiseaseFromLLM: async (diseaseName: string): Promise<Disease> => {
-    const response = await fetch(`${API_BASE_URL}/diseases/llm/?name=${encodeURIComponent(diseaseName)}`);
-    if (!response.ok) throw new Error('LLM fetch failed');
+    const response = await fetch(
+      `${API_BASE_URL}/diseases/llm/?name=${encodeURIComponent(diseaseName)}`,
+    );
+    if (!response.ok) throw new Error("LLM fetch failed");
     return response.json();
   },
 };
@@ -491,10 +510,10 @@ export const diseaseService = {
 export const gardenService = {
   getUserPlants: async (): Promise<UserPlant[]> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch user plants');
+    if (!response.ok) throw new Error("Failed to fetch user plants");
     return response.json();
   },
 
@@ -504,24 +523,29 @@ export const gardenService = {
     notes?: string;
   }): Promise<UserPlant> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(plantData),
     });
-    if (!response.ok) throw new Error('Failed to add plant to garden');
+    if (!response.ok) throw new Error("Failed to add plant to garden");
     return response.json();
   },
 
-  updateUserPlant: async (id: number, plantData: Partial<UserPlant>): Promise<UserPlant> => {
+  updateUserPlant: async (
+    id: number,
+    plantData: Partial<UserPlant>,
+  ): Promise<UserPlant> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/${id}/`, {
-      method: 'PATCH',
+      method: "PATCH",
       headers: getAuthHeaders(),
       body: JSON.stringify(plantData),
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(
-        errorData.detail || JSON.stringify(errorData) || 'Failed to update plant'
+        errorData.detail ||
+          JSON.stringify(errorData) ||
+          "Failed to update plant",
       );
     }
     return response.json();
@@ -529,10 +553,10 @@ export const gardenService = {
 
   removeUserPlant: async (id: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/${id}/`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to remove plant from garden');
+    if (!response.ok) throw new Error("Failed to remove plant from garden");
   },
 
   addGrowthRecord: async (data: {
@@ -543,38 +567,47 @@ export const gardenService = {
     notes?: string;
   }): Promise<GrowthRecord> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/growth/`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to add growth record');
+    if (!response.ok) throw new Error("Failed to add growth record");
     return response.json();
   },
 
   waterPlant: async (id: number): Promise<UserPlant> => {
-    const response = await fetch(`${API_BASE_URL}/my-garden/${id}/water_plant/`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to water plant');
+    const response = await fetch(
+      `${API_BASE_URL}/my-garden/${id}/water_plant/`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to water plant");
     return response.json();
   },
 
   fertilizePlant: async (id: number): Promise<UserPlant> => {
-    const response = await fetch(`${API_BASE_URL}/my-garden/${id}/fertilize_plant/`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fertilize plant');
+    const response = await fetch(
+      `${API_BASE_URL}/my-garden/${id}/fertilize_plant/`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to fertilize plant");
     return response.json();
   },
 
   prunePlant: async (id: number): Promise<UserPlant> => {
-    const response = await fetch(`${API_BASE_URL}/my-garden/${id}/prune_plant/`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to prune plant');
+    const response = await fetch(
+      `${API_BASE_URL}/my-garden/${id}/prune_plant/`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to prune plant");
     return response.json();
   },
 };
@@ -585,71 +618,82 @@ export const gardenService = {
 export const reminderService = {
   getReminders: async (): Promise<Reminder[]> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/reminders/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch reminders');
+    if (!response.ok) throw new Error("Failed to fetch reminders");
     return response.json();
   },
 
   getUpcomingReminders: async (): Promise<Reminder[]> => {
-    const response = await fetch(`${API_BASE_URL}/my-garden/reminders/upcoming/`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch upcoming reminders');
+    const response = await fetch(
+      `${API_BASE_URL}/my-garden/reminders/upcoming/`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to fetch upcoming reminders");
     return response.json();
   },
 
   getOverdueReminders: async (): Promise<Reminder[]> => {
-    const response = await fetch(`${API_BASE_URL}/my-garden/reminders/overdue/`, {
-      method: 'GET',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch overdue reminders');
+    const response = await fetch(
+      `${API_BASE_URL}/my-garden/reminders/overdue/`,
+      {
+        method: "GET",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to fetch overdue reminders");
     return response.json();
   },
 
-  createReminder: async (reminderData: Omit<Reminder, 'id'>): Promise<Reminder> => {
+  createReminder: async (
+    reminderData: Omit<Reminder, "id">,
+  ): Promise<Reminder> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/reminders/`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify(reminderData),
     });
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.detail || 'Failed to create reminder');
+      throw new Error(errorData.detail || "Failed to create reminder");
     }
     return response.json();
   },
 
-  updateReminder: async (id: number, reminderData: Partial<Reminder>): Promise<Reminder> => {
+  updateReminder: async (
+    id: number,
+    reminderData: Partial<Reminder>,
+  ): Promise<Reminder> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/reminders/${id}/`, {
-      method: 'PUT',
+      method: "PUT",
       headers: getAuthHeaders(),
       body: JSON.stringify(reminderData),
     });
-    if (!response.ok) throw new Error('Failed to update reminder');
+    if (!response.ok) throw new Error("Failed to update reminder");
     return response.json();
   },
 
   deleteReminder: async (id: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/my-garden/reminders/${id}/`, {
-      method: 'DELETE',
+      method: "DELETE",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to delete reminder');
+    if (!response.ok) throw new Error("Failed to delete reminder");
   },
 
   markCompleted: async (id: number): Promise<void> => {
     const response = await fetch(
       `${API_BASE_URL}/my-garden/reminders/${id}/mark_completed/`,
       {
-        method: 'POST',
+        method: "POST",
         headers: getAuthHeaders(),
-      }
+      },
     );
-    if (!response.ok) throw new Error('Failed to mark reminder as completed');
+    if (!response.ok) throw new Error("Failed to mark reminder as completed");
   },
 };
 
@@ -657,8 +701,11 @@ export const reminderService = {
 // Blog Service
 // ==============================
 export const blogService = {
-  getAllPosts: async (params?: { tags?: string; limit?: number }): Promise<PaginatedResponse<PostListItem> | PostListItem[]> => {
-    const response = await blogApi.get('/posts/', { params });
+  getAllPosts: async (params?: {
+    tags?: string;
+    limit?: number;
+  }): Promise<PaginatedResponse<PostListItem> | PostListItem[]> => {
+    const response = await blogApi.get("/posts/", { params });
     return response.data;
   },
 
@@ -667,28 +714,55 @@ export const blogService = {
     return response.data;
   },
 
-  likePost: async (slug: string): Promise<{ likes_count: number; dislikes_count: number; user_has_liked: boolean; user_has_disliked: boolean }> => {
+  likePost: async (
+    slug: string,
+  ): Promise<{
+    likes_count: number;
+    dislikes_count: number;
+    user_has_liked: boolean;
+    user_has_disliked: boolean;
+  }> => {
     const response = await blogApi.post(`/posts/${slug}/like/`);
     return response.data;
   },
 
-  dislikePost: async (slug: string): Promise<{ likes_count: number; dislikes_count: number; user_has_liked: boolean; user_has_disliked: boolean }> => {
+  dislikePost: async (
+    slug: string,
+  ): Promise<{
+    likes_count: number;
+    dislikes_count: number;
+    user_has_liked: boolean;
+    user_has_disliked: boolean;
+  }> => {
     const response = await blogApi.post(`/posts/${slug}/dislike/`);
     return response.data;
   },
 
-  getComments: async (slug: string): Promise<BlogComment[] | PaginatedResponse<BlogComment>> => {
+  getComments: async (
+    slug: string,
+  ): Promise<BlogComment[] | PaginatedResponse<BlogComment>> => {
     const response = await blogApi.get(`/posts/${slug}/comments/`);
     return response.data;
   },
 
-  addComment: async (slug: string, commentData: { content: string; parent?: number }): Promise<BlogComment> => {
-    const response = await blogApi.post(`/posts/${slug}/comments/`, commentData);
+  addComment: async (
+    slug: string,
+    commentData: { content: string; parent?: number },
+  ): Promise<BlogComment> => {
+    const response = await blogApi.post(
+      `/posts/${slug}/comments/`,
+      commentData,
+    );
     return response.data;
   },
 
-  voteComment: async (commentId: number, voteType: 1 | -1): Promise<unknown> => {
-    const response = await blogApi.post(`/comments/${commentId}/vote/`, { vote_type: voteType });
+  voteComment: async (
+    commentId: number,
+    voteType: 1 | -1,
+  ): Promise<unknown> => {
+    const response = await blogApi.post(`/comments/${commentId}/vote/`, {
+      vote_type: voteType,
+    });
     return response.data;
   },
 
@@ -696,26 +770,29 @@ export const blogService = {
     await blogApi.delete(`/comments/${commentId}/`);
   },
 
-  updateComment: async (commentId: number, content: string): Promise<BlogComment> => {
+  updateComment: async (
+    commentId: number,
+    content: string,
+  ): Promise<BlogComment> => {
     const response = await blogApi.put(`/comments/${commentId}/`, { content });
     return response.data;
   },
 
   getPopularPosts: async (limit = 10): Promise<PostListItem[]> => {
-    const response = await blogApi.get('/posts/', {
-      params: { ordering: '-likes_count', page_size: limit },
+    const response = await blogApi.get("/posts/", {
+      params: { ordering: "-likes_count", page_size: limit },
     });
     return response.data.results || response.data;
   },
 
   getLatestPosts: async (): Promise<PostListItem[]> => {
-    const response = await blogApi.get('/posts/latest/');
+    const response = await blogApi.get("/posts/latest/");
     return response.data.results || response.data;
   },
 
   getMostViewedPosts: async (limit = 10): Promise<PostListItem[]> => {
-    const response = await blogApi.get('/posts/', {
-      params: { ordering: '-view_count', page_size: limit },
+    const response = await blogApi.get("/posts/", {
+      params: { ordering: "-view_count", page_size: limit },
     });
     return response.data.results || response.data;
   },
@@ -726,39 +803,59 @@ export const blogService = {
 // ==============================
 export const commentService = {
   getComments: async (plantId: number): Promise<PlantComment[]> => {
-    const response = await fetch(`${API_BASE_URL}/plants/${plantId}/comments/`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch comments');
+    const response = await fetch(
+      `${API_BASE_URL}/plants/${plantId}/comments/`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to fetch comments");
     return response.json();
   },
 
-  addComment: async (plantId: number, content: string, parentId?: number): Promise<PlantComment> => {
-    const response = await fetch(`${API_BASE_URL}/plants/${plantId}/comments/`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ content, parent: parentId || null }),
-    });
-    if (!response.ok) throw new Error('Failed to add comment');
+  addComment: async (
+    plantId: number,
+    content: string,
+    parentId?: number,
+  ): Promise<PlantComment> => {
+    const response = await fetch(
+      `${API_BASE_URL}/plants/${plantId}/comments/`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ content, parent: parentId || null }),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to add comment");
     return response.json();
   },
 
-  updateComment: async (plantId: number, commentId: number, content: string): Promise<PlantComment> => {
-    const response = await fetch(`${API_BASE_URL}/plants/${plantId}/comments/${commentId}/`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ content }),
-    });
-    if (!response.ok) throw new Error('Failed to update comment');
+  updateComment: async (
+    plantId: number,
+    commentId: number,
+    content: string,
+  ): Promise<PlantComment> => {
+    const response = await fetch(
+      `${API_BASE_URL}/plants/${plantId}/comments/${commentId}/`,
+      {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ content }),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to update comment");
     return response.json();
   },
 
   deleteComment: async (plantId: number, commentId: number): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/plants/${plantId}/comments/${commentId}/`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to delete comment');
+    const response = await fetch(
+      `${API_BASE_URL}/plants/${plantId}/comments/${commentId}/`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to delete comment");
   },
 };
 
@@ -768,71 +865,93 @@ export const commentService = {
 export const favouriteService = {
   getFavourites: async (): Promise<Plant[]> => {
     const response = await fetch(`${API_BASE_URL}/favourites/`, {
-      method: 'GET',
+      method: "GET",
       headers: getAuthHeaders(),
     });
-    if (!response.ok) throw new Error('Failed to fetch favourites');
+    if (!response.ok) throw new Error("Failed to fetch favourites");
     return response.json();
   },
 
   addFavourite: async (plantId: number): Promise<Plant> => {
     const response = await fetch(`${API_BASE_URL}/favourite/`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ plant: plantId }),
     });
-    if (!response.ok) throw new Error('Failed to add favourite');
+    if (!response.ok) throw new Error("Failed to add favourite");
     return response.json();
   },
 
   removeFavourite: async (plantId: number): Promise<void> => {
     const response = await fetch(`${API_BASE_URL}/favourite/remove/`, {
-      method: 'POST',
+      method: "POST",
       headers: getAuthHeaders(),
       body: JSON.stringify({ plant: plantId }),
     });
-    if (!response.ok) throw new Error('Failed to remove favourite');
+    if (!response.ok) throw new Error("Failed to remove favourite");
   },
 };
-
 
 // ==============================
 //  Disease Service
 // ==============================
 export const diseaseCommentService = {
   getComments: async (diseaseId: number): Promise<DiseaseComment[]> => {
-    const response = await fetch(`${API_BASE_URL}/diseases/${diseaseId}/comments/`, {
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to fetch comments');
+    const response = await fetch(
+      `${API_BASE_URL}/diseases/${diseaseId}/comments/`,
+      {
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to fetch comments");
     return response.json();
   },
 
-  addComment: async (diseaseId: number, content: string, parentId?: number): Promise<DiseaseComment> => {
-    const response = await fetch(`${API_BASE_URL}/diseases/${diseaseId}/comments/`, {
-      method: 'POST',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ content, parent: parentId || null }),
-    });
-    if (!response.ok) throw new Error('Failed to add comment');
+  addComment: async (
+    diseaseId: number,
+    content: string,
+    parentId?: number,
+  ): Promise<DiseaseComment> => {
+    const response = await fetch(
+      `${API_BASE_URL}/diseases/${diseaseId}/comments/`,
+      {
+        method: "POST",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ content, parent: parentId || null }),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to add comment");
     return response.json();
   },
 
-  updateComment: async (diseaseId: number, commentId: number, content: string): Promise<DiseaseComment> => {
-    const response = await fetch(`${API_BASE_URL}/diseases/${diseaseId}/comments/${commentId}/`, {
-      method: 'PUT',
-      headers: getAuthHeaders(),
-      body: JSON.stringify({ content }),
-    });
-    if (!response.ok) throw new Error('Failed to update comment');
+  updateComment: async (
+    diseaseId: number,
+    commentId: number,
+    content: string,
+  ): Promise<DiseaseComment> => {
+    const response = await fetch(
+      `${API_BASE_URL}/diseases/${diseaseId}/comments/${commentId}/`,
+      {
+        method: "PUT",
+        headers: getAuthHeaders(),
+        body: JSON.stringify({ content }),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to update comment");
     return response.json();
   },
 
-  deleteComment: async (diseaseId: number, commentId: number): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/diseases/${diseaseId}/comments/${commentId}/`, {
-      method: 'DELETE',
-      headers: getAuthHeaders(),
-    });
-    if (!response.ok) throw new Error('Failed to delete comment');
+  deleteComment: async (
+    diseaseId: number,
+    commentId: number,
+  ): Promise<void> => {
+    const response = await fetch(
+      `${API_BASE_URL}/diseases/${diseaseId}/comments/${commentId}/`,
+      {
+        method: "DELETE",
+        headers: getAuthHeaders(),
+      },
+    );
+    if (!response.ok) throw new Error("Failed to delete comment");
   },
 };

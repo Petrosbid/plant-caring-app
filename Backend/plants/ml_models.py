@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 # =====================================================================
 USE_GEMINI = True
 
-VISION_MODEL = "gemini-3.5-flash" if USE_GEMINI else "gemma-3-27b-it"
+VISION_MODEL = "gemini-3.1-flash-lite" if USE_GEMINI else "gemma-3-27b-it"
 
 # =====================================================================
 # IMPORTS & CLIENT INITIALIZATION

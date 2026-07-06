@@ -1,10 +1,16 @@
 // src/context/AuthContext.tsx
-import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { authService } from '../services/api';
-import { getAccessToken, clearTokens } from '../utils/tokenStorage';
-import { registerPushNotifications } from '../services/notifications';
-import type { User } from '../types';
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useCallback,
+} from "react";
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { authService } from "../services/api";
+import { getAccessToken, clearTokens } from "../utils/tokenStorage";
+import { registerPushNotifications } from "../services/notifications";
+import type { User } from "../types";
 
 interface RegisterOtpData {
   phone?: string;
@@ -24,16 +30,18 @@ interface AuthContextType {
   updateUser: (userData: Partial<User>) => void;
   setUser: (user: User) => void;
   checkAuth: () => Promise<void>;
-  requestOtpCode: (phoneNumber: string) => Promise<void>;
+  requestOtpCode: (phoneNumber: string) => Promise<string | null>;
   loginWithOtp: (phoneNumber: string, code: string) => Promise<void>;
-  registerWithPhoneOtp: (data: RegisterOtpData) => Promise<void>;
-  registerWithEmailOtp: (data: RegisterOtpData) => Promise<void>;
+  registerWithPhoneOtp: (data: RegisterOtpData) => Promise<string | null>;
+  registerWithEmailOtp: (data: RegisterOtpData) => Promise<string | null>;
   verifyRegisterOtp: (identifier: string, code: string) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
+  children,
+}) => {
   const [user, setUserState] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -42,21 +50,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const token = await getAccessToken();
       if (token) {
         try {
-          // If token is found, try to get profile. 
+          // If token is found, try to get profile.
           // Our API service will automatically handle refreshing if this 401s.
           const profile = await authService.getProfile();
           setUserState(profile);
-          await AsyncStorage.setItem('user', JSON.stringify(profile));
+          await AsyncStorage.setItem("user", JSON.stringify(profile));
         } catch (profileError) {
-          console.error('[Auth] Failed to fetch profile:', profileError);
+          console.error("[Auth] Failed to fetch profile:", profileError);
           // If even after refresh attempt it fails, clear everything
           await clearTokens();
-          await AsyncStorage.removeItem('user');
+          await AsyncStorage.removeItem("user");
           setUserState(null);
         }
       } else {
         // No access token, check if we have user in storage as fallback (unlikely without token)
-        const storedUser = await AsyncStorage.getItem('user');
+        const storedUser = await AsyncStorage.getItem("user");
         if (storedUser) {
           try {
             // Check if we can get profile with existing tokens (might trigger refresh)
@@ -65,14 +73,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
           } catch {
             setUserState(null);
             await clearTokens();
-            await AsyncStorage.removeItem('user');
+            await AsyncStorage.removeItem("user");
           }
         } else {
           setUserState(null);
         }
       }
     } catch (error) {
-      console.error('[Auth] Auth check internal error:', error);
+      console.error("[Auth] Auth check internal error:", error);
       setUserState(null);
     } finally {
       setIsLoading(false);
@@ -92,7 +100,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const finishAuthSession = async () => {
     const profile = await authService.getProfile();
     setUserState(profile);
-    await AsyncStorage.setItem('user', JSON.stringify(profile));
+    await AsyncStorage.setItem("user", JSON.stringify(profile));
   };
 
   const login = async (credentials: { username: string; password: string }) => {
@@ -101,15 +109,18 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await authService.login(credentials);
       await finishAuthSession();
     } catch (error) {
-      console.error('Login failed:', error);
+      console.error("Login failed:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const requestOtpCode = async (phoneNumber: string) => {
-    await authService.requestOtp(phoneNumber);
+  const requestOtpCode = async (
+    phoneNumber: string,
+  ): Promise<string | null> => {
+    const response = await authService.requestOtp(phoneNumber);
+    return response.simulated_otp ?? null;
   };
 
   const loginWithOtp = async (phoneNumber: string, code: string) => {
@@ -118,19 +129,25 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await authService.verifyOtp(phoneNumber, code);
       await finishAuthSession();
     } catch (error) {
-      console.error('OTP login failed:', error);
+      console.error("OTP login failed:", error);
       throw error;
     } finally {
       setIsLoading(false);
     }
   };
 
-  const registerWithPhoneOtp = async (data: RegisterOtpData) => {
-    await authService.registerRequestOtp('phone', data);
+  const registerWithPhoneOtp = async (
+    data: RegisterOtpData,
+  ): Promise<string | null> => {
+    const response = await authService.registerRequestOtp("phone", data);
+    return response.simulated_otp ?? null;
   };
 
-  const registerWithEmailOtp = async (data: RegisterOtpData) => {
-    await authService.registerRequestOtp('email', data);
+  const registerWithEmailOtp = async (
+    data: RegisterOtpData,
+  ): Promise<string | null> => {
+    const response = await authService.registerRequestOtp("email", data);
+    return response.simulated_otp ?? null;
   };
 
   const verifyRegisterOtp = async (identifier: string, code: string) => {
@@ -139,7 +156,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await authService.registerVerifyOtp(identifier, code);
       await finishAuthSession();
     } catch (error) {
-      console.error('Register OTP verify failed:', error);
+      console.error("Register OTP verify failed:", error);
       throw error;
     } finally {
       setIsLoading(false);
@@ -152,7 +169,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       await authService.logout();
       setUserState(null);
     } catch (error) {
-      console.error('Logout failed:', error);
+      console.error("Logout failed:", error);
     } finally {
       setIsLoading(false);
     }
@@ -162,14 +179,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setUserState((prev) => {
       if (!prev) return prev;
       const updatedUser = { ...prev, ...userData };
-      AsyncStorage.setItem('user', JSON.stringify(updatedUser));
+      AsyncStorage.setItem("user", JSON.stringify(updatedUser));
       return updatedUser;
     });
   };
 
   const setUser = (nextUser: User) => {
     setUserState(nextUser);
-    AsyncStorage.setItem('user', JSON.stringify(nextUser));
+    AsyncStorage.setItem("user", JSON.stringify(nextUser));
   };
 
   return (
@@ -198,7 +215,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (context === undefined) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };

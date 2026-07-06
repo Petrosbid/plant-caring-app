@@ -7,6 +7,7 @@ import { authService } from '../services/api';
 import {m, AnimatePresence} from 'framer-motion';
 import { toast, Toaster } from 'react-hot-toast';
 import { useForm } from 'react-hook-form';
+import myImage from '../assets/images/images.jpg';
 
 interface UserDashboardProps {
   navigateTo: (page: string) => void;
@@ -110,10 +111,10 @@ const ProfileHeader: React.FC<{ user: any; onAvatarChange: (file: File) => void 
   return (
     <div className="relative mb-6 md:mb-8 bg-white dark:bg-gray-800 rounded-2xl overflow-hidden shadow-sm border border-slate-200/60 dark:border-slate-700/50">
       {/* Cover Image Container */}
-      <div className="relative h-32 sm:h-40 md:h-48 lg:h-56 w-full overflow-hidden">
+      <div className="relative h-42 sm:h-40 md:h-50 lg:h-[25rem] w-full overflow-hidden">
         <div
           className="absolute inset-0 bg-cover bg-center transition-all duration-500 scale-105 hover:scale-100"
-          style={{ backgroundImage: `url('/static/images/travel-cover.jpg')` }}
+          style={{ backgroundImage: `url(${myImage})` }}
         >
           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/30 to-transparent" />
         </div>

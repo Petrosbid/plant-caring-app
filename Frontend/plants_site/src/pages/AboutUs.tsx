@@ -58,7 +58,7 @@ const AboutUs: React.FC = () => {
       roleFa: 'طراح ارشد تجربه کاربری',
       bioEn: 'Dedicated to making nature interaction accessible and delightful for everyone.',
       bioFa: 'متعهد به ساده‌سازی و دلپذیر کردن تعامل انسان با طبیعت برای همه.',
-      avatar: 'https://avatars.githubusercontent.com/u/175981312?v=4',
+      avatar: 'https://avatars.githubusercontent.com/u/159718?v=4',
       icon: '🎨'
     }
   ];

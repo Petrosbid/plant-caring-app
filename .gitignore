@@ -84,7 +84,7 @@ Frontend/plants_app/app-example
 Frontend/plants_app/# generated native folders
 Frontend/plants_app/ios
 Frontend/plants_app/android
-
+Frontend/plants_app/bugs
 # Node modules
 Frontend/plants_site/node_modules/
 Frontend/plants_site/dist/
@@ -99,3 +99,8 @@ Frontend/figma/
 .env.production.local
 Frontend/New Microsoft Word Document.docx
 Frontend/plants_app/src/components/home/debug.log
+Backend/plant_caring_app_setup.sql
+Backend/blog.zip
+debug.log
+.claude/
+.github/

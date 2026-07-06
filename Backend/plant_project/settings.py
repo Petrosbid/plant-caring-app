@@ -260,16 +260,16 @@ SPECTACULAR_SETTINGS = {
     'TITLE': 'PlantCare Pro API',
     'DESCRIPTION': '''
         ## PlantCare Pro Backend API
-        
+
         This API provides endpoints for:
         - **User Authentication**: JWT-based authentication with login, register, and profile management
         - **Plants**: Plant identification and plant database
         - **Diseases**: Disease detection and information
         - **My Garden**: User's personal garden management
         - **Blog**: Blog posts and articles about plant care
-        
+
         ## Authentication
-        Most endpoints require authentication using JWT tokens. 
+        Most endpoints require authentication using JWT tokens.
         Obtain a token by posting to `/api/token/` with your credentials.
         Include the token in the Authorization header: `Bearer <your-token>`
     ''',
@@ -302,4 +302,5 @@ AVALAI_API_KEY = os.getenv('AVALAI_API_KEY', "AVALAI_API_KEY")
 SMS_IR_API_KEY = os.getenv('SMS_IR_API_KEY', "YOUR_API_KEY")
 SMS_IR_LINE_NUMBER = os.getenv('SMS_IR_LINE_NUMBER', "YOUR_LINE_NUMBER")
 SMS_IR_OTP_TEMPLATE_ID = os.getenv('SMS_IR_OTP_TEMPLATE_ID', "YOUR_OTP_TEMPLATE_ID")
+OTP_SIMULATION_MODE = os.getenv('OTP_SIMULATION_MODE', 'True' if DEBUG else 'False') == 'True'
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', 'OPENROUTER_API_KEY')

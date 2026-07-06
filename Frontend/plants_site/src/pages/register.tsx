@@ -1,8 +1,8 @@
 // Register.tsx
-import React, { useState } from 'react';
-import {m} from 'framer-motion';
-import { useAuth } from '../contexts/AuthContext';
-import { useLanguageTheme } from '../contexts/LanguageThemeContext';
+import React, { useState } from "react";
+import { m } from "framer-motion";
+import { useAuth } from "../contexts/AuthContext";
+import { useLanguageTheme } from "../contexts/LanguageThemeContext";
 
 interface RegisterProps {
   onSuccess: () => void;
@@ -11,64 +11,81 @@ interface RegisterProps {
 
 const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
   const { t } = useLanguageTheme();
-  const { registerWithPhoneOtp, registerWithEmailOtp, verifyRegisterOtp } = useAuth();
-  const isEn = t('home') === 'Home';
+  const { registerWithPhoneOtp, registerWithEmailOtp, verifyRegisterOtp } =
+    useAuth();
+  const isEn = t("home") === "Home";
 
-  const [method, setMethod] = useState<'phone' | 'email'>('phone');
-  const [step, setStep] = useState<'form' | 'verify'>('form');
+  const [method, setMethod] = useState<"phone" | "email">("phone");
+  const [step, setStep] = useState<"form" | "verify">("form");
   const [formData, setFormData] = useState({
-    username: '',
-    first_name: '',
-    last_name: '',
-    phone: '',
-    email: '',
+    username: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    email: "",
   });
-  const [code, setCode] = useState('');
-  const [identifier, setIdentifier] = useState('');
+  const [code, setCode] = useState("");
+  const [identifier, setIdentifier] = useState("");
+  const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setFormData(prev => ({ ...prev, [e.target.name]: e.target.value }));
+    setFormData((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
   const handleSendCode = async () => {
     setError(null);
-    if (method === 'phone' && !formData.phone) {
-      setError(isEn ? 'Phone number required' : 'شماره تلفن لازم است');
+    if (method === "phone" && !formData.phone) {
+      setError(isEn ? "Phone number required" : "شماره تلفن لازم است");
       return;
     }
-    if (method === 'email' && !formData.email) {
-      setError(isEn ? 'Email required' : 'ایمیل لازم است');
+    if (method === "email" && !formData.email) {
+      setError(isEn ? "Email required" : "ایمیل لازم است");
       return;
     }
     if (!formData.username) {
-      setError(isEn ? 'Username required' : 'نام کاربری لازم است');
+      setError(isEn ? "Username required" : "نام کاربری لازم است");
       return;
     }
 
+    setSimulatedOtp(null);
     setLoading(true);
     try {
-      if (method === 'phone') {
-        await registerWithPhoneOtp({
+      if (method === "phone") {
+        const simulatedCode = await registerWithPhoneOtp({
           phone: formData.phone,
           username: formData.username,
           first_name: formData.first_name,
           last_name: formData.last_name,
         });
         setIdentifier(formData.phone);
+        setSimulatedOtp(simulatedCode);
+        if (simulatedCode) {
+          setCode(simulatedCode);
+        }
       } else {
-        await registerWithEmailOtp({
+        const simulatedCode = await registerWithEmailOtp({
           email: formData.email,
           username: formData.username,
           first_name: formData.first_name,
           last_name: formData.last_name,
         });
         setIdentifier(formData.email);
+        setSimulatedOtp(simulatedCode);
+        if (simulatedCode) {
+          setCode(simulatedCode);
+        }
       }
-      setStep('verify');
+      setStep("verify");
     } catch (err) {
-      setError(err instanceof Error ? err.message : isEn ? 'Error sending code' : 'خطا در ارسال کد');
+      setError(
+        err instanceof Error
+          ? err.message
+          : isEn
+            ? "Error sending code"
+            : "خطا در ارسال کد",
+      );
     } finally {
       setLoading(false);
     }
@@ -76,7 +93,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
 
   const handleVerifyCode = async () => {
     if (!code) {
-      setError(isEn ? 'Code required' : 'کد تایید لازم است');
+      setError(isEn ? "Code required" : "کد تایید لازم است");
       return;
     }
     setLoading(true);
@@ -84,7 +101,13 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
       await verifyRegisterOtp(identifier, code);
       onSuccess(); // به صفحه پروفایل یا داشبورد برود
     } catch (err) {
-      setError(err instanceof Error ? err.message : isEn ? 'Invalid code' : 'کد نامعتبر');
+      setError(
+        err instanceof Error
+          ? err.message
+          : isEn
+            ? "Invalid code"
+            : "کد نامعتبر",
+      );
     } finally {
       setLoading(false);
     }
@@ -95,41 +118,64 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
       <div className="grid grid-cols-2 gap-4">
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-            {isEn ? 'First Name' : 'نام'}
+            {isEn ? "First Name" : "نام"}
           </label>
-          <input name="first_name" value={formData.first_name} onChange={handleChange}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
+          <input
+            name="first_name"
+            value={formData.first_name}
+            onChange={handleChange}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
+          />
         </div>
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-            {isEn ? 'Last Name' : 'نام خانوادگی'}
+            {isEn ? "Last Name" : "نام خانوادگی"}
           </label>
-          <input name="last_name" value={formData.last_name} onChange={handleChange}
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
+          <input
+            name="last_name"
+            value={formData.last_name}
+            onChange={handleChange}
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
+          />
         </div>
       </div>
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-          {isEn ? 'Username' : 'نام کاربری'} *
+          {isEn ? "Username" : "نام کاربری"} *
         </label>
-        <input name="username" value={formData.username} onChange={handleChange} required
-          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
+        <input
+          name="username"
+          value={formData.username}
+          onChange={handleChange}
+          required
+          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
+        />
       </div>
-      {method === 'phone' ? (
+      {method === "phone" ? (
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-            {isEn ? 'Phone Number' : 'شماره تلفن'} *
+            {isEn ? "Phone Number" : "شماره تلفن"} *
           </label>
-          <input name="phone" value={formData.phone} onChange={handleChange} type="tel"
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
+          <input
+            name="phone"
+            value={formData.phone}
+            onChange={handleChange}
+            type="tel"
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
+          />
         </div>
       ) : (
         <div>
           <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-            {isEn ? 'Email Address' : 'آدرس ایمیل'} *
+            {isEn ? "Email Address" : "آدرس ایمیل"} *
           </label>
-          <input name="email" value={formData.email} onChange={handleChange} type="email"
-            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
+          <input
+            name="email"
+            value={formData.email}
+            onChange={handleChange}
+            type="email"
+            className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
+          />
         </div>
       )}
       <m.button
@@ -139,7 +185,13 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         whileHover={{ scale: 1.01 }}
         whileTap={{ scale: 0.99 }}
       >
-        {loading ? (isEn ? 'Sending...' : 'در حال ارسال...') : (isEn ? 'Send Verification Code' : 'ارسال کد تایید')}
+        {loading
+          ? isEn
+            ? "Sending..."
+            : "در حال ارسال..."
+          : isEn
+            ? "Send Verification Code"
+            : "ارسال کد تایید"}
       </m.button>
     </div>
   );
@@ -149,48 +201,82 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
       <p className="text-center text-slate-600 dark:text-slate-400">
         {isEn ? `Code sent to ${identifier}` : `کد به ${identifier} ارسال شد`}
       </p>
+      {simulatedOtp && (
+        <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3 text-center text-sm text-amber-800 dark:text-amber-200">
+          {isEn
+            ? `Simulation OTP: ${simulatedOtp}`
+            : `کد شبیه‌سازی: ${simulatedOtp}`}
+        </div>
+      )}
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
-          {isEn ? 'Verification Code' : 'کد تایید'}
+          {isEn ? "Verification Code" : "کد تایید"}
         </label>
-        <input type="text" value={code} onChange={(e) => setCode(e.target.value)}
-          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50" />
+        <input
+          type="text"
+          value={code}
+          onChange={(e) => setCode(e.target.value)}
+          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
+        />
       </div>
       <m.button
         onClick={handleVerifyCode}
         disabled={loading}
         className="w-full py-3 rounded-xl font-medium text-white bg-brand-500 hover:bg-brand-600"
       >
-        {loading ? (isEn ? 'Verifying...' : 'در حال تایید...') : (isEn ? 'Complete Registration' : 'تکمیل ثبت‌نام')}
+        {loading
+          ? isEn
+            ? "Verifying..."
+            : "در حال تایید..."
+          : isEn
+            ? "Complete Registration"
+            : "تکمیل ثبت‌نام"}
       </m.button>
       <button
-        onClick={() => { setStep('form'); setCode(''); setError(null); }}
+        onClick={() => {
+          setStep("form");
+          setCode("");
+          setSimulatedOtp(null);
+          setError(null);
+        }}
         className="w-full text-center text-sm text-brand-600 dark:text-brand-400"
       >
-        {isEn ? 'Change phone/email' : 'تغییر شماره/ایمیل'}
+        {isEn ? "Change phone/email" : "تغییر شماره/ایمیل"}
       </button>
     </div>
   );
 
   return (
     <div>
-      {step === 'form' && (
+      {step === "form" && (
         <>
           <div className="flex space-x-4 rtl:space-x-reverse mb-6">
-            <button onClick={() => setMethod('phone')}
-              className={`flex-1 py-2 rounded-lg ${method === 'phone' ? 'bg-brand-500 text-white' : 'bg-slate-100 dark:bg-slate-700'}`}>
-              {isEn ? 'Via Phone' : 'با تلفن'}
+            <button
+              onClick={() => {
+                setMethod("phone");
+                setSimulatedOtp(null);
+              }}
+              className={`flex-1 py-2 rounded-lg ${method === "phone" ? "bg-brand-500 text-white" : "bg-slate-100 dark:bg-slate-700"}`}
+            >
+              {isEn ? "Via Phone" : "با تلفن"}
             </button>
-            <button onClick={() => setMethod('email')}
-              className={`flex-1 py-2 rounded-lg ${method === 'email' ? 'bg-brand-500 text-white' : 'bg-slate-100 dark:bg-slate-700'}`}>
-              {isEn ? 'Via Email' : 'با ایمیل'}
+            <button
+              onClick={() => {
+                setMethod("email");
+                setSimulatedOtp(null);
+              }}
+              className={`flex-1 py-2 rounded-lg ${method === "email" ? "bg-brand-500 text-white" : "bg-slate-100 dark:bg-slate-700"}`}
+            >
+              {isEn ? "Via Email" : "با ایمیل"}
             </button>
           </div>
           {renderForm()}
         </>
       )}
-      {step === 'verify' && renderVerify()}
-      {error && <div className="mt-4 text-red-500 text-center text-sm">{error}</div>}
+      {step === "verify" && renderVerify()}
+      {error && (
+        <div className="mt-4 text-red-500 text-center text-sm">{error}</div>
+      )}
     </div>
   );
 };

@@ -1,8 +1,8 @@
-import React, { useState } from 'react';
-import { View, TouchableOpacity, Pressable } from 'react-native';
-import { useTranslation } from 'react-i18next';
-import { useNavigation } from '@react-navigation/native';
-import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import React, { useState } from "react";
+import { View, TouchableOpacity, Pressable } from "react-native";
+import { useTranslation } from "react-i18next";
+import { useNavigation } from "@react-navigation/native";
+import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import {
   UserPlus,
   User,
@@ -12,46 +12,49 @@ import {
   Lock,
   Eye,
   EyeOff,
-} from 'lucide-react-native';
-import { Motion as _Motion } from '@legendapp/motion';
+} from "lucide-react-native";
+import { Motion as _Motion } from "@legendapp/motion";
 
 const MotionL = _Motion as any;
-import { Input } from '../components/common/Input';
-import { Button } from '../components/common/Button';
-import { AppText as Text } from '../components/common/AppText';
-import { useAuth } from '../context/AuthContext';
-import { RootStackParamList } from '../types/navigation';
+import { Input } from "../components/common/Input";
+import { Button } from "../components/common/Button";
+import { AppText as Text } from "../components/common/AppText";
+import { useAuth } from "../context/AuthContext";
+import { RootStackParamList } from "../types/navigation";
 import {
   AuthScreenLayout,
   AuthErrorBanner,
   AuthDivider,
-} from '../components/auth/AuthScreenLayout';
-import { AuthMethodTabs } from '../components/auth/AuthMethodTabs';
-import { OtpInput } from '../components/auth/OtpInput';
-import { GoogleSignInButton } from '../components/auth/GoogleSignInButton';
+} from "../components/auth/AuthScreenLayout";
+import { AuthMethodTabs } from "../components/auth/AuthMethodTabs";
+import { OtpInput } from "../components/auth/OtpInput";
+import { GoogleSignInButton } from "../components/auth/GoogleSignInButton";
 
-type SignupMethod = 'phone' | 'email';
-type SignupStep = 'form' | 'verify';
+type SignupMethod = "phone" | "email";
+type SignupStep = "form" | "verify";
 
 const SignupScreen = () => {
   const { i18n } = useTranslation();
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { registerWithPhoneOtp, registerWithEmailOtp, verifyRegisterOtp } = useAuth();
-  const isEn = i18n.language === 'en';
+  const navigation =
+    useNavigation<NativeStackNavigationProp<RootStackParamList>>();
+  const { registerWithPhoneOtp, registerWithEmailOtp, verifyRegisterOtp } =
+    useAuth();
+  const isEn = i18n.language === "en";
 
-  const [method, setMethod] = useState<SignupMethod>('phone');
-  const [step, setStep] = useState<SignupStep>('form');
+  const [method, setMethod] = useState<SignupMethod>("phone");
+  const [step, setStep] = useState<SignupStep>("form");
   const [formData, setFormData] = useState({
-    username: '',
-    first_name: '',
-    last_name: '',
-    phone: '',
-    email: '',
-    password: '',
+    username: "",
+    first_name: "",
+    last_name: "",
+    phone: "",
+    email: "",
+    password: "",
   });
   const [showPassword, setShowPassword] = useState(false);
-  const [code, setCode] = useState('');
-  const [identifier, setIdentifier] = useState('');
+  const [code, setCode] = useState("");
+  const [identifier, setIdentifier] = useState("");
+  const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,36 +64,38 @@ const SignupScreen = () => {
 
   const handleMethodChange = (next: SignupMethod) => {
     setMethod(next);
+    setSimulatedOtp(null);
     setError(null);
   };
 
   const handleGoogleSignIn = () => {
     setError(
       isEn
-        ? 'Google sign-up will be available in a future update.'
-        : 'ثبت‌نام با گوگل در به‌روزرسانی بعدی فعال می‌شود.',
+        ? "Google sign-up will be available in a future update."
+        : "ثبت‌نام با گوگل در به‌روزرسانی بعدی فعال می‌شود.",
     );
   };
 
   const handleSendCode = async () => {
     if (!formData.username.trim()) {
-      setError(isEn ? 'Username is required' : 'نام کاربری لازم است');
+      setError(isEn ? "Username is required" : "نام کاربری لازم است");
       return;
     }
-    if (method === 'phone' && !formData.phone.trim()) {
-      setError(isEn ? 'Phone number is required' : 'شماره تلفن لازم است');
+    if (method === "phone" && !formData.phone.trim()) {
+      setError(isEn ? "Phone number is required" : "شماره تلفن لازم است");
       return;
     }
-    if (method === 'email' && !formData.email.trim()) {
-      setError(isEn ? 'Email is required' : 'ایمیل لازم است');
+    if (method === "email" && !formData.email.trim()) {
+      setError(isEn ? "Email is required" : "ایمیل لازم است");
       return;
     }
     if (!formData.password) {
-      setError(isEn ? 'Password is required' : 'رمز عبور لازم است');
+      setError(isEn ? "Password is required" : "رمز عبور لازم است");
       return;
     }
 
     setError(null);
+    setSimulatedOtp(null);
     setLoading(true);
     try {
       const payload = {
@@ -99,28 +104,31 @@ const SignupScreen = () => {
         last_name: formData.last_name.trim() || undefined,
         password: formData.password,
       };
-      if (method === 'phone') {
-        await registerWithPhoneOtp({
+      if (method === "phone") {
+        const simulatedCode = await registerWithPhoneOtp({
           ...payload,
           phone: formData.phone.trim(),
         });
         setIdentifier(formData.phone.trim());
+        setSimulatedOtp(simulatedCode);
+        setCode(simulatedCode ?? "");
       } else {
-        await registerWithEmailOtp({
+        const simulatedCode = await registerWithEmailOtp({
           ...payload,
           email: formData.email.trim(),
         });
         setIdentifier(formData.email.trim());
+        setSimulatedOtp(simulatedCode);
+        setCode(simulatedCode ?? "");
       }
-      setStep('verify');
-      setCode('');
+      setStep("verify");
     } catch (err: unknown) {
       setError(
         err instanceof Error
           ? err.message
           : isEn
-            ? 'Error sending code'
-            : 'خطا در ارسال کد',
+            ? "Error sending code"
+            : "خطا در ارسال کد",
       );
     } finally {
       setLoading(false);
@@ -129,7 +137,9 @@ const SignupScreen = () => {
 
   const handleVerifyCode = async () => {
     if (code.length < 6) {
-      setError(isEn ? 'Please enter the 6-digit code' : 'لطفاً کد ۶ رقمی را وارد کنید');
+      setError(
+        isEn ? "Please enter the 6-digit code" : "لطفاً کد ۶ رقمی را وارد کنید",
+      );
       return;
     }
     setError(null);
@@ -138,7 +148,11 @@ const SignupScreen = () => {
       await verifyRegisterOtp(identifier, code);
     } catch (err: unknown) {
       setError(
-        err instanceof Error ? err.message : isEn ? 'Invalid code' : 'کد نامعتبر',
+        err instanceof Error
+          ? err.message
+          : isEn
+            ? "Invalid code"
+            : "کد نامعتبر",
       );
     } finally {
       setLoading(false);
@@ -148,11 +162,11 @@ const SignupScreen = () => {
   const footer = (
     <View className="flex-row justify-center gap-2 mb-6">
       <Text className="text-slate-500 dark:text-slate-400">
-        {isEn ? 'Already have an account?' : 'قبلاً ثبت‌نام کرده‌اید؟'}
+        {isEn ? "Already have an account?" : "قبلاً ثبت‌نام کرده‌اید؟"}
       </Text>
-      <TouchableOpacity onPress={() => navigation.navigate('Login')}>
+      <TouchableOpacity onPress={() => navigation.navigate("Login")}>
         <Text className="text-brand-600 dark:text-brand-400 font-bold">
-          {isEn ? 'Sign In' : 'ورود'}
+          {isEn ? "Sign In" : "ورود"}
         </Text>
       </TouchableOpacity>
     </View>
@@ -162,25 +176,22 @@ const SignupScreen = () => {
     <AuthScreenLayout
       accent="blue"
       icon={<UserPlus size={40} color="white" />}
-      title={isEn ? 'Create Account' : 'ایجاد حساب کاربری'}
+      title={isEn ? "Create Account" : "ایجاد حساب کاربری"}
       subtitle={
         isEn
-          ? 'Join the Verna community with a quick OTP verification'
-          : 'با تایید سریع کد یکبارمصرف به جامعه ورنا بپیوندید'
+          ? "Join the Verna community with a quick OTP verification"
+          : "با تایید سریع کد یکبارمصرف به جامعه ورنا بپیوندید"
       }
       footer={footer}
     >
-      <AuthErrorBanner message={error ?? ''} />
+      <AuthErrorBanner message={error ?? ""} />
 
-      {step === 'form' ? (
-        <MotionL.View
-          key="signup-form"
-          animate={{ opacity: 1, y: 0 }}
-        >
+      {step === "form" ? (
+        <MotionL.View key="signup-form" animate={{ opacity: 1, y: 0 }}>
           <AuthMethodTabs
             options={[
-              { id: 'phone', labelEn: 'Via Phone', labelFa: 'با تلفن' },
-              { id: 'email', labelEn: 'Via Email', labelFa: 'با ایمیل' },
+              { id: "phone", labelEn: "Via Phone", labelFa: "با تلفن" },
+              { id: "email", labelEn: "Via Email", labelFa: "با ایمیل" },
             ]}
             active={method}
             onChange={handleMethodChange}
@@ -191,38 +202,38 @@ const SignupScreen = () => {
           <View className="flex-row gap-3">
             <View className="flex-1">
               <Input
-                label={isEn ? 'First Name' : 'نام'}
-                placeholder={isEn ? 'John' : 'نام'}
+                label={isEn ? "First Name" : "نام"}
+                placeholder={isEn ? "John" : "نام"}
                 value={formData.first_name}
-                onChangeText={(v) => updateField('first_name', v)}
+                onChangeText={(v) => updateField("first_name", v)}
                 containerClassName="mb-3"
               />
             </View>
             <View className="flex-1">
               <Input
-                label={isEn ? 'Last Name' : 'نام خانوادگی'}
-                placeholder={isEn ? 'Doe' : 'نام خانوادگی'}
+                label={isEn ? "Last Name" : "نام خانوادگی"}
+                placeholder={isEn ? "Doe" : "نام خانوادگی"}
                 value={formData.last_name}
-                onChangeText={(v) => updateField('last_name', v)}
+                onChangeText={(v) => updateField("last_name", v)}
                 containerClassName="mb-3"
               />
             </View>
           </View>
 
           <Input
-            label={isEn ? 'Username' : 'نام کاربری'}
-            placeholder={isEn ? 'Pick a unique username' : 'نام کاربری یکتا'}
+            label={isEn ? "Username" : "نام کاربری"}
+            placeholder={isEn ? "Pick a unique username" : "نام کاربری یکتا"}
             value={formData.username}
-            onChangeText={(v) => updateField('username', v)}
+            onChangeText={(v) => updateField("username", v)}
             leftIcon={<User size={20} color="#94a3b8" />}
             autoCapitalize="none"
           />
 
           <Input
-            label={isEn ? 'Password' : 'رمز عبور'}
+            label={isEn ? "Password" : "رمز عبور"}
             placeholder="••••••••"
             value={formData.password}
-            onChangeText={(v) => updateField('password', v)}
+            onChangeText={(v) => updateField("password", v)}
             leftIcon={<Lock size={20} color="#94a3b8" />}
             rightIcon={
               <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
@@ -237,22 +248,22 @@ const SignupScreen = () => {
             autoComplete="password-new"
           />
 
-          {method === 'phone' ? (
+          {method === "phone" ? (
             <Input
-              label={isEn ? 'Phone Number' : 'شماره تلفن'}
-              placeholder={isEn ? '09xxxxxxxxx' : '۰۹xxxxxxxxx'}
+              label={isEn ? "Phone Number" : "شماره تلفن"}
+              placeholder={isEn ? "09xxxxxxxxx" : "۰۹xxxxxxxxx"}
               value={formData.phone}
-              onChangeText={(v) => updateField('phone', v)}
+              onChangeText={(v) => updateField("phone", v)}
               leftIcon={<Phone size={20} color="#94a3b8" />}
               keyboardType="phone-pad"
               autoComplete="tel"
             />
           ) : (
             <Input
-              label={isEn ? 'Email' : 'ایمیل'}
-              placeholder={isEn ? 'you@example.com' : 'ایمیل شما'}
+              label={isEn ? "Email" : "ایمیل"}
+              placeholder={isEn ? "you@example.com" : "ایمیل شما"}
               value={formData.email}
-              onChangeText={(v) => updateField('email', v)}
+              onChangeText={(v) => updateField("email", v)}
               leftIcon={<Mail size={20} color="#94a3b8" />}
               keyboardType="email-address"
               autoCapitalize="none"
@@ -267,11 +278,15 @@ const SignupScreen = () => {
             onPress={handleSendCode}
             className="mt-2"
           >
-            <Text>{isEn ? 'Send Verification Code' : 'ارسال کد تایید'}</Text>
+            <Text>{isEn ? "Send Verification Code" : "ارسال کد تایید"}</Text>
           </Button>
 
           <AuthDivider isEn={isEn} />
-          <GoogleSignInButton onPress={handleGoogleSignIn} isEn={isEn} disabled={loading} />
+          <GoogleSignInButton
+            onPress={handleGoogleSignIn}
+            isEn={isEn}
+            disabled={loading}
+          />
         </MotionL.View>
       ) : (
         <MotionL.View
@@ -280,8 +295,17 @@ const SignupScreen = () => {
           transition={{ duration: 0.3 }}
         >
           <Text className="text-center text-slate-600 dark:text-slate-400 mb-5 text-sm">
-            {isEn ? `Code sent to ${identifier}` : `کد به ${identifier} ارسال شد`}
+            {isEn
+              ? `Code sent to ${identifier}`
+              : `کد به ${identifier} ارسال شد`}
           </Text>
+          {simulatedOtp ? (
+            <Text className="text-sm text-amber-700 dark:text-amber-300 text-center mb-3 font-semibold">
+              {isEn
+                ? `Simulation OTP: ${simulatedOtp}`
+                : `کد شبیه‌سازی: ${simulatedOtp}`}
+            </Text>
+          ) : null}
 
           <OtpInput value={code} onChange={setCode} isEn={isEn} />
 
@@ -293,20 +317,21 @@ const SignupScreen = () => {
               onPress={handleVerifyCode}
               disabled={code.length < 6}
             >
-              <Text>{isEn ? 'Complete Registration' : 'تکمیل ثبت‌نام'}</Text>
+              <Text>{isEn ? "Complete Registration" : "تکمیل ثبت‌نام"}</Text>
             </Button>
           </View>
 
           <Pressable
             onPress={() => {
-              setStep('form');
-              setCode('');
+              setStep("form");
+              setCode("");
+              setSimulatedOtp(null);
               setError(null);
             }}
             className="mt-4 py-3 items-center"
           >
             <Text className="text-sm font-bold text-brand-600 dark:text-brand-400">
-              {isEn ? 'Change phone or email' : 'تغییر شماره یا ایمیل'}
+              {isEn ? "Change phone or email" : "تغییر شماره یا ایمیل"}
             </Text>
           </Pressable>
         </MotionL.View>

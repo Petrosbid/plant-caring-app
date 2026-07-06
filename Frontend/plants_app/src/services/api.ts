@@ -1,5 +1,10 @@
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { getAccessToken, getRefreshToken, saveTokens, clearTokens } from "../utils/tokenStorage";
+import {
+  getAccessToken,
+  getRefreshToken,
+  saveTokens,
+  clearTokens,
+} from "../utils/tokenStorage";
 import type {
   Disease,
   Plant,
@@ -9,9 +14,9 @@ import type {
   UserPlant,
 } from "../types";
 
-export const API_BASE_URL = 'https://django-3b13q0.chbkn.run/api';
-const BLOG_API_BASE_URL = 'https://django-3b13q0.chbkn.run/api/blog';
-export const BLOG_SHARE_BASE_URL = API_BASE_URL.replace('/api', '');
+export const API_BASE_URL = "https://django-3b13q0.chbkn.run/api";
+const BLOG_API_BASE_URL = "https://django-3b13q0.chbkn.run/api/blog";
+export const BLOG_SHARE_BASE_URL = API_BASE_URL.replace("/api", "");
 
 let isRefreshing = false;
 let refreshSubscribers: ((token: string) => void)[] = [];
@@ -28,13 +33,19 @@ const onTokenRefreshed = (token: string) => {
 /**
  * Standard fetch wrapper with automatic token refresh
  */
-const authenticatedFetch = async (url: string, options: RequestInit = {}): Promise<Response> => {
+const authenticatedFetch = async (
+  url: string,
+  options: RequestInit = {},
+): Promise<Response> => {
   let token = await getAccessToken();
-  
+
   const headers = {
     ...options.headers,
     ...(token ? { Authorization: `Bearer ${token}` } : {}),
-    "Content-Type": options.body instanceof FormData ? undefined : (options.headers as any)?.["Content-Type"] || "application/json",
+    "Content-Type":
+      options.body instanceof FormData
+        ? undefined
+        : (options.headers as any)?.["Content-Type"] || "application/json",
   };
 
   // Remove Content-Type if it's FormData to let the browser set it with boundary
@@ -65,16 +76,19 @@ const authenticatedFetch = async (url: string, options: RequestInit = {}): Promi
 
     if (refreshToken) {
       try {
-        const refreshResponse = await fetch(`${API_BASE_URL}/auth/token/refresh/`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ refresh: refreshToken }),
-        });
+        const refreshResponse = await fetch(
+          `${API_BASE_URL}/auth/token/refresh/`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ refresh: refreshToken }),
+          },
+        );
 
         if (refreshResponse.ok) {
           const data = await refreshResponse.json();
           await saveTokens(data.access, data.refresh || refreshToken);
-          
+
           isRefreshing = false;
           onTokenRefreshed(data.access);
 
@@ -127,7 +141,7 @@ export const buildProfilePayload = (
   assign("national_code", data.national_code);
   assign("birth_date", data.birth_date);
   assign("gender", data.gender);
-  
+
   // Push Notification Settings
   assign("push_token", data.push_token);
   assign("timezone", data.timezone);
@@ -156,7 +170,9 @@ export const authService = {
     return response.json();
   },
 
-  login: async (credentials: any): Promise<{ access: string; refresh: string }> => {
+  login: async (
+    credentials: any,
+  ): Promise<{ access: string; refresh: string }> => {
     const response = await fetch(`${API_BASE_URL}/auth/login/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -210,7 +226,9 @@ export const authService = {
     return response.json();
   },
 
-  requestOtp: async (phoneNumber: string): Promise<void> => {
+  requestOtp: async (
+    phoneNumber: string,
+  ): Promise<{ message: string; simulated_otp?: string }> => {
     const response = await fetch(`${API_BASE_URL}/auth/api/otp/request/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -218,11 +236,17 @@ export const authService = {
     });
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(formatApiError(errorData, "Failed to send verification code"));
+      throw new Error(
+        formatApiError(errorData, "Failed to send verification code"),
+      );
     }
+    return response.json();
   },
 
-  verifyOtp: async (phoneNumber: string, code: string): Promise<{ access: string; refresh: string }> => {
+  verifyOtp: async (
+    phoneNumber: string,
+    code: string,
+  ): Promise<{ access: string; refresh: string }> => {
     const response = await fetch(`${API_BASE_URL}/auth/api/otp/verify/`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -239,24 +263,39 @@ export const authService = {
     return data;
   },
 
-  registerRequestOtp: async (method: "phone" | "email", data: any): Promise<void> => {
-    const response = await fetch(`${API_BASE_URL}/auth/api/register/otp/request/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ method, ...data }),
-    });
+  registerRequestOtp: async (
+    method: "phone" | "email",
+    data: any,
+  ): Promise<{ message: string; simulated_otp?: string }> => {
+    const response = await fetch(
+      `${API_BASE_URL}/auth/api/register/otp/request/`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ method, ...data }),
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(formatApiError(errorData, "Failed to send verification code"));
+      throw new Error(
+        formatApiError(errorData, "Failed to send verification code"),
+      );
     }
+    return response.json();
   },
 
-  registerVerifyOtp: async (identifier: string, code: string): Promise<{ access: string; refresh: string; user?: User }> => {
-    const response = await fetch(`${API_BASE_URL}/auth/api/register/otp/verify/`, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ identifier, code }),
-    });
+  registerVerifyOtp: async (
+    identifier: string,
+    code: string,
+  ): Promise<{ access: string; refresh: string; user?: User }> => {
+    const response = await fetch(
+      `${API_BASE_URL}/auth/api/register/otp/verify/`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ identifier, code }),
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(formatApiError(errorData, "Invalid verification code"));
@@ -279,20 +318,27 @@ export const authService = {
     // @ts-ignore
     formData.append("profile_picture", { uri: imageUri, name: filename, type });
 
-    const response = await authenticatedFetch(`${API_BASE_URL}/auth/profile/picture/`, {
-      method: "PUT",
-      body: formData,
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/auth/profile/picture/`,
+      {
+        method: "PUT",
+        body: formData,
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(formatApiError(errorData, "Failed to update profile picture"));
+      throw new Error(
+        formatApiError(errorData, "Failed to update profile picture"),
+      );
     }
     return response.json();
   },
 };
 
 export const plantService = {
-  getPlants: async (params?: any): Promise<{ results: Plant[]; next: string | null }> => {
+  getPlants: async (
+    params?: any,
+  ): Promise<{ results: Plant[]; next: string | null }> => {
     const query = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, val]) => {
@@ -313,11 +359,18 @@ export const plantService = {
   identifyPlant: async (imageUri: string): Promise<Plant> => {
     const formData = new FormData();
     // @ts-ignore
-    formData.append("image", { uri: imageUri, name: "photo.jpg", type: "image/jpeg" });
-    const response = await authenticatedFetch(`${API_BASE_URL}/plants/identify/`, {
-      method: "POST",
-      body: formData,
+    formData.append("image", {
+      uri: imageUri,
+      name: "photo.jpg",
+      type: "image/jpeg",
     });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/plants/identify/`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.detail || "Plant identification failed");
@@ -325,11 +378,22 @@ export const plantService = {
     return response.json();
   },
 
-  recommendPlant: async (answers: any, language: string = "en", additionalNotes: string = ""): Promise<any> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/plants/recommend-plant/`, {
-      method: "POST",
-      body: JSON.stringify({ language, answers, additional_notes: additionalNotes }),
-    });
+  recommendPlant: async (
+    answers: any,
+    language: string = "en",
+    additionalNotes: string = "",
+  ): Promise<any> => {
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/plants/recommend-plant/`,
+      {
+        method: "POST",
+        body: JSON.stringify({
+          language,
+          answers,
+          additional_notes: additionalNotes,
+        }),
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.error || "Recommendation failed");
@@ -339,14 +403,18 @@ export const plantService = {
 };
 
 export const diseaseService = {
-  getDiseases: async (params?: any): Promise<{ results: Disease[]; next: string | null }> => {
+  getDiseases: async (
+    params?: any,
+  ): Promise<{ results: Disease[]; next: string | null }> => {
     const query = new URLSearchParams();
     if (params) {
       Object.entries(params).forEach(([key, val]) => {
         if (val !== undefined) query.append(key, String(val));
       });
     }
-    const response = await fetch(`${API_BASE_URL}/diseases/?${query.toString()}`);
+    const response = await fetch(
+      `${API_BASE_URL}/diseases/?${query.toString()}`,
+    );
     if (!response.ok) throw new Error("Failed to fetch diseases");
     return response.json();
   },
@@ -360,11 +428,18 @@ export const diseaseService = {
   diagnoseDisease: async (imageUri: string): Promise<Disease> => {
     const formData = new FormData();
     // @ts-ignore
-    formData.append("image", { uri: imageUri, name: "photo.jpg", type: "image/jpeg" });
-    const response = await authenticatedFetch(`${API_BASE_URL}/diseases/diagnose/`, {
-      method: "POST",
-      body: formData,
+    formData.append("image", {
+      uri: imageUri,
+      name: "photo.jpg",
+      type: "image/jpeg",
     });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/diseases/diagnose/`,
+      {
+        method: "POST",
+        body: formData,
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.detail || "Disease diagnosis failed");
@@ -396,10 +471,13 @@ export const gardenService = {
   },
 
   updateUserPlant: async (id: number, data: any): Promise<UserPlant> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/${id}/`, {
-      method: "PATCH",
-      body: JSON.stringify(data),
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/${id}/`,
+      {
+        method: "PATCH",
+        body: JSON.stringify(data),
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
       throw new Error(errorData.detail || "Failed to update plant");
@@ -408,26 +486,35 @@ export const gardenService = {
   },
 
   removeUserPlant: async (id: number): Promise<void> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/${id}/`, {
-      method: "DELETE",
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/${id}/`,
+      {
+        method: "DELETE",
+      },
+    );
     if (!response.ok) throw new Error("Failed to remove plant");
   },
 
   chatWithPlant: async (plantId: number, message: string): Promise<any> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/chat/`, {
-      method: "POST",
-      body: JSON.stringify({ plant_id: plantId, message }),
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/chat/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ plant_id: plantId, message }),
+      },
+    );
     if (!response.ok) throw new Error("Chat request failed");
     return response.json();
   },
 
   addGrowthRecord: async (data: any): Promise<any> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/growth/`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/growth/`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    );
     if (!response.ok) throw new Error("Failed to add growth record");
     return response.json();
   },
@@ -435,31 +522,42 @@ export const gardenService = {
 
 export const reminderService = {
   getReminders: async (): Promise<Reminder[]> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/reminders/`);
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/reminders/`,
+    );
     if (!response.ok) throw new Error("Failed to fetch reminders");
     return response.json();
   },
 
   createReminder: async (data: any): Promise<Reminder> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/reminders/`, {
-      method: "POST",
-      body: JSON.stringify(data),
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/reminders/`,
+      {
+        method: "POST",
+        body: JSON.stringify(data),
+      },
+    );
     if (!response.ok) throw new Error("Failed to create reminder");
     return response.json();
   },
 
   toggleReminder: async (id: number): Promise<void> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/reminders/${id}/mark_completed/`, {
-      method: "POST",
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/reminders/${id}/mark_completed/`,
+      {
+        method: "POST",
+      },
+    );
     if (!response.ok) throw new Error("Toggle reminder failed");
   },
 
   deleteReminder: async (id: number): Promise<void> => {
-    const response = await authenticatedFetch(`${API_BASE_URL}/my-garden/reminders/${id}/`, {
-      method: "DELETE",
-    });
+    const response = await authenticatedFetch(
+      `${API_BASE_URL}/my-garden/reminders/${id}/`,
+      {
+        method: "DELETE",
+      },
+    );
     if (!response.ok) throw new Error("Delete reminder failed");
   },
 };
@@ -472,42 +570,59 @@ export const blogService = {
         if (val !== undefined) query.append(key, String(val));
       });
     }
-    const response = await fetch(`${BLOG_API_BASE_URL}/posts/?${query.toString()}`);
+    const response = await fetch(
+      `${BLOG_API_BASE_URL}/posts/?${query.toString()}`,
+    );
     if (!response.ok) throw new Error("Failed to fetch posts");
     const data = await response.json();
-    return Array.isArray(data) ? { results: data, count: data.length, next: null } : data;
+    return Array.isArray(data)
+      ? { results: data, count: data.length, next: null }
+      : data;
   },
 
   getPostBySlug: async (slug: string): Promise<any> => {
-    const response = await authenticatedFetch(`${BLOG_API_BASE_URL}/posts/${slug}/`);
+    const response = await authenticatedFetch(
+      `${BLOG_API_BASE_URL}/posts/${slug}/`,
+    );
     if (!response.ok) throw new Error("Failed to fetch post");
     return response.json();
   },
 
   likePost: async (slug: string): Promise<any> => {
-    const response = await authenticatedFetch(`${BLOG_API_BASE_URL}/posts/${slug}/like/`, { method: "POST" });
+    const response = await authenticatedFetch(
+      `${BLOG_API_BASE_URL}/posts/${slug}/like/`,
+      { method: "POST" },
+    );
     if (!response.ok) throw new Error("Failed to like post");
     return response.json();
   },
 
   dislikePost: async (slug: string): Promise<any> => {
-    const response = await authenticatedFetch(`${BLOG_API_BASE_URL}/posts/${slug}/dislike/`, { method: "POST" });
+    const response = await authenticatedFetch(
+      `${BLOG_API_BASE_URL}/posts/${slug}/dislike/`,
+      { method: "POST" },
+    );
     if (!response.ok) throw new Error("Failed to dislike post");
     return response.json();
   },
 
   getComments: async (slug: string): Promise<any[]> => {
-    const response = await fetch(`${BLOG_API_BASE_URL}/posts/${slug}/comments/`);
+    const response = await fetch(
+      `${BLOG_API_BASE_URL}/posts/${slug}/comments/`,
+    );
     if (!response.ok) throw new Error("Failed to fetch comments");
     const data = await response.json();
     return Array.isArray(data) ? data : data.results || [];
   },
 
   addComment: async (slug: string, commentData: any): Promise<any> => {
-    const response = await authenticatedFetch(`${BLOG_API_BASE_URL}/posts/${slug}/comments/`, {
-      method: "POST",
-      body: JSON.stringify(commentData),
-    });
+    const response = await authenticatedFetch(
+      `${BLOG_API_BASE_URL}/posts/${slug}/comments/`,
+      {
+        method: "POST",
+        body: JSON.stringify(commentData),
+      },
+    );
     if (!response.ok) {
       const errorData = await response.json().catch(() => null);
       throw new Error(formatApiError(errorData, "Failed to add comment"));
@@ -516,24 +631,33 @@ export const blogService = {
   },
 
   voteComment: async (commentId: number, voteType: 1 | -1): Promise<any> => {
-    const response = await authenticatedFetch(`${BLOG_API_BASE_URL}/comments/${commentId}/vote/`, {
-      method: "POST",
-      body: JSON.stringify({ vote_type: voteType }),
-    });
+    const response = await authenticatedFetch(
+      `${BLOG_API_BASE_URL}/comments/${commentId}/vote/`,
+      {
+        method: "POST",
+        body: JSON.stringify({ vote_type: voteType }),
+      },
+    );
     if (!response.ok) throw new Error("Failed to vote on comment");
     return response.json();
   },
 
   deleteComment: async (commentId: number): Promise<void> => {
-    const response = await authenticatedFetch(`${BLOG_API_BASE_URL}/comments/${commentId}/`, { method: "DELETE" });
+    const response = await authenticatedFetch(
+      `${BLOG_API_BASE_URL}/comments/${commentId}/`,
+      { method: "DELETE" },
+    );
     if (!response.ok) throw new Error("Failed to delete comment");
   },
 
   updateComment: async (commentId: number, content: string): Promise<any> => {
-    const response = await authenticatedFetch(`${BLOG_API_BASE_URL}/comments/${commentId}/`, {
-      method: "PUT",
-      body: JSON.stringify({ content }),
-    });
+    const response = await authenticatedFetch(
+      `${BLOG_API_BASE_URL}/comments/${commentId}/`,
+      {
+        method: "PUT",
+        body: JSON.stringify({ content }),
+      },
+    );
     if (!response.ok) throw new Error("Failed to update comment");
     return response.json();
   },
