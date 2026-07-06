@@ -4,6 +4,7 @@ import { m } from "framer-motion";
 import { useAuth } from "../contexts/AuthContext";
 import { useLanguageTheme } from "../contexts/LanguageThemeContext";
 import Register from "./register";
+import ElectricBorder from '../components/animation/ElectricBorder'
 
 interface LoginProps {
   navigateTo: (page: string) => void;
@@ -333,113 +334,117 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center gradient-mesh bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
-      <m.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.4 }}
-        className="max-w-md w-full"
-      >
-        <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-8 lg:p-10">
-          <div className="text-center mb-8">
-            <m.div
-              initial={{ scale: 0.9 }}
-              animate={{ scale: 1 }}
-              transition={{ type: "spring", stiffness: 200 }}
-              className="mx-auto w-16 h-16 rounded-2xl bg-brand-500/15 dark:bg-brand-500/25 flex items-center justify-center text-4xl mb-4"
-            >
-              🌱
-            </m.div>
-            <h2 className="font-display text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white">
+    
+      <div className="min-h-screen flex items-center justify-center gradient-mesh bg-slate-50 dark:bg-slate-900 py-12 px-4 sm:px-6 lg:px-8">
+        <m.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.4 }}
+          className="max-w-md w-full"
+        >
+        <ElectricBorder color="#88ff7d"      speed={0.5}      chaos={0.1}       style={{ borderRadius: 16 }}   >
+          <div className="bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-8 lg:p-10">
+            <div className="text-center mb-8">
+              <m.div
+                initial={{ scale: 0.9 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 200 }}
+                className="mx-auto w-16 h-16 rounded-2xl bg-brand-500/15 dark:bg-brand-500/25 flex items-center justify-center text-4xl mb-4"
+              >
+                🌱
+              </m.div>
+              <h2 className="font-display text-2xl lg:text-3xl font-semibold text-slate-900 dark:text-white">
+                {isSignUp
+                  ? isEn
+                    ? "Create Account"
+                    : "ایجاد حساب کاربری"
+                  : isEn
+                    ? "Sign in to your account"
+                    : "ورود به حساب کاربری"}
+              </h2>
+              <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
+                {isSignUp
+                  ? isEn
+                    ? "Join our community of plant lovers"
+                    : "به جامعه عاشقان گیاهان ما بپیوندید"
+                  : isEn
+                    ? "Access your personalized plant care dashboard"
+                    : "دسترسی به داشبورد مراقبت از گیاهان"}
+              </p>
+            </div>
+
+            <ErrorDisplay error={error} />
+            {isSignUp ? (
+              <Register
+                onSuccess={() => navigateTo("profile")}
+                switchToLogin={() => setIsSignUp(false)}
+              />
+            ) : (
+              <>
+                <div className="flex space-x-4 rtl:space-x-reverse mb-6">
+                  <button
+                    type="button"
+                    onClick={() => setLoginMethod("password")}
+                    className={`flex-1 py-2 text-center rounded-lg transition-colors ${
+                      loginMethod === "password"
+                        ? "bg-brand-500 text-white"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                    }`}
+                  >
+                    {isEn ? "Password Login" : "ورود با رمز عبور"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setLoginMethod("otp")}
+                    className={`flex-1 py-2 text-center rounded-lg transition-colors ${
+                      loginMethod === "otp"
+                        ? "bg-brand-500 text-white"
+                        : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
+                    }`}
+                  >
+                    {isEn ? "One-Time Password" : "ورود با کد یکبارمصرف"}
+                  </button>
+                </div>
+
+                {renderLoginForm()}
+              </>
+            )}
+
+            <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
               {isSignUp
                 ? isEn
-                  ? "Create Account"
-                  : "ایجاد حساب کاربری"
+                  ? "Already have an account?"
+                  : "حساب کاربری دارید؟"
                 : isEn
-                  ? "Sign in to your account"
-                  : "ورود به حساب کاربری"}
-            </h2>
-            <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">
-              {isSignUp
-                ? isEn
-                  ? "Join our community of plant lovers"
-                  : "به جامعه عاشقان گیاهان ما بپیوندید"
-                : isEn
-                  ? "Access your personalized plant care dashboard"
-                  : "دسترسی به داشبورد مراقبت از گیاهان"}
+                  ? "Don't have an account?"
+                  : "حساب کاربری ندارید؟"}{" "}
+              <button
+                type="button"
+                onClick={() => {
+                  setIsSignUp(!isSignUp);
+                  setError(null);
+                  setOtpSent(false);
+                  setOtpCode("");
+                  setSimulatedOtp(null);
+                  setPhoneNumber("");
+                }}
+                disabled={loading}
+                className="font-medium text-brand-600 dark:text-brand-400 hover:underline disabled:opacity-50"
+              >
+                {isSignUp
+                  ? isEn
+                    ? "Sign in here"
+                    : "وارد شوید"
+                  : isEn
+                    ? "Sign up here"
+                    : "ثبت نام کنید"}
+              </button>
             </p>
           </div>
-
-          <ErrorDisplay error={error} />
-          {isSignUp ? (
-            <Register
-              onSuccess={() => navigateTo("profile")}
-              switchToLogin={() => setIsSignUp(false)}
-            />
-          ) : (
-            <>
-              <div className="flex space-x-4 rtl:space-x-reverse mb-6">
-                <button
-                  type="button"
-                  onClick={() => setLoginMethod("password")}
-                  className={`flex-1 py-2 text-center rounded-lg transition-colors ${
-                    loginMethod === "password"
-                      ? "bg-brand-500 text-white"
-                      : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
-                  }`}
-                >
-                  {isEn ? "Password Login" : "ورود با رمز عبور"}
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setLoginMethod("otp")}
-                  className={`flex-1 py-2 text-center rounded-lg transition-colors ${
-                    loginMethod === "otp"
-                      ? "bg-brand-500 text-white"
-                      : "bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600"
-                  }`}
-                >
-                  {isEn ? "One-Time Password" : "ورود با کد یکبارمصرف"}
-                </button>
-              </div>
-
-              {renderLoginForm()}
-            </>
-          )}
-
-          <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
-            {isSignUp
-              ? isEn
-                ? "Already have an account?"
-                : "حساب کاربری دارید؟"
-              : isEn
-                ? "Don't have an account?"
-                : "حساب کاربری ندارید؟"}{" "}
-            <button
-              type="button"
-              onClick={() => {
-                setIsSignUp(!isSignUp);
-                setError(null);
-                setOtpSent(false);
-                setOtpCode("");
-                setSimulatedOtp(null);
-                setPhoneNumber("");
-              }}
-              disabled={loading}
-              className="font-medium text-brand-600 dark:text-brand-400 hover:underline disabled:opacity-50"
-            >
-              {isSignUp
-                ? isEn
-                  ? "Sign in here"
-                  : "وارد شوید"
-                : isEn
-                  ? "Sign up here"
-                  : "ثبت نام کنید"}
-            </button>
-          </p>
-        </div>
-      </m.div>
-    </div>
+        </ElectricBorder>
+        </m.div>
+      </div>
+    
   );
 };
 

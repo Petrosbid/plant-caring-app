@@ -3,6 +3,7 @@ import {m, AnimatePresence} from 'framer-motion';
 import type { Plant } from '../types';
 import { plantService, gardenService } from '../services/api';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
+import BorderGlow from '../components/animation/BorderGlow';
 
 const PlantIdentification: React.FC = () => {
   const { t, language } = useLanguageTheme();
@@ -219,63 +220,65 @@ const PlantIdentification: React.FC = () => {
       <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
         {t('identify')}
       </m.h1>
-      <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">
-        <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-6">
-          {isEn ? 'Upload a photo of a plant to identify it' : 'یک عکس از گیاه بارگذاری کنید تا شناسایی شود'}
-        </h2>
-        {!previewUrl ? (
-          <m.div
-            layout
-            className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-10 text-center cursor-pointer hover:border-brand-500 dark:hover:border-brand-400 hover:bg-brand-500/5 dark:hover:bg-brand-500/10 transition-all duration-300"
-            onDrop={handleDrop}
-            onDragOver={(e) => e.preventDefault()}
-            onClick={() => document.getElementById('fileInput')?.click()}
-          >
-            <div className="flex flex-col items-center justify-center gap-3">
-              <span className="text-5xl">📷</span>
-              <p className="text-slate-600 dark:text-slate-300 font-medium">
-                {isEn ? 'Drag & drop your plant photo here' : 'تصویر گیاه خود را اینجا بکشید و رها کنید'}
-              </p>
-              <p className="text-slate-500 dark:text-slate-400 text-sm">{isEn ? 'or' : 'یا'}</p>
-              <span className="inline-flex px-4 py-2 rounded-xl bg-brand-500 text-white text-sm font-medium">
-                {isEn ? 'Browse Files' : 'انتخاب فایل'}
-              </span>
-              <p className="text-slate-400 dark:text-slate-500 text-xs">
-                {isEn ? 'Supports JPG, PNG up to 10MB' : 'پشتیبانی از JPG، PNG تا 10 مگابایت'}
-              </p>
-            </div>
-            <input id="fileInput" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
-          </m.div>
-        ) : (
-          <m.div layout className="text-center">
-            <m.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 rounded-xl overflow-hidden shadow-lg">
-              <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto w-full object-cover" />
+      <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} >
+        <BorderGlow className='max-w-2xl mx-auto rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8'    edgeSensitivity={20}    glowColor="40 80 80"    backgroundColor="isDark ? #1A2536 : #FFFFFF"    borderRadius={28}    glowRadius={40}    glowIntensity={1}    coneSpread={25}    animated={true}    colors={['#e084fc', '#f472b6', '#389bf8']}  >
+          <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-6">
+            {isEn ? 'Upload a photo of a plant to identify it' : 'یک عکس از گیاه بارگذاری کنید تا شناسایی شود'}
+          </h2>
+          {!previewUrl ? (
+            <m.div
+              layout
+              className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-2xl p-10 text-center cursor-pointer hover:border-brand-500 dark:hover:border-brand-400 hover:bg-brand-500/5 dark:hover:bg-brand-500/10 transition-all duration-300"
+              onDrop={handleDrop}
+              onDragOver={(e) => e.preventDefault()}
+              onClick={() => document.getElementById('fileInput')?.click()}
+            >
+              <div className="flex flex-col items-center justify-center gap-3">
+                <span className="text-5xl">📷</span>
+                <p className="text-slate-600 dark:text-slate-300 font-medium">
+                  {isEn ? 'Drag & drop your plant photo here' : 'تصویر گیاه خود را اینجا بکشید و رها کنید'}
+                </p>
+                <p className="text-slate-500 dark:text-slate-400 text-sm">{isEn ? 'or' : 'یا'}</p>
+                <span className="inline-flex px-4 py-2 rounded-xl bg-brand-500 text-white text-sm font-medium">
+                  {isEn ? 'Browse Files' : 'انتخاب فایل'}
+                </span>
+                <p className="text-slate-400 dark:text-slate-500 text-xs">
+                  {isEn ? 'Supports JPG, PNG up to 10MB' : 'پشتیبانی از JPG، PNG تا 10 مگابایت'}
+                </p>
+              </div>
+              <input id="fileInput" type="file" accept="image/*" onChange={handleFileChange} className="hidden" />
             </m.div>
-            <button onClick={handleReset} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium text-sm">
-              {isEn ? 'Choose Another Image' : 'انتخاب تصویر دیگر'}
-            </button>
-          </m.div>
-        )}
-        <AnimatePresence>
-          {error && (
-            <m.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-xl text-sm">
-              {error}
+          ) : (
+            <m.div layout className="text-center">
+              <m.div initial={{ scale: 0.95, opacity: 0 }} animate={{ scale: 1, opacity: 1 }} className="mb-4 rounded-xl overflow-hidden shadow-lg">
+                <img src={previewUrl} alt="Preview" className="max-h-64 mx-auto w-full object-cover" />
+              </m.div>
+              <button onClick={handleReset} className="text-brand-600 dark:text-brand-400 hover:text-brand-700 dark:hover:text-brand-300 font-medium text-sm">
+                {isEn ? 'Choose Another Image' : 'انتخاب تصویر دیگر'}
+              </button>
             </m.div>
           )}
-        </AnimatePresence>
-        <div className="mt-6 text-center">
-          <m.button
-            onClick={handleIdentify}
-            disabled={isLoading || !selectedFile}
-            className={`font-medium py-3 px-6 rounded-xl transition-all ${
-              isLoading || !selectedFile ? 'bg-slate-300 dark:bg-slate-600 cursor-not-allowed text-slate-500' : 'bg-brand-500 hover:bg-brand-600 text-white shadow-lg hover:shadow-glow'
-            }`}
-            whileHover={!(isLoading || !selectedFile) ? { scale: 1.02 } : {}}
-            whileTap={!(isLoading || !selectedFile) ? { scale: 0.98 } : {}}
-          >
-            {isLoading ? (isEn ? 'Identifying...' : 'در حال شناسایی...') : (isEn ? 'Identify Plant' : 'شناسایی گیاه')}
-          </m.button>
-        </div>
+          <AnimatePresence>
+            {error && (
+              <m.div initial={{ opacity: 0, height: 0 }} animate={{ opacity: 1, height: 'auto' }} exit={{ opacity: 0, height: 0 }} className="mt-4 p-4 bg-red-50 dark:bg-red-900/30 text-red-700 dark:text-red-200 rounded-xl text-sm">
+                {error}
+              </m.div>
+            )}
+          </AnimatePresence>
+          <div className="mt-6 text-center">
+            <m.button
+              onClick={handleIdentify}
+              disabled={isLoading || !selectedFile}
+              className={`font-medium py-3 px-6 rounded-xl transition-all ${
+                isLoading || !selectedFile ? 'bg-slate-300 dark:bg-slate-600 cursor-not-allowed text-slate-500' : 'bg-brand-500 hover:bg-brand-600 text-white shadow-lg hover:shadow-glow'
+              }`}
+              whileHover={!(isLoading || !selectedFile) ? { scale: 1.02 } : {}}
+              whileTap={!(isLoading || !selectedFile) ? { scale: 0.98 } : {}}
+            >
+              {isLoading ? (isEn ? 'Identifying...' : 'در حال شناسایی...') : (isEn ? 'Identify Plant' : 'شناسایی گیاه')}
+            </m.button>
+          </div>
+        </BorderGlow>
       </m.div>
     </div>
   );

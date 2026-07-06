@@ -145,7 +145,7 @@ const SignupScreen = () => {
     setError(null);
     setLoading(true);
     try {
-      await verifyRegisterOtp(identifier, code);
+      await verifyRegisterOtp(identifier, code, formData.password);
     } catch (err: unknown) {
       setError(
         err instanceof Error

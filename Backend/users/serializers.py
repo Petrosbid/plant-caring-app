@@ -1,7 +1,21 @@
+import re
+
 from rest_framework import serializers
 
 from .models import CustomUser, OTPCode
 from .utils import normalize_phone_number
+
+_PERSIAN_ARABIC_DIGIT_MAP = str.maketrans(
+    "۰۱۲۳۴۵۶۷۸۹٠١٢٣٤٥٦٧٨٩", "01234567890123456789"
+)
+
+
+def normalize_otp_code(value: str) -> str:
+    raw = (value or "").strip().translate(_PERSIAN_ARABIC_DIGIT_MAP)
+    digits_only = re.sub(r"\D", "", raw)
+    if len(digits_only) != 6:
+        raise serializers.ValidationError("OTP code must be exactly 6 digits.")
+    return digits_only
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -81,7 +95,16 @@ class PhoneSerializer(serializers.Serializer):
 
 class OTPVerifySerializer(serializers.Serializer):
     phone_number = serializers.CharField(max_length=20)
-    code = serializers.CharField(max_length=6)
+    code = serializers.CharField(max_length=12)
+
+    def validate_phone_number(self, value):
+        try:
+            return normalize_phone_number(value)
+        except ValueError as e:
+            raise serializers.ValidationError(str(e))
+
+    def validate_code(self, value):
+        return normalize_otp_code(value)
 
 
 class RegisterInitPhoneSerializer(serializers.Serializer):
@@ -123,5 +146,9 @@ class RegisterInitEmailSerializer(serializers.Serializer):
 
 class RegisterVerifySerializer(serializers.Serializer):
     identifier = serializers.CharField()  # phone or email
-    code = serializers.CharField(max_length=6)
+    code = serializers.CharField(max_length=12)
+    password = serializers.CharField(required=False, allow_blank=False, write_only=True)
     purpose = serializers.CharField(default="register")
+
+    def validate_code(self, value):
+        return normalize_otp_code(value)

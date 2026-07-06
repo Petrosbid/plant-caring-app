@@ -285,10 +285,19 @@ export const authService = {
     return response.data;
   },
 
-  registerVerifyOtp: async (identifier: string, code: string) => {
+  registerVerifyOtp: async (
+    identifier: string,
+    code: string,
+    password?: string,
+  ) => {
+    const payload: { identifier: string; code: string; password?: string } = {
+      identifier,
+      code,
+    };
+    if (password) payload.password = password;
     const response = await axios.post(
       `${API_BASE_URL}/auth/api/register/otp/verify/`,
-      { identifier, code },
+      payload,
     );
     if (response.data.access && response.data.refresh) {
       localStorage.setItem("access_token", response.data.access);

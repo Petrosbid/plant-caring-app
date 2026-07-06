@@ -35,7 +35,11 @@ interface AuthContextType {
     first_name?: string;
     last_name?: string;
   }) => Promise<string | null>;
-  verifyRegisterOtp: (identifier: string, code: string) => Promise<void>;
+  verifyRegisterOtp: (
+    identifier: string,
+    code: string,
+    password?: string,
+  ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -207,9 +211,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
-  const verifyRegisterOtp = async (identifier: string, code: string) => {
+  const verifyRegisterOtp = async (
+    identifier: string,
+    code: string,
+    password?: string,
+  ) => {
     try {
-      const response = await authService.registerVerifyOtp(identifier, code);
+      const response = await authService.registerVerifyOtp(
+        identifier,
+        code,
+        password,
+      );
       const userData = response.user || (await authService.getProfile());
       localStorage.setItem("user", JSON.stringify(userData));
       setUser(userData);

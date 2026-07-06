@@ -25,6 +25,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
     email: "",
   });
   const [code, setCode] = useState("");
+  const [verifyPassword, setVerifyPassword] = useState("");
   const [identifier, setIdentifier] = useState("");
   const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -77,6 +78,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
           setCode(simulatedCode);
         }
       }
+      setVerifyPassword("");
       setStep("verify");
     } catch (err) {
       setError(
@@ -96,9 +98,13 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
       setError(isEn ? "Code required" : "کد تایید لازم است");
       return;
     }
+    if (!verifyPassword) {
+      setError(isEn ? "Password required" : "رمز عبور لازم است");
+      return;
+    }
     setLoading(true);
     try {
-      await verifyRegisterOtp(identifier, code);
+      await verifyRegisterOtp(identifier, code, verifyPassword);
       onSuccess(); // به صفحه پروفایل یا داشبورد برود
     } catch (err) {
       setError(
@@ -219,6 +225,18 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
           className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
         />
       </div>
+      <div>
+        <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
+          {isEn ? "Set Password" : "تنظیم رمز عبور"}
+        </label>
+        <input
+          type="password"
+          value={verifyPassword}
+          onChange={(e) => setVerifyPassword(e.target.value)}
+          className="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-600 bg-white dark:bg-slate-700/50"
+          placeholder="••••••••"
+        />
+      </div>
       <m.button
         onClick={handleVerifyCode}
         disabled={loading}
@@ -236,6 +254,7 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
         onClick={() => {
           setStep("form");
           setCode("");
+          setVerifyPassword("");
           setSimulatedOtp(null);
           setError(null);
         }}

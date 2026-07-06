@@ -287,13 +287,20 @@ export const authService = {
   registerVerifyOtp: async (
     identifier: string,
     code: string,
+    password?: string,
   ): Promise<{ access: string; refresh: string; user?: User }> => {
+    const payload: { identifier: string; code: string; password?: string } = {
+      identifier,
+      code,
+    };
+    if (password) payload.password = password;
+
     const response = await fetch(
       `${API_BASE_URL}/auth/api/register/otp/verify/`,
       {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ identifier, code }),
+        body: JSON.stringify(payload),
       },
     );
     if (!response.ok) {

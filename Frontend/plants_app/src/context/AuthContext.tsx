@@ -34,7 +34,11 @@ interface AuthContextType {
   loginWithOtp: (phoneNumber: string, code: string) => Promise<void>;
   registerWithPhoneOtp: (data: RegisterOtpData) => Promise<string | null>;
   registerWithEmailOtp: (data: RegisterOtpData) => Promise<string | null>;
-  verifyRegisterOtp: (identifier: string, code: string) => Promise<void>;
+  verifyRegisterOtp: (
+    identifier: string,
+    code: string,
+    password?: string,
+  ) => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -150,10 +154,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     return response.simulated_otp ?? null;
   };
 
-  const verifyRegisterOtp = async (identifier: string, code: string) => {
+  const verifyRegisterOtp = async (
+    identifier: string,
+    code: string,
+    password?: string,
+  ) => {
     setIsLoading(true);
     try {
-      await authService.registerVerifyOtp(identifier, code);
+      await authService.registerVerifyOtp(identifier, code, password);
       await finishAuthSession();
     } catch (error) {
       console.error("Register OTP verify failed:", error);

@@ -1,5 +1,6 @@
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
+from django.db import IntegrityError
 from rest_framework import status
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.parsers import FormParser, MultiPartParser
@@ -26,6 +27,7 @@ from .services import (
     send_or_simulate_otp_email,
     send_or_simulate_phone_otp,
 )
+from .utils import normalize_phone_number
 
 User = get_user_model()
 sms_service = SmsIrService()
@@ -242,6 +244,10 @@ class RegisterRequestOTPView(APIView):
             pass
 
         cache.set(f"temp_reg_data:{identifier}", temp_reg_data, timeout=10 * 60)
+        if isinstance(identifier, str):
+            cache.set(
+                f"temp_reg_data:{identifier.lower()}", temp_reg_data, timeout=10 * 60
+            )
 
         # ذخیره کد در دیتابیس
         otp = OTPCode(
@@ -281,20 +287,38 @@ class RegisterVerifyOTPView(APIView):
         identifier = serializer.validated_data["identifier"]
         code = serializer.validated_data["code"]
 
+        # Build candidate identifiers to handle formatting differences
+        candidates = [identifier]
+        lowered_identifier = identifier.lower()
+        if lowered_identifier not in candidates:
+            candidates.append(lowered_identifier)
+        try:
+            normalized_phone = normalize_phone_number(identifier)
+            if normalized_phone not in candidates:
+                candidates.append(normalized_phone)
+        except ValueError:
+            pass
+
         # بازیابی اطلاعات موقت: session first, then cache fallback
         temp_data = request.session.get("temp_reg_data")
-        if not temp_data or temp_data.get("identifier") != identifier:
-            temp_data = cache.get(f"temp_reg_data:{identifier}")
+        if not temp_data or temp_data.get("identifier") not in candidates:
+            temp_data = None
+            for candidate in candidates:
+                temp_data = cache.get(f"temp_reg_data:{candidate}")
+                if temp_data:
+                    break
 
-        if not temp_data or temp_data.get("identifier") != identifier:
+        if not temp_data:
             return Response({"error": "No pending registration found"}, status=400)
+
+        resolved_identifier = temp_data.get("identifier", identifier)
 
         # یافتن کد
         filter_kwargs = {"code": code, "purpose": "register", "is_used": False}
         if temp_data["method"] == "phone":
-            filter_kwargs["phone"] = identifier
+            filter_kwargs["phone"] = resolved_identifier
         else:
-            filter_kwargs["email"] = identifier
+            filter_kwargs["email"] = resolved_identifier
 
         try:
             otp = OTPCode.objects.get(**filter_kwargs)
@@ -304,15 +328,40 @@ class RegisterVerifyOTPView(APIView):
         if not otp.is_valid():
             return Response({"error": "Code expired"}, status=400)
 
-        password = temp_data.get("password")
-        user = User.objects.create_user(
-            username=temp_data["username"],
-            phone=identifier if temp_data["method"] == "phone" else "",
-            email=identifier if temp_data["method"] == "email" else "",
-            first_name=temp_data.get("first_name", ""),
-            last_name=temp_data.get("last_name", ""),
-            password=password,
+        # Prefer password sent at verify step, fallback to temp data (for compatibility)
+        password = serializer.validated_data.get("password") or temp_data.get(
+            "password"
         )
+
+        if temp_data["method"] == "phone":
+            user_phone = resolved_identifier
+            user_email = f"phone_{user_phone.replace('+', '')}@otp.local"
+        else:
+            user_phone = ""
+            user_email = resolved_identifier
+
+        # Final safety checks to avoid IntegrityError (e.g. race conditions / old temp data)
+        if User.objects.filter(username=temp_data["username"]).exists():
+            return Response({"error": "Username already taken."}, status=400)
+        if user_phone and User.objects.filter(phone=user_phone).exists():
+            return Response({"error": "Phone number already registered."}, status=400)
+        if User.objects.filter(email=user_email).exists():
+            return Response({"error": "Email already registered."}, status=400)
+
+        try:
+            user = User.objects.create_user(
+                username=temp_data["username"],
+                phone=user_phone,
+                email=user_email,
+                first_name=temp_data.get("first_name", ""),
+                last_name=temp_data.get("last_name", ""),
+                password=password,
+            )
+        except IntegrityError:
+            return Response(
+                {"error": "User already exists with provided data."}, status=400
+            )
+
         if not password:
             user.set_unusable_password()
             user.save()
@@ -326,7 +375,9 @@ class RegisterVerifyOTPView(APIView):
                 del request.session["temp_reg_data"]
         except Exception:
             pass
-        cache.delete(f"temp_reg_data:{identifier}")
+        for candidate in candidates:
+            cache.delete(f"temp_reg_data:{candidate}")
+        cache.delete(f"temp_reg_data:{resolved_identifier}")
 
         refresh = RefreshToken.for_user(user)
         access_token = str(refresh.access_token)

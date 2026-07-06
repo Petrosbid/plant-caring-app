@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {m, AnimatePresence} from 'framer-motion';
 import { diseaseService } from '../services/api';
 import { useLanguageTheme } from '../contexts/LanguageThemeContext';
+import BorderGlow from '../components/animation/BorderGlow';
 
 const DiseaseDetection: React.FC = () => {
   const { t, language } = useLanguageTheme();
@@ -11,6 +12,8 @@ const DiseaseDetection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
+  const { theme } = useLanguageTheme(); 
+  const isDark = theme === 'dark';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
@@ -187,7 +190,8 @@ const DiseaseDetection: React.FC = () => {
       <m.h1 initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="font-display text-3xl lg:text-4xl font-semibold text-center text-brand-700 dark:text-brand-400 mb-10">
         {t('disease')}
       </m.h1>
-      <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="max-w-2xl mx-auto bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8">
+      <m.div initial={{ opacity: 0, y: 16 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} >
+      <BorderGlow className='max-w-2xl mx-auto rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 p-6 lg:p-8'    edgeSensitivity={20}    glowColor="40 80 80"    backgroundColor="isDark ? #1A2536 : #FFFFFF"    borderRadius={28}    glowRadius={40}    glowIntensity={1}    coneSpread={25}    animated={true}    colors={['#e084fc', '#f472b6', '#389bf8']}  >
         <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white mb-6">
           {isEn ? 'Upload a photo of a plant showing symptoms' : 'تصویر گیاهی که علائم دارد را بارگذاری کنید'}
         </h2>
@@ -231,6 +235,7 @@ const DiseaseDetection: React.FC = () => {
             {isLoading ? (isEn ? 'Scanning...' : 'در حال اسکن...') : (isEn ? 'Scan for Diseases' : 'اسکن بیماری‌ها')}
           </m.button>
         </div>
+      </BorderGlow>
       </m.div>
     </div>
   );
