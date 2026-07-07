@@ -18,7 +18,7 @@ if USE_GEMINI:
     from google.genai import types
     from google.genai.errors import APIError
 
-    GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', "AQ.Ab8RN6KI05T4Tw6pydyIqo4v_hPHDu6ScI5M_eAtCqtIG_8flA")
+    GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', None)
     client = genai.Client(api_key=GEMINI_API_KEY)
 else:
     from openai import OpenAI
