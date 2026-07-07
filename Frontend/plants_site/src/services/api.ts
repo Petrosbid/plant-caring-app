@@ -14,7 +14,7 @@ import type { PostListItem, PostDetail, BlogComment } from "../types/blog";
 import axios from "axios";
 
 // Base API URL - points to your backend
-export const API_BASE_URL = "http://127.0.0.1:8000/api";
+export const API_BASE_URL = "https://django-9yn0pd.cldv.dev/api";
 export const BLOG_API_BASE_URL = `${API_BASE_URL}/blog`;
 
 // Create axios instance for blog API with error handling

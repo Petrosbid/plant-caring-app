@@ -12,8 +12,6 @@ const DiseaseDetection: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [result, setResult] = useState<any>(null);
   const [error, setError] = useState<string | null>(null);
-  const { theme } = useLanguageTheme(); 
-  const isDark = theme === 'dark';
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files?.[0]) {
