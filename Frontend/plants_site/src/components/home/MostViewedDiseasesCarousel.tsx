@@ -56,9 +56,17 @@ const MostViewedDiseasesCarousel: React.FC = () => {
             <SwiperSlide key={disease.id} className={baseStyles.slide}>
               <Link to={`/disease/${disease.id}`} className={baseStyles.slideLink}>
                 <div className={baseStyles.slideContent}>
-                  <div className={cardStyles.diseaseBackground}>
-                    <span className={cardStyles.diseaseIcon}>🦠</span>
-                  </div>
+                  {disease.image ? (
+                    <img
+                      src={disease.image}
+                      alt={name}
+                      className={baseStyles.slideImage}
+                    />
+                  ) : (
+                    <div className={cardStyles.diseaseBackground}>
+                      <span className={cardStyles.diseaseIcon}>🦠</span>
+                    </div>
+                  )}
                   <div className={baseStyles.overlay} />
                   <div className={baseStyles.textContainer}>
                     <h3 className={baseStyles.slideTitle}>{name}</h3>
