@@ -1,7 +1,10 @@
 import os
 import requests
+import logging
 from django.shortcuts import redirect
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db import IntegrityError
@@ -420,10 +423,22 @@ class GoogleCallbackView(APIView):
     permission_classes = [AllowAny]
 
     def get(self, request):
+        logger.info(f"Google Callback request.GET: {request.GET}")
+        
+        error = request.GET.get('error')
+        if error:
+            error_desc = request.GET.get('error_description', '')
+            logger.error(f"Google OAuth error received: {error} - {error_desc}")
+            return Response({
+                'error': f'Google OAuth error: {error}',
+                'details': error_desc
+            }, status=status.HTTP_400_BAD_REQUEST)
+
         code = request.GET.get('code')
         state = request.GET.get('state', 'http://localhost:5173')
         
         if not code:
+            logger.warning("Google Callback invoked without an authorization code or error parameter.")
             return Response({'error': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
             
         client_id = settings.GOOGLE_CLIENT_ID
