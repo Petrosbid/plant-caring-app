@@ -8,6 +8,7 @@ import '@fontsource/inter/500.css'
 import '@fontsource/inter/600.css'
 import '@fontsource/inter/700.css'
 import '@fontsource/dm-sans/index.css'
+import 'vazirmatn/Vazirmatn-font-face.css'
 
 // Initialize theme from localStorage or system preference
 const savedTheme = localStorage.getItem('theme');
