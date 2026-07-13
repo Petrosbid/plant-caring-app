@@ -80,6 +80,48 @@ class DiseaseDiagnoseView(APIView):
         confidence = prediction_result.get('confidence')
 
         if disease_id is None:
+            if disease_name == 'Healthy':
+                return Response({
+                    'id': None,
+                    'name': 'Healthy',
+                    'name_fa': 'سالم',
+                    'description': 'The plant appears to be healthy and shows no signs of disease.',
+                    'description_fa': 'گیاه سالم به نظر می‌رسد و علائمی از بیماری ندارد.',
+                    'symptoms': 'No symptoms detected.',
+                    'symptoms_fa': 'هیچ علامتی شناسایی نشد.',
+                    'solution': 'Continue regular watering, proper lighting, and routine care.',
+                    'solution_fa': 'آبیاری منظم، نور مناسب و مراقبت‌های معمول را ادامه دهید.',
+                    'prevention_methods': 'Keep plant isolated from other infected plants, inspect leaves regularly.',
+                    'prevention_methods_fa': 'گیاه را از سایر گیاهان آلوده دور نگه دارید و برگ‌ها را مرتب بررسی کنید.',
+                    'severity_level': 'low',
+                    'spread_rate': 'slow',
+                    'confidence': confidence,
+                    'detected_name': disease_name,
+                }, status=status.HTTP_200_OK)
+
+            if disease_details:
+                response_data = {
+                    'id': None,
+                    'name': disease_name,
+                    'llm_analysis': disease_details,
+                    'confidence': confidence,
+                    'description': disease_details.get('description_en', disease_details.get('description', '')),
+                    'description_fa': disease_details.get('description_fa', ''),
+                    'symptoms': disease_details.get('symptoms_en', disease_details.get('symptoms', '')),
+                    'symptoms_fa': disease_details.get('symptoms_fa', ''),
+                    'solution': '\n'.join(disease_details.get('treatment_steps_en', [])) if isinstance(disease_details.get('treatment_steps_en'), list) else disease_details.get('treatment_steps_en', ''),
+                    'solution_fa': '\n'.join(disease_details.get('treatment_steps_fa', [])) if isinstance(disease_details.get('treatment_steps_fa'), list) else disease_details.get('treatment_steps_fa', ''),
+                    'prevention_methods': disease_details.get('prevention_en', disease_details.get('prevention', '')),
+                    'prevention_methods_fa': disease_details.get('prevention_fa', ''),
+                    'severity_level': disease_details.get('severity', 'unknown'),
+                    'spread_rate': disease_details.get('spread_rate', 'unknown'),
+                    'affected_plants': [],
+                    'created_at': None,
+                    'updated_at': None,
+                    'detected_name': disease_name,
+                }
+                return Response(response_data, status=status.HTTP_200_OK)
+
             return Response({'error': 'Could not diagnose the disease.'}, status=status.HTTP_404_NOT_FOUND)
 
         try:
@@ -104,15 +146,20 @@ class DiseaseDiagnoseView(APIView):
                     'name': disease_name,
                     'llm_analysis': disease_details,
                     'confidence': confidence,
-                    'description': disease_details.get('description', ''),
-                    'symptoms': '',
-                    'solution': '',
-                    'prevention_methods': disease_details.get('prevention', []),
+                    'description': disease_details.get('description_en', disease_details.get('description', '')),
+                    'description_fa': disease_details.get('description_fa', ''),
+                    'symptoms': disease_details.get('symptoms_en', disease_details.get('symptoms', '')),
+                    'symptoms_fa': disease_details.get('symptoms_fa', ''),
+                    'solution': '\n'.join(disease_details.get('treatment_steps_en', [])) if isinstance(disease_details.get('treatment_steps_en'), list) else disease_details.get('treatment_steps_en', ''),
+                    'solution_fa': '\n'.join(disease_details.get('treatment_steps_fa', [])) if isinstance(disease_details.get('treatment_steps_fa'), list) else disease_details.get('treatment_steps_fa', ''),
+                    'prevention_methods': disease_details.get('prevention_en', disease_details.get('prevention', '')),
+                    'prevention_methods_fa': disease_details.get('prevention_fa', ''),
                     'severity_level': disease_details.get('severity', 'unknown'),
-                    'spread_rate': 'unknown',
+                    'spread_rate': disease_details.get('spread_rate', 'unknown'),
                     'affected_plants': [],
                     'created_at': None,
                     'updated_at': None,
+                    'detected_name': disease_name,
                 }
                 return Response(response_data, status=status.HTTP_200_OK)
             else:

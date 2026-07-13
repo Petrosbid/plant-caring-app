@@ -194,15 +194,8 @@ def predict_disease(image_data):
 
         disease_details = None
         try:
-            import importlib.util
-            diseases_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'diseases')
-            llm_diseas_path = os.path.join(diseases_dir, 'llm_diseas.py')
-
-            spec = importlib.util.spec_from_file_location("llm_diseas", llm_diseas_path)
-            llm_diseas_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(llm_diseas_module)
-
-            disease_details = llm_diseas_module.get_disease_details_from_llm(predicted_disease_label)
+            from .llm_diseas import get_disease_details_from_llm
+            disease_details = get_disease_details_from_llm(predicted_disease_label)
         except Exception as e:
             logger.error(f"Failed to import or execute llm_diseas module: {e}")
 
@@ -220,6 +213,14 @@ def predict_disease(image_data):
                     if d.name.lower() in predicted_lower or predicted_lower in d.name.lower():
                         detected_disease = d
                         break
+
+            # If still not found, and it is not "Healthy", try to fetch and create it dynamically via LLM
+            if not detected_disease and predicted_disease_label.lower() != "healthy":
+                try:
+                    from .llm_diseas import create_or_update_disease_from_llm
+                    detected_disease = create_or_update_disease_from_llm(predicted_disease_label)
+                except Exception as create_err:
+                    logger.error(f"Failed to dynamically create disease '{predicted_disease_label}': {create_err}")
 
             if detected_disease:
                 detected_disease_id = detected_disease.id

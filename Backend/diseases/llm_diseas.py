@@ -12,16 +12,15 @@ DISEASE_MODEL = "gemini-3.5-flash" if USE_GEMINI else "gemma-4-31b-it"
 # =====================================================================
 # IMPORTS & CLIENT INITIALIZATION
 # =====================================================================
-if USE_GEMINI:
-    from google import genai
-    from google.genai import types
-    from google.genai.errors import APIError
+from google import genai
+from google.genai import types
+from google.genai.errors import APIError
 
-    GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', None)
-    client = genai.Client(api_key=GEMINI_API_KEY)
-else:
-    from openai import OpenAI, APIConnectionError, APITimeoutError
-    AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
+GEMINI_API_KEY = getattr(settings, 'GEMINI_API_KEY', None)
+client = genai.Client(api_key=GEMINI_API_KEY)
+
+from openai import OpenAI, APIConnectionError, APITimeoutError
+AVALAI_API_KEY = getattr(settings, 'AVALAI_API_KEY', None)
 
 
 def get_disease_details_from_llm(disease_name, plant_name=None):
