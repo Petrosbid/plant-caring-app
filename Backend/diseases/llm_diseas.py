@@ -75,6 +75,7 @@ Return ONLY a valid JSON object (no markdown, no extra text). The JSON must stri
     "prevention_en": "Prevention methods in English: proper spacing, drip irrigation, resistant varieties, tool disinfection, weed control, etc.",
     "organic_treatment_fa": "درمان ارگانیک/طبیعی به فارسی (مثلاً مخلوط جوش شیرین و روغن، عصاره سیر، یا معرفی دشمنان طبیعی). اگر وجود ندارد بنویسید 'درمان ارگانیک شناخته شده‌ای نیست'.",
     "organic_treatment_en": "Organic/natural treatment in English (e.g., baking soda and oil spray, garlic extract, beneficial insects). If none, write 'No known organic treatment'."
+    "image_url": a high quality of disease and landscape image URL
 }}
 
 ---
@@ -154,6 +155,7 @@ Now, generate the JSON for disease: **{disease_name}**
         return None
 
 
+
 def create_or_update_disease_from_llm(disease_name):
     info = get_disease_details_from_llm(disease_name)
     if not info:
@@ -195,6 +197,7 @@ def create_or_update_disease_from_llm(disease_name):
             disease.prevention_methods_fa = prevention_fa
             disease.severity_level = severity
             disease.spread_rate = info.get('spread_rate', 'moderate')
+
             disease.save()
         else:
             disease = Disease.objects.create(
@@ -210,7 +213,11 @@ def create_or_update_disease_from_llm(disease_name):
                 prevention_methods_fa=prevention_fa,
                 severity_level=severity,
                 spread_rate=info.get('spread_rate', 'moderate'),
+                image_url=info.get('image_url')
             )
+
+
+
         return disease
     except Exception as e:
         print(f"Error creating/updating disease: {e}")

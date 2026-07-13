@@ -14,8 +14,8 @@ import type {
   UserPlant,
 } from "../types";
 
-export const API_BASE_URL = "https://django-3b13q0.chbkn.run/api";
-const BLOG_API_BASE_URL = "https://django-3b13q0.chbkn.run/api/blog";
+export const API_BASE_URL = "https://django-9yn0pd.cldv.dev/api";
+export const BLOG_API_BASE_URL = `${API_BASE_URL}/blog`;
 export const BLOG_SHARE_BASE_URL = API_BASE_URL.replace("/api", "");
 
 let isRefreshing = false;

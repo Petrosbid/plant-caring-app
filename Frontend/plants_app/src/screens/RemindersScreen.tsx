@@ -105,7 +105,9 @@ const RemindersScreen = () => {
             showAddForm ? (
               <AddReminderForm
                 userPlants={userPlants}
-                onSubmit={addReminder}
+                onSubmit={async (data) => {
+                  await addReminder(data);
+                }}
                 onCancel={() => setShowAddForm(false)}
               />
             ) : null

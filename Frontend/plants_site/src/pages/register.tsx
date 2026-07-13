@@ -27,7 +27,6 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
   const [code, setCode] = useState("");
   const [verifyPassword, setVerifyPassword] = useState("");
   const [identifier, setIdentifier] = useState("");
-  const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -50,33 +49,24 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
       return;
     }
 
-    setSimulatedOtp(null);
     setLoading(true);
     try {
       if (method === "phone") {
-        const simulatedCode = await registerWithPhoneOtp({
+        await registerWithPhoneOtp({
           phone: formData.phone,
           username: formData.username,
           first_name: formData.first_name,
           last_name: formData.last_name,
         });
         setIdentifier(formData.phone);
-        setSimulatedOtp(simulatedCode);
-        if (simulatedCode) {
-          setCode(simulatedCode);
-        }
       } else {
-        const simulatedCode = await registerWithEmailOtp({
+        await registerWithEmailOtp({
           email: formData.email,
           username: formData.username,
           first_name: formData.first_name,
           last_name: formData.last_name,
         });
         setIdentifier(formData.email);
-        setSimulatedOtp(simulatedCode);
-        if (simulatedCode) {
-          setCode(simulatedCode);
-        }
       }
       setVerifyPassword("");
       setStep("verify");
@@ -207,13 +197,6 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
       <p className="text-center text-slate-600 dark:text-slate-400">
         {isEn ? `Code sent to ${identifier}` : `کد به ${identifier} ارسال شد`}
       </p>
-      {simulatedOtp && (
-        <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3 text-center text-sm text-amber-800 dark:text-amber-200">
-          {isEn
-            ? `Simulation OTP: ${simulatedOtp}`
-            : `کد شبیه‌سازی: ${simulatedOtp}`}
-        </div>
-      )}
       <div>
         <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1">
           {isEn ? "Verification Code" : "کد تایید"}

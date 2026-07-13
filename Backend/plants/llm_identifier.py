@@ -81,7 +81,7 @@ that follows the structure below.
 
 **is_toxic** true or false (must be lowercase json booleans)
 
-**image_url** a high quality of and landscape image URL. 
+**image_url** a high quality of plant and landscape image URL. 
 
 ---
 
@@ -311,7 +311,6 @@ def create_or_update_plant_from_llm(plant_name):
             plant.other_names_en = plant_info.get('other_names_en', plant.other_names_en)
             plant.save()
 
-        # Handle plant image download and save
         image_url = plant_info.get('image_url')
         if image_url:
             save_plant_image_from_url(plant, image_url)

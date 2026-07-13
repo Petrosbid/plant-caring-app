@@ -82,7 +82,6 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'material',
 
     # Third-party apps
     'rest_framework',
@@ -302,7 +301,7 @@ AVALAI_API_KEY = os.getenv('AVALAI_API_KEY', "AVALAI_API_KEY")
 SMS_IR_API_KEY = os.getenv('SMS_IR_API_KEY', "YOUR_API_KEY")
 SMS_IR_LINE_NUMBER = os.getenv('SMS_IR_LINE_NUMBER', "YOUR_LINE_NUMBER")
 SMS_IR_OTP_TEMPLATE_ID = os.getenv('SMS_IR_OTP_TEMPLATE_ID', "YOUR_OTP_TEMPLATE_ID")
-OTP_SIMULATION_MODE = os.getenv('OTP_SIMULATION_MODE', 'True' if DEBUG else 'False') == 'True'
+OTP_SIMULATION_MODE = os.getenv('OTP_SIMULATION_MODE', 'False') == 'True'
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', 'OPENROUTER_API_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'GEMINI_API_KEY')
 

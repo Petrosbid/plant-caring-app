@@ -17,7 +17,7 @@ export const GoogleSignInButton: React.FC<GoogleSignInButtonProps> = ({
   isEn,
   disabled,
 }) => (
-  <MotionL.View whileTap={disabled ? {} : { scale: 0.98 }}>
+  <MotionL.View whileTap={{ scale: disabled ? 1 : 0.98 }}>
     <Pressable
       onPress={onPress}
       disabled={disabled}

@@ -44,7 +44,7 @@ class SmsIrService:
         print(sms_ir_mobile)
         try:
             response = self.sms_ir.send_verify_code(
-                sms_ir_mobile, template_id, parameters
+                int(sms_ir_mobile), template_id, parameters
             )
 
             if response.status_code == 200:

@@ -51,7 +51,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
 
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -108,14 +107,9 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
       return;
     }
     setError(null);
-    setSimulatedOtp(null);
     setLoading(true);
     try {
-      const simulatedCode = await requestOtpCode(phoneNumber);
-      setSimulatedOtp(simulatedCode);
-      if (simulatedCode) {
-        setOtpCode(simulatedCode);
-      }
+      await requestOtpCode(phoneNumber);
       setOtpSent(true);
     } catch (err) {
       setError(
@@ -270,16 +264,8 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                 : isEn
                   ? "Send Verification Code"
                   : "ارسال کد تایید"}
-            </m.button>
           ) : (
             <>
-              {simulatedOtp && (
-                <div className="rounded-xl bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-700 p-3 text-center text-sm text-amber-800 dark:text-amber-200">
-                  {isEn
-                    ? `Simulation OTP: ${simulatedOtp}`
-                    : `کد شبیه‌سازی: ${simulatedOtp}`}
-                </div>
-              )}
               <div>
                 <label
                   htmlFor="otp"
@@ -318,7 +304,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                   onClick={() => {
                     setOtpSent(false);
                     setOtpCode("");
-                    setSimulatedOtp(null);
                     setError(null);
                   }}
                   disabled={loading}
@@ -468,7 +453,6 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                   setError(null);
                   setOtpSent(false);
                   setOtpCode("");
-                  setSimulatedOtp(null);
                   setPhoneNumber("");
                 }}
                 disabled={loading}

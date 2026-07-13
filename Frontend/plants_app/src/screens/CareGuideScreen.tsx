@@ -12,7 +12,7 @@ import { cn } from '../utils/cn';
 
 const CareGuideScreen = () => {
   const { t, i18n } = useTranslation();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { theme } = useTheme();
   const isEn = i18n.language === 'en';
   const isDark = theme === 'dark';

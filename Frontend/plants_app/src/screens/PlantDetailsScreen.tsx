@@ -14,7 +14,7 @@ import { useTheme } from '../context/ThemeContext';
 
 const PlantDetailsScreen = () => {
   const route = useRoute();
-  const navigation = useNavigation();
+  const navigation = useNavigation<any>();
   const { id } = route.params as { id: string };
   const { i18n } = useTranslation();
   const { width } = useWindowDimensions();
@@ -328,7 +328,7 @@ const PlantDetailsScreen = () => {
                   <Text className="text-sm font-bold text-slate-600 dark:text-slate-400 mb-1">
                     {isEn ? 'Toxicity' : 'سمیت'}
                   </Text>
-                  <Badge variant={plant.is_toxic ? 'danger' : 'success'}>
+                  <Badge variant={plant.is_toxic ? 'error' : 'success'}>
                     {plant.is_toxic ? (isEn ? 'Toxic' : 'سمی') : (isEn ? 'Non-toxic' : 'غیرسمی')}
                   </Badge>
                 </View>

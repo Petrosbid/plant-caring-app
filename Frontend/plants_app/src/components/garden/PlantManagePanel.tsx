@@ -323,10 +323,10 @@ const InfoTab = ({ userPlant, isEn }: { userPlant: UserPlant; isEn: boolean }) =
     borderWidth: 1,
     borderColor: '#f1f5f9',
     marginBottom: 12,
-  };
+  } as const;
 
-  const labelStyle = { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase' as const, letterSpacing: 1 };
-  const valueStyle = { fontSize: 13, fontWeight: '900', color: '#0f172a', marginTop: 4 };
+  const labelStyle = { fontSize: 9, fontWeight: '900', color: '#94a3b8', textTransform: 'uppercase', letterSpacing: 1 } as const;
+  const valueStyle = { fontSize: 13, fontWeight: '900', color: '#0f172a', marginTop: 4 } as const;
 
   return (
     <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={{ paddingBottom: 24 }}>

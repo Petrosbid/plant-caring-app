@@ -1,36 +1,106 @@
-import * as Notifications from 'expo-notifications';
-import * as Device from 'expo-device';
-import Constants from 'expo-constants';
-import { Platform } from 'react-native';
-import * as Localization from 'expo-localization';
-import { authService } from './api';
+import * as Device from "expo-device";
+import Constants from "expo-constants";
+import * as Localization from "expo-localization";
+import { Platform } from "react-native";
+import type { User } from "../types";
+import { authService } from "./api";
 
-// Configure foreground notification handling
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: true,
-    shouldSetBadge: false,
-    shouldShowBanner: true,
-    shouldShowList: true,
-  }),
-});
+type NotificationsModule = typeof import("expo-notifications");
 
-export async function registerPushNotifications(user: any, setUser: (user: any) => void) {
+let notificationsModulePromise: Promise<NotificationsModule | null> | null =
+  null;
+let notificationHandlerConfigured = false;
+let expoGoWarningShown = false;
+
+function isExpoGo() {
+  return Constants.executionEnvironment === "storeClient";
+}
+
+function warnExpoGoUnsupported() {
+  if (expoGoWarningShown) {
+    return;
+  }
+
+  expoGoWarningShown = true;
+  console.warn(
+    "[Notifications] Push token registration is disabled in Expo Go. Use a development build for remote push notifications.",
+  );
+}
+
+async function getNotificationsModule(): Promise<NotificationsModule | null> {
+  if (Platform.OS === "web") {
+    return null;
+  }
+
+  if (isExpoGo()) {
+    warnExpoGoUnsupported();
+    return null;
+  }
+
+  if (!notificationsModulePromise) {
+    notificationsModulePromise = import("expo-notifications").then(
+      (module) => module,
+      (error) => {
+        notificationsModulePromise = null;
+        throw error;
+      },
+    );
+  }
+
+  return notificationsModulePromise;
+}
+
+async function configureNotificationHandler() {
+  if (notificationHandlerConfigured) {
+    return;
+  }
+
+  const Notifications = await getNotificationsModule();
+  if (!Notifications) {
+    return;
+  }
+
+  Notifications.setNotificationHandler({
+    handleNotification: async () => ({
+      shouldShowAlert: true,
+      shouldPlaySound: true,
+      shouldSetBadge: false,
+      shouldShowBanner: true,
+      shouldShowList: true,
+    }),
+  });
+
+  notificationHandlerConfigured = true;
+}
+
+export async function registerPushNotifications(
+  user: User,
+  setUser: (user: User) => void,
+) {
   if (!Device.isDevice) {
-    console.log('Must use physical device for Push Notifications');
+    console.log("Must use physical device for Push Notifications");
     return;
   }
 
   try {
-    const { status: existingStatus } = await Notifications.getPermissionsAsync();
+    const Notifications = await getNotificationsModule();
+    if (!Notifications) {
+      return;
+    }
+
+    await configureNotificationHandler();
+
+    const { status: existingStatus } =
+      await Notifications.getPermissionsAsync();
     let finalStatus = existingStatus;
-    if (existingStatus !== 'granted') {
+
+    if (existingStatus !== "granted") {
       const { status } = await Notifications.requestPermissionsAsync();
       finalStatus = status;
     }
-    if (finalStatus !== 'granted') {
-      console.log('Failed to get push token for push notification!');
+
+    if (finalStatus !== "granted") {
+      console.log("Failed to get push token for push notification!");
       return;
     }
 
@@ -40,30 +110,30 @@ export async function registerPushNotifications(user: any, setUser: (user: any) 
 
     const tokenData = await Notifications.getExpoPushTokenAsync({ projectId });
     const token = tokenData.data;
+    const timezone = Localization.getCalendars()[0]?.timeZone || "Asia/Tehran";
 
-    // Determine device timezone
-    const timezone = Localization.getCalendars()[0]?.timeZone || 'Asia/Tehran';
-
-    // Android channel settings
-    if (Platform.OS === 'android') {
-      await Notifications.setNotificationChannelAsync('default', {
-        name: 'default',
+    if (Platform.OS === "android") {
+      await Notifications.setNotificationChannelAsync("default", {
+        name: "default",
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: '#22c55e', // green color matching our brand
+        lightColor: "#22c55e",
       });
     }
 
-    // Sync token and timezone with backend if they have changed or are empty
-    if (user && (user.push_token !== token || user.timezone !== timezone)) {
-      console.log('Updating push token and timezone in backend:', token, timezone);
+    if (user.push_token !== token || user.timezone !== timezone) {
+      console.log(
+        "Updating push token and timezone in backend:",
+        token,
+        timezone,
+      );
       const updatedUser = await authService.updateProfile({
         push_token: token,
-        timezone: timezone,
+        timezone,
       });
       setUser(updatedUser);
     }
   } catch (error) {
-    console.error('Error registering push notifications:', error);
+    console.error("Error registering push notifications:", error);
   }
 }

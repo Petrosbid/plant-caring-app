@@ -8,11 +8,13 @@ import {
   ReanimatedLogLevel,
 } from "react-native-reanimated";
 import * as SplashScreen from "expo-splash-screen";
-import { useFonts, Inter_400Regular, Inter_700Bold } from "@expo-google-fonts/inter";
+import {
+  useFonts,
+  Inter_400Regular,
+  Inter_700Bold,
+} from "@expo-google-fonts/inter";
 import { Vazirmatn_400Regular } from "@expo-google-fonts/vazirmatn/400Regular";
 import { Vazirmatn_700Bold } from "@expo-google-fonts/vazirmatn/700Bold";
-import { View } from "react-native";
-
 // وارد کردن کامپوننت SafeAreaView در کنار SafeAreaProvider
 import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 import "../../global.css";
@@ -67,10 +69,10 @@ function AppContent() {
       {/* قراردادن SafeAreaView برای جلوگیری از تداخل با هدر و ناوبری گوشی.
         رنگ پس‌زمینه (backgroundColor) بر اساس تم تغییر میکند تا حاشیه‌ها یکدست شوند.
       */}
-      <SafeAreaView 
-        style={{ 
-          flex: 1, 
-          backgroundColor: theme === "dark" ? "#121212" : "#ffffff" 
+      <SafeAreaView
+        style={{
+          flex: 1,
+          backgroundColor: theme === "dark" ? "#121212" : "#ffffff",
         }}
         onLayout={onLayoutRootView}
       >

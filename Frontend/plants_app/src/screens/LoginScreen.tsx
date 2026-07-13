@@ -45,14 +45,12 @@ const LoginScreen = () => {
   const [phoneNumber, setPhoneNumber] = useState("");
   const [otpCode, setOtpCode] = useState("");
   const [otpSent, setOtpSent] = useState(false);
-  const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const resetOtpFlow = () => {
     setOtpSent(false);
     setOtpCode("");
-    setSimulatedOtp(null);
     setPhoneNumber("");
   };
 
@@ -105,13 +103,10 @@ const LoginScreen = () => {
       return;
     }
     setError(null);
-    setSimulatedOtp(null);
     setLoading(true);
     try {
-      const simulatedCode = await requestOtpCode(phoneNumber.trim());
+      await requestOtpCode(phoneNumber.trim());
       setOtpSent(true);
-      setSimulatedOtp(simulatedCode);
-      setOtpCode(simulatedCode ?? "");
     } catch (err: unknown) {
       setError(
         err instanceof Error
@@ -164,7 +159,7 @@ const LoginScreen = () => {
 
   return (
     <AuthScreenLayout
-      accent="blue"
+      accent="brand"
       icon={<LogIn size={40} color="white" />}
       title={isEn ? "Welcome Back" : "خوش آمدید"}
       subtitle={
@@ -228,7 +223,7 @@ const LoginScreen = () => {
             </Text>
           </TouchableOpacity>
           <Button
-            variant="blue"
+            variant="primary"
             size="lg"
             isLoading={loading}
             onPress={handlePasswordLogin}
@@ -255,7 +250,7 @@ const LoginScreen = () => {
 
           {!otpSent ? (
             <Button
-              variant="blue"
+              variant="primary"
               size="lg"
               isLoading={loading}
               onPress={handleSendOtp}
@@ -269,13 +264,6 @@ const LoginScreen = () => {
                   ? `Code sent to ${phoneNumber}`
                   : `کد به ${phoneNumber} ارسال شد`}
               </Text>
-              {simulatedOtp ? (
-                <Text className="text-sm text-amber-700 dark:text-amber-300 text-center mb-3 font-semibold">
-                  {isEn
-                    ? `Simulation OTP: ${simulatedOtp}`
-                    : `کد شبیه‌سازی: ${simulatedOtp}`}
-                </Text>
-              ) : null}
               <OtpInput
                 value={otpCode}
                 onChange={setOtpCode}
@@ -285,7 +273,7 @@ const LoginScreen = () => {
               <View className="flex-row gap-3 mt-6">
                 <View className="flex-1">
                   <Button
-                    variant="blue"
+                    variant="primary"
                     size="lg"
                     isLoading={loading}
                     onPress={handleVerifyOtp}

@@ -30,10 +30,10 @@ interface AuthContextType {
   updateUser: (userData: Partial<User>) => void;
   setUser: (user: User) => void;
   checkAuth: () => Promise<void>;
-  requestOtpCode: (phoneNumber: string) => Promise<string | null>;
+  requestOtpCode: (phoneNumber: string) => Promise<void>;
   loginWithOtp: (phoneNumber: string, code: string) => Promise<void>;
-  registerWithPhoneOtp: (data: RegisterOtpData) => Promise<string | null>;
-  registerWithEmailOtp: (data: RegisterOtpData) => Promise<string | null>;
+  registerWithPhoneOtp: (data: RegisterOtpData) => Promise<void>;
+  registerWithEmailOtp: (data: RegisterOtpData) => Promise<void>;
   verifyRegisterOtp: (
     identifier: string,
     code: string,
@@ -122,9 +122,8 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const requestOtpCode = async (
     phoneNumber: string,
-  ): Promise<string | null> => {
-    const response = await authService.requestOtp(phoneNumber);
-    return response.simulated_otp ?? null;
+  ): Promise<void> => {
+    await authService.requestOtp(phoneNumber);
   };
 
   const loginWithOtp = async (phoneNumber: string, code: string) => {
@@ -142,16 +141,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const registerWithPhoneOtp = async (
     data: RegisterOtpData,
-  ): Promise<string | null> => {
-    const response = await authService.registerRequestOtp("phone", data);
-    return response.simulated_otp ?? null;
+  ): Promise<void> => {
+    await authService.registerRequestOtp("phone", data);
   };
 
   const registerWithEmailOtp = async (
     data: RegisterOtpData,
-  ): Promise<string | null> => {
-    const response = await authService.registerRequestOtp("email", data);
-    return response.simulated_otp ?? null;
+  ): Promise<void> => {
+    await authService.registerRequestOtp("email", data);
   };
 
   const verifyRegisterOtp = async (

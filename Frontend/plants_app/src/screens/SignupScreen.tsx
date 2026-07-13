@@ -54,7 +54,6 @@ const SignupScreen = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [code, setCode] = useState("");
   const [identifier, setIdentifier] = useState("");
-  const [simulatedOtp, setSimulatedOtp] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -64,7 +63,6 @@ const SignupScreen = () => {
 
   const handleMethodChange = (next: SignupMethod) => {
     setMethod(next);
-    setSimulatedOtp(null);
     setError(null);
   };
 
@@ -95,7 +93,6 @@ const SignupScreen = () => {
     }
 
     setError(null);
-    setSimulatedOtp(null);
     setLoading(true);
     try {
       const payload = {
@@ -105,21 +102,17 @@ const SignupScreen = () => {
         password: formData.password,
       };
       if (method === "phone") {
-        const simulatedCode = await registerWithPhoneOtp({
+        await registerWithPhoneOtp({
           ...payload,
           phone: formData.phone.trim(),
         });
         setIdentifier(formData.phone.trim());
-        setSimulatedOtp(simulatedCode);
-        setCode(simulatedCode ?? "");
       } else {
-        const simulatedCode = await registerWithEmailOtp({
+        await registerWithEmailOtp({
           ...payload,
           email: formData.email.trim(),
         });
         setIdentifier(formData.email.trim());
-        setSimulatedOtp(simulatedCode);
-        setCode(simulatedCode ?? "");
       }
       setStep("verify");
     } catch (err: unknown) {
@@ -174,7 +167,7 @@ const SignupScreen = () => {
 
   return (
     <AuthScreenLayout
-      accent="blue"
+      accent="brand"
       icon={<UserPlus size={40} color="white" />}
       title={isEn ? "Create Account" : "ایجاد حساب کاربری"}
       subtitle={
@@ -272,7 +265,7 @@ const SignupScreen = () => {
           )}
 
           <Button
-            variant="blue"
+            variant="primary"
             size="lg"
             isLoading={loading}
             onPress={handleSendCode}
@@ -299,19 +292,12 @@ const SignupScreen = () => {
               ? `Code sent to ${identifier}`
               : `کد به ${identifier} ارسال شد`}
           </Text>
-          {simulatedOtp ? (
-            <Text className="text-sm text-amber-700 dark:text-amber-300 text-center mb-3 font-semibold">
-              {isEn
-                ? `Simulation OTP: ${simulatedOtp}`
-                : `کد شبیه‌سازی: ${simulatedOtp}`}
-            </Text>
-          ) : null}
 
           <OtpInput value={code} onChange={setCode} isEn={isEn} />
 
           <View className="mt-6">
             <Button
-              variant="blue"
+              variant="primary"
               size="lg"
               isLoading={loading}
               onPress={handleVerifyCode}
@@ -325,7 +311,6 @@ const SignupScreen = () => {
             onPress={() => {
               setStep("form");
               setCode("");
-              setSimulatedOtp(null);
               setError(null);
             }}
             className="mt-4 py-3 items-center"
