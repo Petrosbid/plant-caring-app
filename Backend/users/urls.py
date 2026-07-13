@@ -8,6 +8,7 @@ from .views import (
     UserProfileView,
     UserProfilePictureView,
     UserDeleteView, VerifyOTPView, RequestOTPView, RegisterVerifyOTPView, RegisterRequestOTPView,
+    GoogleLoginView, GoogleCallbackView,
 )
 
 urlpatterns = [
@@ -17,6 +18,12 @@ urlpatterns = [
     path('profile/', UserProfileView.as_view(), name='user-profile'),
     path('profile/picture/', UserProfilePictureView.as_view(), name='user-profile-picture'),
     path('profile/delete/', UserDeleteView.as_view(), name='user-delete'),
+    
+    # Google OAuth
+    path('google/login/', GoogleLoginView.as_view(), name='google-login'),
+    path('google/callback', GoogleCallbackView.as_view(), name='google-callback'),
+    path('google/callback/', GoogleCallbackView.as_view()),
+    
     path('ckeditor/', include('ckeditor_uploader.urls')),
     path('api/blog/', include('blog.urls')),
     path('api/otp/request/', RequestOTPView.as_view(), name='otp-request'),

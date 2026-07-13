@@ -5,6 +5,7 @@ import { useAuth } from "../contexts/AuthContext";
 import { useLanguageTheme } from "../contexts/LanguageThemeContext";
 import Register from "./register";
 import ElectricBorder from '../components/animation/ElectricBorder'
+import { API_BASE_URL } from "../services/api";
 
 interface LoginProps {
   navigateTo: (page: string) => void;
@@ -409,6 +410,48 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                 {renderLoginForm()}
               </>
             )}
+
+            <div className="relative my-6">
+              <div className="absolute inset-0 flex items-center">
+                <div className="w-full border-t border-slate-200 dark:border-slate-700"></div>
+              </div>
+              <div className="relative flex justify-center text-sm uppercase">
+                <span className="bg-white dark:bg-slate-800 px-2 text-slate-500 dark:text-slate-400">
+                  {isEn ? "Or" : "یا"}
+                </span>
+              </div>
+            </div>
+
+            <m.button
+              type="button"
+              onClick={() => {
+                window.location.href = `${API_BASE_URL}/auth/google/login/?state=${encodeURIComponent(window.location.origin + window.location.pathname)}`;
+              }}
+              className="w-full py-3 px-4 rounded-xl border border-slate-200 dark:border-slate-700 font-medium text-slate-700 dark:text-slate-200 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/50 flex items-center justify-center gap-3 transition-colors shadow-sm"
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24">
+                <path
+                  fill="#EA4335"
+                  d="M12 5.04c1.66 0 3.2.57 4.38 1.69l3.27-3.27C17.67 1.54 14.98 0 12 0 7.35 0 3.37 2.67 1.43 6.56l3.86 3c.96-2.87 3.65-5 6.71-5z"
+                />
+                <path
+                  fill="#4285F4"
+                  d="M23.49 12.27c0-.81-.07-1.59-.2-2.27H12v4.51h6.46c-.29 1.48-1.14 2.73-2.4 3.58l3.76 2.91c2.2-2.02 3.67-5 3.67-8.73z"
+                />
+                <path
+                  fill="#FBBC05"
+                  d="M5.29 14.56c-.25-.76-.39-1.57-.39-2.41s.14-1.65.39-2.41L1.43 6.56C.52 8.39 0 10.14 0 12s.52 3.61 1.43 5.44l3.86-3z"
+                />
+                <path
+                  fill="#34A853"
+                  d="M12 24c3.24 0 5.97-1.07 7.96-2.91l-3.76-2.91c-1.1.74-2.52 1.18-4.2 1.18-3.06 0-5.75-2.13-6.71-5L1.43 17.4C3.37 21.33 7.35 24 12 24z"
+                />
+              </svg>
+              <span>{isEn ? "Continue with Google" : "ادامه با گوگل"}</span>
+            </m.button>
+
 
             <p className="mt-6 text-center text-sm text-slate-600 dark:text-slate-400">
               {isSignUp

@@ -68,26 +68,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, []);
 
   useEffect(() => {
-    const accessToken = localStorage.getItem("access_token");
-    const refreshToken = localStorage.getItem("refresh_token");
+    const searchParams = new URLSearchParams(window.location.search);
+    const urlAccess = searchParams.get("access");
+    const urlRefresh = searchParams.get("refresh");
 
-    if (accessToken && refreshToken) {
-      const fetchUserProfile = async () => {
-        try {
-          const userData = await authService.getProfile();
-          localStorage.setItem("user", JSON.stringify(userData));
-          setUser(userData);
-          setIsAuthenticated(true);
-        } catch (error) {
-          console.error("Failed to fetch user profile:", error);
-          localStorage.removeItem("access_token");
-          localStorage.removeItem("refresh_token");
-          localStorage.removeItem("user");
-          setUser(null);
-          setIsAuthenticated(false);
-        }
-      };
-      fetchUserProfile();
+    const fetchUserProfile = async (access: string, refresh: string) => {
+      try {
+        localStorage.setItem("access_token", access);
+        localStorage.setItem("refresh_token", refresh);
+        const userData = await authService.getProfile();
+        localStorage.setItem("user", JSON.stringify(userData));
+        setUser(userData);
+        setIsAuthenticated(true);
+      } catch (error) {
+        console.error("Failed to fetch user profile:", error);
+        localStorage.removeItem("access_token");
+        localStorage.removeItem("refresh_token");
+        localStorage.removeItem("user");
+        setUser(null);
+        setIsAuthenticated(false);
+      }
+    };
+
+    if (urlAccess && urlRefresh) {
+      // Clean search parameters from URL without reloading the page
+      const cleanUrl = window.location.pathname + window.location.hash;
+      window.history.replaceState({}, document.title, cleanUrl);
+      fetchUserProfile(urlAccess, urlRefresh);
+    } else {
+      const accessToken = localStorage.getItem("access_token");
+      const refreshToken = localStorage.getItem("refresh_token");
+
+      if (accessToken && refreshToken) {
+        fetchUserProfile(accessToken, refreshToken);
+      }
     }
   }, []);
 

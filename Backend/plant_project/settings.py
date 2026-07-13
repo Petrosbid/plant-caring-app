@@ -305,3 +305,8 @@ SMS_IR_OTP_TEMPLATE_ID = os.getenv('SMS_IR_OTP_TEMPLATE_ID', "YOUR_OTP_TEMPLATE_
 OTP_SIMULATION_MODE = os.getenv('OTP_SIMULATION_MODE', 'True' if DEBUG else 'False') == 'True'
 OPENROUTER_API_KEY = os.getenv('OPENROUTER_API_KEY', 'OPENROUTER_API_KEY')
 GEMINI_API_KEY = os.getenv('GEMINI_API_KEY', 'GEMINI_API_KEY')
+
+# Google OAuth Settings
+GOOGLE_CLIENT_ID = os.getenv('GOOGLE_CLIENT_ID', '470968416969-sc4qbgd3d93598kg0o5em017ae6bkood.apps.googleusercontent.com')
+GOOGLE_CLIENT_SECRET = os.getenv('GOOGLE_CLIENT_SECRET')
+GOOGLE_REDIRECT_URI = os.getenv('GOOGLE_REDIRECT_URI', 'https://django-9yn0pd.cldv.dev/api/auth/google/callback')

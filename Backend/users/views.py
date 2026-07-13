@@ -1,3 +1,7 @@
+import os
+import requests
+from django.shortcuts import redirect
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.cache import cache
 from django.db import IntegrityError
@@ -391,3 +395,115 @@ class RegisterVerifyOTPView(APIView):
             },
             status=200,
         )
+
+
+class GoogleLoginView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        client_id = settings.GOOGLE_CLIENT_ID
+        redirect_uri = settings.GOOGLE_REDIRECT_URI
+        state = request.GET.get('state', 'http://localhost:5173')
+        
+        google_auth_url = (
+            f"https://accounts.google.com/o/oauth2/v2/auth?"
+            f"client_id={client_id}&"
+            f"redirect_uri={redirect_uri}&"
+            f"response_type=code&"
+            f"scope=openid%20email%20profile&"
+            f"state={state}"
+        )
+        return redirect(google_auth_url)
+
+
+class GoogleCallbackView(APIView):
+    permission_classes = [AllowAny]
+
+    def get(self, request):
+        code = request.GET.get('code')
+        state = request.GET.get('state', 'http://localhost:5173')
+        
+        if not code:
+            return Response({'error': 'No code provided'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        client_id = settings.GOOGLE_CLIENT_ID
+        client_secret = settings.GOOGLE_CLIENT_SECRET
+        redirect_uri = settings.GOOGLE_REDIRECT_URI
+        
+        # 1. Exchange auth code for access token
+        token_url = "https://oauth2.googleapis.com/token"
+        data = {
+            'code': code,
+            'client_id': client_id,
+            'client_secret': client_secret,
+            'redirect_uri': redirect_uri,
+            'grant_type': 'authorization_code'
+        }
+        
+        token_response = requests.post(token_url, data=data)
+        if not token_response.ok:
+            return Response({
+                'error': 'Failed to exchange code for token',
+                'details': token_response.json()
+            }, status=status.HTTP_400_BAD_REQUEST)
+            
+        token_data = token_response.json()
+        google_access_token = token_data.get('access_token')
+        
+        # 2. Get user info from Google
+        user_info_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+        headers = {'Authorization': f'Bearer {google_access_token}'}
+        user_info_response = requests.get(user_info_url, headers=headers)
+        
+        if not user_info_response.ok:
+            return Response({'error': 'Failed to fetch user info from Google'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        user_info = user_info_response.json()
+        email = user_info.get('email')
+        first_name = user_info.get('given_name', '')
+        last_name = user_info.get('family_name', '')
+        
+        if not email:
+            return Response({'error': 'No email returned from Google'}, status=status.HTTP_400_BAD_REQUEST)
+            
+        # 3. Find or create user
+        try:
+            user = User.objects.get(email=email)
+        except User.DoesNotExist:
+            username = email.split('@')[0]
+            base_username = username
+            counter = 1
+            while User.objects.filter(username=username).exists():
+                username = f"{base_username}{counter}"
+                counter += 1
+                
+            user = User.objects.create_user(
+                username=username,
+                email=email,
+                first_name=first_name,
+                last_name=last_name,
+            )
+            user.set_unusable_password()
+            user.save()
+            
+        # 4. Generate JWT tokens
+        refresh = RefreshToken.for_user(user)
+        access_token = str(refresh.access_token)
+        refresh_token = str(refresh)
+        
+        # Validate state URL to prevent open redirect vulnerabilities
+        target_redirect = 'http://localhost:5173'
+        if state:
+            is_valid_origin = state.startswith('http://localhost') or state.startswith('http://127.0.0.1')
+            if not is_valid_origin:
+                for origin in getattr(settings, 'CORS_ALLOWED_ORIGINS', []):
+                    if state.startswith(origin):
+                        is_valid_origin = True
+                        break
+            if is_valid_origin:
+                target_redirect = state
+                
+        delimiter = '&' if '?' in target_redirect else '?'
+        final_redirect = f"{target_redirect}{delimiter}access={access_token}&refresh={refresh_token}"
+        return redirect(final_redirect)
+
