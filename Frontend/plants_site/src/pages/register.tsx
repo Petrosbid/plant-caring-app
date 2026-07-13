@@ -238,7 +238,6 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
           setStep("form");
           setCode("");
           setVerifyPassword("");
-          setSimulatedOtp(null);
           setError(null);
         }}
         className="w-full text-center text-sm text-brand-600 dark:text-brand-400"
@@ -256,7 +255,6 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
             <button
               onClick={() => {
                 setMethod("phone");
-                setSimulatedOtp(null);
               }}
               className={`flex-1 py-2 rounded-lg ${method === "phone" ? "bg-brand-500 text-white" : "bg-slate-100 dark:bg-slate-700"}`}
             >
@@ -265,7 +263,6 @@ const Register: React.FC<RegisterProps> = ({ onSuccess }) => {
             <button
               onClick={() => {
                 setMethod("email");
-                setSimulatedOtp(null);
               }}
               className={`flex-1 py-2 rounded-lg ${method === "email" ? "bg-brand-500 text-white" : "bg-slate-100 dark:bg-slate-700"}`}
             >
