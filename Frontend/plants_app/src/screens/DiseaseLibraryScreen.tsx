@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, RefreshControl, TouchableOpacity } from 'react-native';
+import { View, Text, FlatList, RefreshControl, TouchableOpacity, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { ScreenWrapper } from '../components/common/ScreenWrapper';
 import { diseaseService } from '../services/api';
@@ -126,6 +126,11 @@ const DiseaseLibraryScreen = () => {
                 className="mb-6"
               >
                 <Card className="p-5">
+                  {item.image && (
+                    <View className="w-full h-40 rounded-2xl overflow-hidden mb-4">
+                      <Image source={{ uri: item.image }} className="w-full h-full" resizeMode="cover" />
+                    </View>
+                  )}
                   <View className="flex-row justify-between items-start mb-3">
                     <Text className="text-xl font-black text-slate-900 dark:text-white flex-1 mr-2">
                       {name}

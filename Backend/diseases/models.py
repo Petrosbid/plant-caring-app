@@ -24,6 +24,9 @@ class Disease(models.Model):
         ('critical', 'Critical'),
     ], default='medium', help_text="Severity level of the disease")
 
+    image = models.ImageField(upload_to='diseases/', blank=True, null=True, help_text="Disease image")
+    image_url = models.URLField(max_length=500, blank=True, null=True, help_text="Disease image URL")
+
     prevention_methods = models.TextField(blank=True, null=True, help_text="Prevention methods in English")
     prevention_methods_fa = models.TextField(blank=True, null=True, help_text="Prevention methods in Persian")
 

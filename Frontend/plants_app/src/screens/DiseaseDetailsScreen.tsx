@@ -52,8 +52,16 @@ const DiseaseDetailsScreen = () => {
 
   return (
     <ScreenWrapper padding={false}>
-      <View className="relative h-72 w-full bg-red-50 dark:bg-red-900/10 items-center justify-center">
-        <AlertTriangle size={80} color="#ef4444" opacity={0.2} />
+      <View className="relative h-72 w-full bg-red-50 dark:bg-red-900/10 items-center justify-center overflow-hidden">
+        {disease.image ? (
+          <>
+            <Image source={{ uri: disease.image }} className="w-full h-full absolute inset-0" resizeMode="cover" />
+            <View className="absolute inset-0 bg-black/30" />
+            <View className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+          </>
+        ) : (
+          <AlertTriangle size={80} color="#ef4444" opacity={0.2} />
+        )}
         
         <View className="absolute top-12 left-4 z-20">
           <Button 
@@ -70,7 +78,7 @@ const DiseaseDetailsScreen = () => {
           <Badge variant={disease.severity_level === 'critical' || disease.severity_level === 'high' ? 'error' : 'warning'} className="mb-2">
             {isEn ? disease.severity_level : t(`disease.severity.${disease.severity_level}`)}
           </Badge>
-          <Text className="text-3xl font-black text-slate-900 dark:text-white shadow-sm">
+          <Text className={`text-3xl font-black shadow-sm ${disease.image ? 'text-white' : 'text-slate-900 dark:text-white'}`}>
             {name}
           </Text>
         </View>

@@ -170,37 +170,50 @@ const DiseaseDetailsPage: React.FC = () => {
 
         <div className="bg-white/70 dark:bg-slate-800/70 backdrop-blur-sm rounded-3xl shadow-xl border border-white/30 dark:border-slate-700/50 overflow-hidden mb-8">
           <div className="bg-gradient-to-r from-red-500 to-orange-600 px-6 py-8 text-white">
-            <div className="flex justify-between items-start flex-wrap gap-4">
-              <div>
-                <h1 className="text-3xl md:text-4xl font-semibold mb-2">{name}</h1>
-                {disease.name_fa && !isEn && disease.name && (
-                  <p className="text-white/80 text-sm">{disease.name}</p>
-                )}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-center">
+              <div className={disease.image ? "md:col-span-2" : "md:col-span-3"}>
+                <div className="flex justify-between items-start flex-wrap gap-4">
+                  <div>
+                    <h1 className="text-3xl md:text-4xl font-semibold mb-2">{name}</h1>
+                    {disease.name_fa && !isEn && disease.name && (
+                      <p className="text-white/80 text-sm">{disease.name}</p>
+                    )}
+                  </div>
+                  <div className="flex gap-2">
+                    <button
+                      onClick={handleShare}
+                      className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
+                    >
+                      <FiShare2 className="w-5 h-5" />
+                    </button>
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-3 mt-4">
+                  <span className={`px-3 py-1 rounded-full text-sm font-medium ${severityColor}`}>
+                    {isEn ? `Severity: ${disease.severity_level}` : `شدت: ${{
+                      low: 'کم', medium: 'متوسط', high: 'زیاد', critical: 'بحرانی'
+                    }[disease.severity_level]}`}
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20">
+                    {isEn ? `Spread: ${spreadRateLabel}` : `سرایت: ${spreadRateLabel}`}
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 flex items-center gap-1">
+                    <FiEye className="w-4 h-4" /> {disease.view_count.toLocaleString()}
+                  </span>
+                  <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 flex items-center gap-1">
+                    <FiMessageCircle className="w-4 h-4" /> {disease.comment_count || comments.length}
+                  </span>
+                </div>
               </div>
-              <div className="flex gap-2">
-                <button
-                  onClick={handleShare}
-                  className="p-2 rounded-full bg-white/20 hover:bg-white/30 transition"
-                >
-                  <FiShare2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-            <div className="flex flex-wrap gap-3 mt-4">
-              <span className={`px-3 py-1 rounded-full text-sm font-medium ${severityColor}`}>
-                {isEn ? `Severity: ${disease.severity_level}` : `شدت: ${{
-                  low: 'کم', medium: 'متوسط', high: 'زیاد', critical: 'بحرانی'
-                }[disease.severity_level]}`}
-              </span>
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20">
-                {isEn ? `Spread: ${spreadRateLabel}` : `سرایت: ${spreadRateLabel}`}
-              </span>
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 flex items-center gap-1">
-                <FiEye className="w-4 h-4" /> {disease.view_count.toLocaleString()}
-              </span>
-              <span className="px-3 py-1 rounded-full text-sm font-medium bg-white/20 flex items-center gap-1">
-                <FiMessageCircle className="w-4 h-4" /> {disease.comment_count || comments.length}
-              </span>
+              {disease.image && (
+                <div className="md:col-span-1 h-44 rounded-2xl overflow-hidden shadow-lg border border-white/20">
+                  <img
+                    src={disease.image}
+                    alt={name}
+                    className="w-full h-full object-cover"
+                  />
+                </div>
+              )}
             </div>
           </div>
 

@@ -57,36 +57,53 @@ const DiseaseCard: React.FC<{ disease: Disease; language: 'en' | 'fa'; delay?: n
 
   return (
     <FadeContent delay={delay} blur duration={1000} ease="ease-out" initialOpacity={0.1}>
-      <m.div className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 overflow-hidden hover:shadow-card-hover transition-all duration-300 h-full">
-        <Link to={`/disease/${disease.id}`} className="block h-full">
-          <div className="p-5">
-            <div className="flex justify-between items-start gap-2 mb-2">
-              <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white line-clamp-2 flex-1">
-                {name}
-              </h2>
-              <span className={`flex-shrink-0 px-2 py-0.5 rounded-lg text-xs font-semibold ${severityColor}`}>
-                {severityLabel}
-              </span>
+      <m.div className="group bg-white dark:bg-slate-800/80 rounded-2xl shadow-card border border-slate-200/60 dark:border-slate-700/50 overflow-hidden hover:shadow-card-hover transition-all duration-300 h-full flex flex-col">
+        <Link to={`/disease/${disease.id}`} className="block flex-grow">
+          {disease.image ? (
+            <div className="w-full h-40 overflow-hidden relative">
+              <img
+                src={disease.image}
+                alt={name}
+                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
             </div>
-
-            <p className="text-xs italic text-slate-500 dark:text-slate-400 mb-3">
-              {disease.name_fa && !isEn && disease.name}
-            </p>
-
-            <div className="flex flex-wrap gap-1.5 mb-3">
-              <div className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700">
-                <FiActivity className="w-3 h-3" />
-                <span>{spreadLabel}</span>
-              </div>
-              <div className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700">
-                <FiAlertCircle className="w-3 h-3" />
-                <span>{isEn ? 'Infectious' : 'مسری'}: {disease.is_infectious_en === 'yes' ? (isEn ? 'Yes' : 'بله') : (isEn ? 'No' : 'خیر')}</span>
-              </div>
+          ) : (
+            <div className="w-full h-40 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-slate-800 dark:to-slate-700 flex items-center justify-center relative overflow-hidden">
+              <span className="text-4xl text-emerald-400/50 select-none">🍂</span>
+              <div className="absolute inset-0 bg-gradient-to-t from-black/5 to-transparent" />
             </div>
+          )}
+          <div className="p-5 flex flex-col justify-between h-[calc(100%-10rem)]">
+            <div>
+              <div className="flex justify-between items-start gap-2 mb-2">
+                <h2 className="font-display text-lg font-semibold text-slate-900 dark:text-white line-clamp-2 flex-1">
+                  {name}
+                </h2>
+                <span className={`flex-shrink-0 px-2 py-0.5 rounded-lg text-xs font-semibold ${severityColor}`}>
+                  {severityLabel}
+                </span>
+              </div>
 
-            <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2 mb-3">
-              {description?.substring(0, 120)}...
-            </p>
+              <p className="text-xs italic text-slate-500 dark:text-slate-400 mb-3">
+                {disease.name_fa && !isEn && disease.name}
+              </p>
+
+              <div className="flex flex-wrap gap-1.5 mb-3">
+                <div className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700">
+                  <FiActivity className="w-3 h-3" />
+                  <span>{spreadLabel}</span>
+                </div>
+                <div className="flex items-center gap-1 text-xs px-2 py-0.5 rounded-full bg-slate-100 dark:bg-slate-700">
+                  <FiAlertCircle className="w-3 h-3" />
+                  <span>{isEn ? 'Infectious' : 'مسری'}: {disease.is_infectious_en === 'yes' ? (isEn ? 'Yes' : 'بله') : (isEn ? 'No' : 'خیر')}</span>
+                </div>
+              </div>
+
+              <p className="text-slate-600 dark:text-slate-300 text-sm line-clamp-2 mb-3">
+                {description?.substring(0, 120)}...
+              </p>
+            </div>
 
             <div className="flex justify-between items-center text-xs text-slate-500 dark:text-slate-400 mt-2 pt-2 border-t border-slate-100 dark:border-slate-700">
               <span className="flex items-center gap-1"><FiEye className="w-3 h-3" /> {disease.view_count}</span>

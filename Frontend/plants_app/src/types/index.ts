@@ -50,6 +50,8 @@ export interface Plant {
   updated_at: string;
   images?: PlantImage[];
   careInstructions?: CareInstruction[];
+  family?: string | null;
+  origin?: string | null;
 }
 
 export interface CareInstruction {
@@ -129,6 +131,7 @@ export interface Disease {
   is_infectious_en?: string; 
   detected_name?: string;
   confidence?: number;
+  image?: string | null;
 }
 
 export interface DiseaseLLMAnalysis {

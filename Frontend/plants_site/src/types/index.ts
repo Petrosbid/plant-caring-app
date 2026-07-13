@@ -213,6 +213,7 @@ export interface Disease {
   llm_analysis?: DiseaseLLMAnalysis;
   affected_plants_list?: string; 
   is_infectious_en?: string; 
+  image?: string | null;
 }
 
 export interface PaginatedResponse<T> {
