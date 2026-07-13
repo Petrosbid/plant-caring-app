@@ -406,7 +406,7 @@ class GoogleLoginView(APIView):
     def get(self, request):
         client_id = settings.GOOGLE_CLIENT_ID
         redirect_uri = settings.GOOGLE_REDIRECT_URI
-        state = request.GET.get('state', 'http://localhost:5173')
+        state = request.GET.get('state', 'https://verna.cldv.dev')
         
         google_auth_url = (
             f"https://accounts.google.com/o/oauth2/v2/auth?"
@@ -435,7 +435,7 @@ class GoogleCallbackView(APIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         code = request.GET.get('code')
-        state = request.GET.get('state', 'http://localhost:5173')
+        state = request.GET.get('state', 'https://verna.cldv.dev/')
         
         if not code:
             logger.warning("Google Callback invoked without an authorization code or error parameter.")
@@ -507,9 +507,12 @@ class GoogleCallbackView(APIView):
         refresh_token = str(refresh)
         
         # Validate state URL to prevent open redirect vulnerabilities
-        target_redirect = 'http://localhost:5173'
+        target_redirect = 'https://verna.cldv.dev/'
         if state:
-            is_valid_origin = state.startswith('http://localhost') or state.startswith('http://127.0.0.1')
+            is_valid_origin = (
+                state.startswith('https://verna.cldv.dev/') or 
+                state.startswith('plantreactnativeapp://')
+            )
             if not is_valid_origin:
                 for origin in getattr(settings, 'CORS_ALLOWED_ORIGINS', []):
                     if state.startswith(origin):
