@@ -7,8 +7,12 @@ import React, {
   useCallback,
 } from "react";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { authService } from "../services/api";
-import { getAccessToken, clearTokens } from "../utils/tokenStorage";
+import * as WebBrowser from "expo-web-browser";
+import * as Linking from "expo-linking";
+import { authService, API_BASE_URL } from "../services/api";
+import { getAccessToken, clearTokens, saveTokens } from "../utils/tokenStorage";
+
+WebBrowser.maybeCompleteAuthSession();
 import { registerPushNotifications } from "../services/notifications";
 import type { User } from "../types";
 
@@ -39,6 +43,7 @@ interface AuthContextType {
     code: string,
     password?: string,
   ) => Promise<void>;
+  loginWithGoogle: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -180,6 +185,32 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     }
   };
 
+  const loginWithGoogle = async () => {
+    setIsLoading(true);
+    try {
+      const redirectUrl = Linking.createURL("redirect");
+      const authUrl = `${API_BASE_URL}/auth/google/login/?state=${encodeURIComponent(redirectUrl)}`;
+      const result = await WebBrowser.openAuthSessionAsync(authUrl, redirectUrl);
+
+      if (result.type === "success" && result.url) {
+        const parsed = Linking.parse(result.url);
+        const { access, refresh } = parsed.queryParams || {};
+
+        if (access && refresh) {
+          await saveTokens(access as string, refresh as string);
+          await finishAuthSession();
+        } else {
+          throw new Error("Authentication failed: No tokens returned");
+        }
+      }
+    } catch (error) {
+      console.error("Google login failed:", error);
+      throw error;
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   const updateUser = (userData: Partial<User>) => {
     setUserState((prev) => {
       if (!prev) return prev;
@@ -210,6 +241,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
         registerWithPhoneOtp,
         registerWithEmailOtp,
         verifyRegisterOtp,
+        loginWithGoogle,
       }}
     >
       {children}

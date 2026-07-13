@@ -35,7 +35,7 @@ const LoginScreen = () => {
   const { i18n } = useTranslation();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { login, requestOtpCode, loginWithOtp } = useAuth();
+  const { login, requestOtpCode, loginWithOtp, loginWithGoogle } = useAuth();
   const isEn = i18n.language === "en";
 
   const [loginMethod, setLoginMethod] = useState<LoginMethod>("password");
@@ -60,13 +60,21 @@ const LoginScreen = () => {
     resetOtpFlow();
   };
 
-  const handleGoogleSignIn = () => {
-    Alert.alert(
-      isEn ? "Coming Soon" : "به زودی",
-      isEn
-        ? "Google sign-in will be available in a future update."
-        : "ورود با گوگل در به‌روزرسانی بعدی فعال می‌شود.",
-    );
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (err: unknown) {
+      console.error("Google sign-in error:", err);
+      setError(
+        isEn
+          ? "Failed to log in with Google"
+          : "ورود با گوگل با خطا مواجه شد",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handlePasswordLogin = async () => {

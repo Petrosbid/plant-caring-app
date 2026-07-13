@@ -37,7 +37,7 @@ const SignupScreen = () => {
   const { i18n } = useTranslation();
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList>>();
-  const { registerWithPhoneOtp, registerWithEmailOtp, verifyRegisterOtp } =
+  const { registerWithPhoneOtp, registerWithEmailOtp, verifyRegisterOtp, loginWithGoogle } =
     useAuth();
   const isEn = i18n.language === "en";
 
@@ -66,12 +66,21 @@ const SignupScreen = () => {
     setError(null);
   };
 
-  const handleGoogleSignIn = () => {
-    setError(
-      isEn
-        ? "Google sign-up will be available in a future update."
-        : "ثبت‌نام با گوگل در به‌روزرسانی بعدی فعال می‌شود.",
-    );
+  const handleGoogleSignIn = async () => {
+    setError(null);
+    setLoading(true);
+    try {
+      await loginWithGoogle();
+    } catch (err: unknown) {
+      console.error("Google sign-up error:", err);
+      setError(
+        isEn
+          ? "Failed to sign up with Google"
+          : "ثبت‌نام با گوگل با خطا مواجه شد",
+      );
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSendCode = async () => {
