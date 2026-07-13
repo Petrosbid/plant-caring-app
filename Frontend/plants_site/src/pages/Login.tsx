@@ -29,9 +29,15 @@ const ErrorDisplay: React.FC<{ error: string | null }> = ({ error }) => {
 
 const Login: React.FC<LoginProps> = ({ navigateTo }) => {
   const { t } = useLanguageTheme();
-  const { login, register, requestOtpCode, loginWithOtp } = useAuth();
+  const { login, register, requestOtpCode, loginWithOtp, user } = useAuth();
 
   const isEn = t("home") === "Home";
+
+  React.useEffect(() => {
+    if (user) {
+      navigateTo("profile");
+    }
+  }, [user, navigateTo]);
 
   const [isSignUp, setIsSignUp] = useState(false);
   const [loginMethod, setLoginMethod] = useState<"password" | "otp">(
@@ -264,6 +270,7 @@ const Login: React.FC<LoginProps> = ({ navigateTo }) => {
                 : isEn
                   ? "Send Verification Code"
                   : "ارسال کد تایید"}
+            </m.button>
           ) : (
             <>
               <div>
