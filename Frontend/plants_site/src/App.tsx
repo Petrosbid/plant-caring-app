@@ -2,6 +2,7 @@ import { BrowserRouter, Routes, Route, useLocation, useNavigate, Navigate } from
 import { LazyMotion, m, AnimatePresence, domMax } from 'framer-motion';
 import { AuthProvider, useAuth } from './contexts/AuthContext'; // استفاده از useAuth
 import { LanguageThemeProvider, useLanguageTheme } from './contexts/LanguageThemeContext';
+import { Toaster } from 'react-hot-toast';
 import Home from './pages/Home';
 import PlantIdentification from './pages/PlantIdentification';
 import DiseaseDetection from './pages/DiseaseDetection';
@@ -63,7 +64,7 @@ function AnimatedRoutes() {
     return 'home';
   };
 
-  const navigateTo = (page: string) => {
+  const navigateTo = (page: string, params?: Record<string, string>) => {
     const routes: Record<string, string> = {
       'home': '/',
       'identify': '/identify',
@@ -82,7 +83,13 @@ function AnimatedRoutes() {
       'about-us': '/about-us',
       'contact-us': '/contact-us',
     };
-    navigate(routes[page] || '/');
+    let path = routes[page] || '/';
+    if (params) {
+      Object.entries(params).forEach(([key, value]) => {
+        path = path.replace(`:${key}`, value);
+      });
+    }
+    navigate(path);
   };
 
   return (
@@ -133,6 +140,7 @@ function AppContent() {
   return (
     <div className={`${language === 'fa' ? 'font-vazirmatn' : 'font-sans'} flex flex-col min-h-screen bg-surface-light dark:bg-surface-dark text-slate-800 dark:text-slate-100 antialiased`}>
       <AnimatedRoutes />
+      <Toaster position="top-center" />
     </div>
   );
 }

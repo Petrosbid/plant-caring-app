@@ -1,6 +1,7 @@
 // PlantDetailsPage.tsx
 import React, { useState, useEffect, useRef } from 'react';
 import {m, AnimatePresence} from 'framer-motion';
+import toast from 'react-hot-toast';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { Navigation, Pagination, Autoplay } from 'swiper/modules';
 import DOMPurify from 'dompurify';
@@ -131,6 +132,11 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
   const handleGardenToggle = async () => {
     if (!plant || gardenActionLoading) return;
 
+    if (!isLoggedIn) {
+      toast.error(isEn ? 'Please log in to add plants to your garden.' : 'برای افزودن گیاه به باغچه ابتدا باید وارد شوید.');
+      return;
+    }
+
     setGardenActionLoading(true);
     const wasInGarden = isInGarden;
 
@@ -142,15 +148,17 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
       if (wasInGarden && userPlantId) {
         await gardenService.removeUserPlant(userPlantId);
         setUserPlantId(null);
+        toast.success(isEn ? 'Removed from your garden' : 'از باغچه شما حذف شد');
       } else {
         const response = await gardenService.addUserPlant({ plant: plant.id });
         setUserPlantId(response.id);
+        toast.success(isEn ? 'Added to your garden' : 'به باغچه شما اضافه شد');
       }
     } catch (err: any) {
       setIsInGarden(wasInGarden);
       setPlant(prev => prev ? { ...prev, garden_count: prev.garden_count + (wasInGarden ? 1 : -1) } : prev);
       console.error('Garden toggle failed:', err);
-      alert('عملیات با خطا مواجه شد');
+      toast.error(isEn ? 'Failed to update garden' : 'عملیات با خطا مواجه شد');
     } finally {
       setGardenActionLoading(false);
     }
@@ -158,6 +166,11 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
 
   const handleFavoriteToggle = async () => {
     if (!plant || favLoading) return;
+
+    if (!isLoggedIn) {
+      toast.error(isEn ? 'Please log in to add plants to your favorites.' : 'برای علاقه‌مندی به گیاهان ابتدا باید وارد شوید.');
+      return;
+    }
 
     setFavLoading(true);
     const wasFavorited = isFavorited;
@@ -168,13 +181,16 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
     try {
       if (wasFavorited) {
         await favouriteService.removeFavourite(plant.id);
+        toast.success(isEn ? 'Removed from favorites' : 'از علاقه‌مندی‌ها حذف شد');
       } else {
         await favouriteService.addFavourite(plant.id);
+        toast.success(isEn ? 'Added to favorites' : 'به علاقه‌مندی‌ها اضافه شد');
       }
     } catch (err) {
       setIsFavorited(wasFavorited);
       setFavoriteCount(prev => prev + (wasFavorited ? 1 : -1));
       console.error('Favorite toggle failed:', err);
+      toast.error(isEn ? 'Failed to update favorites' : 'خطا در ثبت علاقه‌مندی');
     } finally {
       setFavLoading(false);
     }
@@ -412,7 +428,7 @@ const PlantDetailsPage: React.FC<PlantDetailsPageProps> = ({ plantId, navigateTo
             {relatedPlants.length > 0 ? (
               <div className={styles.relatedGrid}>
                 {relatedPlants.map(rp => (
-                  <button key={rp.id} onClick={() => navigateTo?.('plantDetail', { plantId: String(rp.id) })} className={styles.relatedCard}>
+                  <button key={rp.id} onClick={() => navigateTo?.('plant', { id: String(rp.id) })} className={styles.relatedCard}>
                     {rp.primary_image && <img src={rp.primary_image} alt={rp.farsi_name} className={styles.relatedImage} />}
                     <span className={styles.relatedName}>{isEn ? (rp.english_name || rp.farsi_name) : rp.farsi_name}</span>
                   </button>
