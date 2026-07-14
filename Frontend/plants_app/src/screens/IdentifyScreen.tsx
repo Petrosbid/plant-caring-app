@@ -59,10 +59,11 @@ const IdentifyScreen = () => {
     if (!image) return;
     setLoading(true);
     try {
-      const data = await plantService.identifyPlant(image);
+      const data = await plantService.identifyPlant(image, i18n.language);
       setResult(data);
-    } catch (err) {
-      Alert.alert(isEn ? "Error" : "خطا", isEn ? "Could not identify plant. Try a clearer photo." : "شناسایی انجام نشد. عکس واضح‌تری بگیرید.");
+    } catch (err: any) {
+      const errMsg = err?.message || (isEn ? "Could not identify plant. Try a clearer photo." : "شناسایی انجام نشد. عکس واضح‌تری بگیرید.");
+      Alert.alert(isEn ? "Error" : "خطا", errMsg);
     } finally {
       setLoading(false);
     }

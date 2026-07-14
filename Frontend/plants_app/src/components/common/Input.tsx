@@ -33,17 +33,18 @@ export const Input: React.FC<InputProps> = ({
         </Text>
       )}
       <View className={cn(
-        "flex-row items-center bg-slate-50 dark:bg-slate-800/50 border-2 rounded-2xl px-4",
+        "flex-row items-center h-14 bg-slate-50 dark:bg-slate-800/50 border-2 rounded-2xl px-4",
         error ? "border-red-400" : "border-slate-100 dark:border-slate-700 focus:border-brand-500",
         className
       )}>
         {leftIcon && <View className="me-2">{leftIcon}</View>}
         <TextInput
           className={cn(
-            "flex-1 h-12 text-slate-900 dark:text-white text-sm",
+            "flex-1 h-full text-slate-900 dark:text-white text-sm py-0",
             fontClass,
             "text-start"
           )}
+          style={{ textAlignVertical: 'center' }}
           placeholderTextColor="#94a3b8"
           {...props}
         />

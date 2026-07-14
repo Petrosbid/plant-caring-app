@@ -47,11 +47,11 @@ const PlantIdentification: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const identifiedPlant = await plantService.identifyPlant(selectedFile);
+      const identifiedPlant = await plantService.identifyPlant(selectedFile, language);
       if (identifiedPlant) setResult(identifiedPlant);
       else setError(isEn ? 'Could not identify the plant. Please try another image.' : 'نمی‌توان گیاه را شناسایی کرد. لطفاً تصویر دیگری امتحان کنید.');
-    } catch (err) {
-      setError(isEn ? 'An error occurred while identifying the plant. Please try again.' : 'هنگام شناسایی گیاه خطایی رخ داد. لطفاً دوباره امتحان کنید.');
+    } catch (err: any) {
+      setError(err.message || (isEn ? 'An error occurred while identifying the plant. Please try again.' : 'هنگام شناسایی گیاه خطایی رخ داد. لطفاً دوباره امتحان کنید.'));
       console.error(err);
     } finally {
       setIsLoading(false);

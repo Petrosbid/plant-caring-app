@@ -96,8 +96,9 @@ export const OtpInput: React.FC<OtpInputProps> = ({
                     initial={{ scale: 0.3, opacity: 0 }}
                     animate={{ scale: 1, opacity: 1 }}
                     transition={{ type: 'spring', stiffness: 500 }}
+                    className="items-center justify-center"
                   >
-                    <Text className="text-2xl font-bold text-slate-900 dark:text-white">
+                    <Text className="text-2xl font-bold text-slate-900 dark:text-white text-center" style={{ textAlign: 'center' }}>
                       {digit.trim()}
                     </Text>
                   </MotionL.View>

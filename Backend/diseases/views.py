@@ -79,6 +79,20 @@ class DiseaseDiagnoseView(APIView):
         disease_details = prediction_result.get('details')
         confidence = prediction_result.get('confidence')
 
+        if confidence is not None:
+            try:
+                conf_val = float(confidence)
+                if conf_val <= 60:
+                    lang = request.query_params.get('lang') or request.headers.get('Accept-Language', 'en')
+                    if 'fa' in lang.lower():
+                        err_msg = 'کیفیت عکس شما مناسب نیست. لطفاً عکس بهتر و واضح‌تری گرفته و دوباره تلاش کنید.'
+                    else:
+                        err_msg = 'Your photo is not good enough. Please take a clearer, better photo and try again.'
+                    return Response({'error': err_msg}, status=status.HTTP_400_BAD_REQUEST)
+            except (ValueError, TypeError):
+                pass
+
+
         if disease_id is None:
             if disease_name == 'Healthy':
                 return Response({

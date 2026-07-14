@@ -1,5 +1,5 @@
 import React from 'react';
-import { Pressable } from 'react-native';
+import { Pressable, View } from 'react-native';
 import { AppText as Text } from './AppText';
 import { Motion as _Motion } from '@legendapp/motion';
 import { cn } from '../../utils/cn';
@@ -70,16 +70,25 @@ export const Button: React.FC<ButtonProps> = ({
           color={variant === 'outline' || variant === 'ghost' ? '#16a34a' : 'white'} 
         />
       ) : (
-        <Text className={cn(
-          textSizes[size],
-          variant === 'primary' || variant === 'danger' || variant === 'success' ? 'text-white' : '',
-          variant === 'outline' && 'text-brand-500',
-          variant === 'secondary' && 'text-slate-800 dark:text-slate-200',
-          variant === 'ghost' && 'text-slate-600 dark:text-slate-400'
-        )}>
-          {children}
-        </Text>
-        )}
+        <View className="flex-row items-center justify-center gap-2">
+          {React.Children.map(children, child => {
+            if (typeof child === 'string' || typeof child === 'number') {
+              return (
+                <Text className={cn(
+                  textSizes[size],
+                  variant === 'primary' || variant === 'danger' || variant === 'success' ? 'text-white' : '',
+                  variant === 'outline' && 'text-brand-500',
+                  variant === 'secondary' && 'text-slate-800 dark:text-slate-200',
+                  variant === 'ghost' && 'text-slate-600 dark:text-slate-400'
+                )}>
+                  {child}
+                </Text>
+              );
+            }
+            return child;
+          })}
+        </View>
+      )}
         </MotionL.Pressable>
         );
         };

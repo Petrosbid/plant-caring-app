@@ -81,7 +81,6 @@ that follows the structure below.
 
 **is_toxic** true or false (must be lowercase json booleans)
 
-**image_url** a high quality of plant and landscape image URL. 
 
 ---
 
@@ -113,7 +112,6 @@ that follows the structure below.
     "is_toxic": True/False,
     "other_names" : اسامی معروف و عامه دیگر گیاه,
     "other_names_en" : اسامی معروف و عامه دیگر گیاه به انگلیسی
-    "image_url": url of the image
 }
 
 Return ONLY the raw JSON object.
@@ -189,36 +187,6 @@ Return ONLY the raw JSON object.
                 salvaged_data['is_toxic'] = 'false' not in content.lower()
             return salvaged_data
         return None
-
-
-def save_plant_image_from_url(plant, image_url):
-    if not image_url or not image_url.startswith(('http://', 'https://')):
-        return
-    if plant.images.exists():
-        return
-    try:
-        import os
-        import requests
-        from django.core.files.base import ContentFile
-        from urllib.parse import urlparse
-        from .models import PlantImage
-        
-        response = requests.get(image_url, timeout=10)
-        if response.status_code == 200:
-            parsed_url = urlparse(image_url)
-            file_name = os.path.basename(parsed_url.path)
-            if not file_name or '.' not in file_name:
-                file_name = f"plant_{plant.id}.jpg"
-            
-            plant_image = PlantImage(
-                plant=plant,
-                is_primary=True,
-                caption=f"Image for {plant.farsi_name}"
-            )
-            plant_image.image.save(file_name, ContentFile(response.content), save=True)
-            print(f"Successfully downloaded and saved image for plant {plant.farsi_name}")
-    except Exception as e:
-        print(f"Failed to download and save plant image from {image_url}: {e}")
 
 
 def create_or_update_plant_from_llm(plant_name):
@@ -311,9 +279,6 @@ def create_or_update_plant_from_llm(plant_name):
             plant.other_names_en = plant_info.get('other_names_en', plant.other_names_en)
             plant.save()
 
-        image_url = plant_info.get('image_url')
-        if image_url:
-            save_plant_image_from_url(plant, image_url)
 
         return plant
 

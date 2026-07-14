@@ -14,7 +14,7 @@ import type {
   UserPlant,
 } from "../types";
 
-export const API_BASE_URL = "https://django-9yn0pd.cldv.dev/api";
+export const API_BASE_URL = "https://django-jhkzd0.cldv.dev/api";
 export const BLOG_API_BASE_URL = `${API_BASE_URL}/blog`;
 export const BLOG_SHARE_BASE_URL = API_BASE_URL.replace("/api", "");
 
@@ -363,7 +363,7 @@ export const plantService = {
     return response.json();
   },
 
-  identifyPlant: async (imageUri: string): Promise<Plant> => {
+  identifyPlant: async (imageUri: string, lang = "en"): Promise<Plant> => {
     const formData = new FormData();
     // @ts-ignore
     formData.append("image", {
@@ -372,7 +372,7 @@ export const plantService = {
       type: "image/jpeg",
     });
     const response = await authenticatedFetch(
-      `${API_BASE_URL}/plants/identify/`,
+      `${API_BASE_URL}/plants/identify/?lang=${lang}`,
       {
         method: "POST",
         body: formData,
@@ -380,7 +380,7 @@ export const plantService = {
     );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || "Plant identification failed");
+      throw new Error(errorData.error || errorData.detail || "Plant identification failed");
     }
     return response.json();
   },
@@ -432,7 +432,7 @@ export const diseaseService = {
     return response.json();
   },
 
-  diagnoseDisease: async (imageUri: string): Promise<Disease> => {
+  diagnoseDisease: async (imageUri: string, lang = "en"): Promise<Disease> => {
     const formData = new FormData();
     // @ts-ignore
     formData.append("image", {
@@ -441,7 +441,7 @@ export const diseaseService = {
       type: "image/jpeg",
     });
     const response = await authenticatedFetch(
-      `${API_BASE_URL}/diseases/diagnose/`,
+      `${API_BASE_URL}/diseases/diagnose/?lang=${lang}`,
       {
         method: "POST",
         body: formData,
@@ -449,7 +449,7 @@ export const diseaseService = {
     );
     if (!response.ok) {
       const errorData = await response.json().catch(() => ({}));
-      throw new Error(errorData.detail || "Disease diagnosis failed");
+      throw new Error(errorData.error || errorData.detail || "Disease diagnosis failed");
     }
     return response.json();
   },

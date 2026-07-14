@@ -14,7 +14,7 @@ import type { PostListItem, PostDetail, BlogComment } from "../types/blog";
 import axios from "axios";
 
 // Base API URL - points to your backend
-export const API_BASE_URL = "https://django-9yn0pd.cldv.dev/api";
+export const API_BASE_URL = "https://django-jhkzd0.cldv.dev/api";
 export const BLOG_API_BASE_URL = `${API_BASE_URL}/blog`;
 
 // Create axios instance for blog API with error handling
@@ -389,10 +389,10 @@ export const plantService = {
     return response.json();
   },
 
-  identifyPlant: async (imageFile: File): Promise<Plant> => {
+  identifyPlant: async (imageFile: File, lang = "en"): Promise<Plant> => {
     const formData = new FormData();
     formData.append("image", imageFile);
-    const response = await fetch(`${API_BASE_URL}/plants/identify/`, {
+    const response = await fetch(`${API_BASE_URL}/plants/identify/?lang=${lang}`, {
       method: "POST",
       headers: getFileUploadHeaders() as HeadersInit,
       body: formData,
@@ -435,10 +435,10 @@ export const diseaseService = {
     return response.json();
   },
 
-  detectDisease: async (imageFile: File): Promise<Disease> => {
+  detectDisease: async (imageFile: File, lang = "en"): Promise<Disease> => {
     const formData = new FormData();
     formData.append("image", imageFile);
-    const response = await fetch(`${API_BASE_URL}/diseases/diagnose/`, {
+    const response = await fetch(`${API_BASE_URL}/diseases/diagnose/?lang=${lang}`, {
       method: "POST",
       headers: getFileUploadHeaders() as HeadersInit,
       body: formData,

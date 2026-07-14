@@ -43,10 +43,11 @@ const DiseaseCheckScreen = () => {
     if (!image) return;
     setLoading(true);
     try {
-      const data = await diseaseService.diagnoseDisease(image);
+      const data = await diseaseService.diagnoseDisease(image, i18n.language);
       setResult(data);
-    } catch (err) {
-      Alert.alert(isEn ? "Error" : "خطا", isEn ? "Could not diagnose symptoms. Try a closer shot of the leaves." : "تشخیص انجام نشد. از برگ‌ها عکس نزدیک‌تری بگیرید.");
+    } catch (err: any) {
+      const errMsg = err?.message || (isEn ? "Could not diagnose symptoms. Try a closer shot of the leaves." : "تشخیص انجام نشد. از برگ‌ها عکس نزدیک‌تری بگیرید.");
+      Alert.alert(isEn ? "Error" : "خطا", errMsg);
     } finally {
       setLoading(false);
     }

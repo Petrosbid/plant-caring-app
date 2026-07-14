@@ -46,11 +46,11 @@ const DiseaseDetection: React.FC = () => {
     setIsLoading(true);
     setError(null);
     try {
-      const detected = await diseaseService.detectDisease(selectedFile);
+      const detected = await diseaseService.detectDisease(selectedFile, language);
       if (detected) setResult(detected);
       else setError(isEn ? 'No disease detected or could not analyze the image.' : 'هیچ بیماری شناسایی نشد یا نمی‌توان تصویر را تحلیل کرد.');
-    } catch (err) {
-      setError(isEn ? 'An error occurred while scanning for diseases.' : 'هنگام اسکن بیماری‌ها خطایی رخ داد.');
+    } catch (err: any) {
+      setError(err.message || (isEn ? 'An error occurred while scanning for diseases.' : 'هنگام اسکن بیماری‌ها خطایی رخ داد.'));
       console.error(err);
     } finally {
       setIsLoading(false);
